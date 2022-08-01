@@ -1,10 +1,15 @@
+from collections import namedtuple
+
 SIDES: set[str] = {"ant", "con"}
 
-class Proposition:
+tupseq = namedtuple("tupseq", ["ant", "con"])
+
+
+class Proposition: 
     """
     Base class for propositions.
     """
-    
+
     def __init__(self, *args):
         self.content = [arg for arg in args]
         if len(self.content) != self.arity:
@@ -42,8 +47,7 @@ class Proposition:
     def __le__(self, other):
         return self < other or self == other
 
-    def decomposed(self, side)\
-            -> tuple[tuple[list["Proposition"], list["Proposition"]]]:
+    def decomposed(self, side) -> tuple[tupseq]:
         """
         Return results of decomposing an instance of the current
         proposition on input side.
@@ -87,11 +91,11 @@ class Negation(Proposition):
     def __str__(self) -> str:
         return f"(~{self.content[0]})"
 
-    def decomposed(self, side) -> tuple[tuple[list[Proposition], list[Proposition]]]:
+    def decomposed(self, side) -> tuple[tupseq]:
         assert side in SIDES
         if side == "ant":
-            return ([], [self.content[0]]),
-        return ([self.content[0]], []),
+            return tupseq([], [self.content[0]]),
+        return tupseq([self.content[0]], []),
 
 class Conjunction(Proposition):
     """
@@ -106,11 +110,11 @@ class Conjunction(Proposition):
         return f"({self.content[0]} & {self.content[1]})"
     
 
-    def decomposed(self, side) -> tuple[tuple[list[Proposition], list[Proposition]]]:
+    def decomposed(self, side) -> tuple[tupseq]:
         assert side in SIDES
         if side == "ant":
-            return (self.content, []),
-        return ([], [self.content[0]]), ([], [self.content[1]])
+            return tupseq(self.content, []),
+        return tupseq([], [self.content[0]]), tupseq([], [self.content[1]])
 
 
 class Conditional(Proposition):
@@ -125,11 +129,11 @@ class Conditional(Proposition):
     def __str__(self) -> str:
         return f"({self.content[0]} -> {self.content[1]})"
     
-    def decomposed(self, side) -> tuple[tuple[list[Proposition], list[Proposition]]]:
+    def decomposed(self, side) -> tuple[tupseq]:
         assert side in SIDES
         if side == "ant":
-            return ([], [self.content[0]]), ([self.content[1]], [])
-        return ([self.content[0]], [self.content[1]]),
+            return tupseq([], [self.content[0]]), tupseq([self.content[1]], [])
+        return tupseq([self.content[0]], [self.content[1]]),
 
 
 class Disjunction(Proposition):
@@ -144,10 +148,9 @@ class Disjunction(Proposition):
     def __str__(self) -> str:
         return f"({self.content[0]} v {self.content[1]})"
     
-    def decomposed(self, side) -> tuple[tuple[list[Proposition], list[Proposition]]]:
+    def decomposed(self, side) -> tuple[tupseq]:
         assert side in SIDES
         if side == "ant":
-            return ([self.content[0]], []), ([self.content[1]], [])
-        return ([], self.content),
-
+            return tupseq([self.content[0]], []), tupseq([self.content[1]], [])
+        return tupseq([], self.content),
 

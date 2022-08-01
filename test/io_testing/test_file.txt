@@ -1,0 +1,3 @@
+this is line one
+I've added a line two to test line breaks
+here's a bunch of special escaped characters \\ \t \" \' \/

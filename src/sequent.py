@@ -1,3 +1,6 @@
+from typing import Union
+from copy import deepcopy
+
 class Sequent:
     side_strings: set = {"ant", "con"}
 
@@ -11,11 +14,13 @@ class Sequent:
         if self.__class__ == other.__class__:
             for side in ("ant", "con"):
                 if sorted(getattr(self, side)) != sorted(getattr(other, side)):
-                    return False
-        return True
+                    break
+            else:
+                return True
+        return False
 
     def __ne__(self, other) -> bool:
-        return self != other
+        return not (self == other)
     
     @property
     def complexity(self) -> int:
@@ -36,9 +41,21 @@ class Sequent:
             raise self.SequentIsAtomicError(self)       
         prop, side = self.first_complex_prop()
         getattr(self, side).remove(prop)
-        result_of_decomposition:\
-            tuple[list["Proposition"], [list["Proposition"]]] = prop.decomposed(side)
-        
+        decomposed_proposition: "tupseq" = prop.decomposed(side)
+        sequents = []
+        for result in decomposed_proposition:
+            copy = deepcopy(self)
+            sequents.append(copy.mix(result))
+        return sequents
+    
+    def mix(self, other: Union["Sequent", "tupseq"]) -> "Sequent":
+        """
+        Return a combination of self and other. Other can be a sequent
+        or tupseq (or any object with .ant and .con properties).
+        """
+        new_ant = self.ant + other.ant
+        new_con = self.con + other.con
+        return Sequent(new_ant, new_con)
         
     def first_complex_prop(self) -> "Proposition":
         """
