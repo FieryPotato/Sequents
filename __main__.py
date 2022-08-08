@@ -4,13 +4,6 @@ import os
 from pathlib import Path
 
 
-#cmd         solve infile [outfile]
-#            -   decompose sequents in infile and export the results to
-
-#            outfile (if given) or infile_results.json  
-#            
-#            print file
-#            -   prints trees from file
 cmd_help = \
     "solve infile [outfile]\n"\
     "-   decompose sequents in infile and export the results to\n"\
@@ -18,16 +11,6 @@ cmd_help = \
     " \n"\
     "print file\n"\
     "-   prints trees from file"
-
-
-#help_text = f"""usage: Sequents.py [-h] [cmd ...]
-#
-#positional arguments: 
-#{cmd_help}
-#
-#options:
-#-h,  --h    show this help message and exit
-#"""
 
 
 def main():
