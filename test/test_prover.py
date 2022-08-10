@@ -2,6 +2,8 @@ import os
 import unittest
 
 from src.prover import Prover
+from src.sequent import Sequent
+from src.proposition import Atom
 
 
 EMPTY_TEST = 'test/io_testing/empty_test.txt'
@@ -44,12 +46,19 @@ class TestProverIO(unittest.TestCase):
         self.assertTrue(os.path.exists(self.test_out))
 
     def test_outfile_saves_prover_content(self) -> None:
-        out_contents = "Testing output contents."
+        out_contents = 'Testing output contents.'
         self.prover.outfile = self.test_out
         self.prover.contents = out_contents
         self.prover.export_()
         with open(self.test_out, 'r') as file:
             self.assertEqual(file.read(), self.prover.contents)
+
+#    def test_prover_imports_propositions(self) -> None:
+#        string = 'The cat is on the mat'
+#        import_file = 'test/io_testing/propositions.txt'
+#        expected = Sequent([Atom('The cat is on the mat')], [Atom('The cat is on the mat')])
+#        self.prover.import_(import_file, outfile=self.test_out)
+#        self.assertEqual([expected], self.prover.contents)
 
 
 if __name__ == '__main__':
