@@ -1,9 +1,13 @@
+import re
+
 from abc import ABC, abstractmethod
 from collections import namedtuple
 
 SIDES: set[str] = {'ant', 'con'}
 
 tupseq = namedtuple('tupseq', ['ant', 'con'])
+RE_BINARY = re.compile(r'(.+)( and | \& | -\> | or | v )(.+)')
+RE_IF = re.compile(r'(if )(.+)( then )(.+)')
 
 
 class Proposition(ABC): 
@@ -60,6 +64,42 @@ class Proposition(ABC):
         def __init__(self, proposition):
             msg = f'{proposition} is an atom and cannot be decomposed.'
             super().__init__(msg)
+
+    @classmethod
+    def from_string(cls, string) -> 'Proposition':
+        '''
+        Convert input string into the appropriate proposition type.
+        '''
+        if re_result := re.match(RE_BINARY, string):
+            return cls.format_binary(re_result)
+        elif re_result := re.match(RE_IF, string):
+            return cls.format_verbose_if(re_result)
+        else:
+            return Atom(string)
+
+    @staticmethod
+    def format_binary(regex_match: re.Match) -> 'Proposition':
+        '''
+        Convert a string matched by RE_BINARY into the proposition
+        it contains.
+        '''
+        match regex_match.groups():
+            case [left, ' and ' | ' & ', right]:
+                return Conjunction(Atom(left), Atom(right))
+            case [antecedent, ' -> ', consequent]:
+                return Conditional(Atom(antecedent), Atom(consequent))
+            case [left, ' or ' | ' v ', right]:
+                return Disjunction(Atom(left), Atom(right))
+
+    @staticmethod
+    def format_verbose_if(regex_match: re.Match) -> 'Proposition':
+        '''
+        Convert a string matched by RE_IF into the conditional it 
+        contains.
+        '''
+        if_, antecedent, then_, consequent = regex_match.groups()
+        return Conditional(Atom(antecedent), Atom(consequent))
+
 
 
 class BinaryProposition(Proposition):
