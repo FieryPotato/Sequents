@@ -34,6 +34,10 @@ class TestUnary(unittest.TestCase):
         self.a1 = Atom("p1")
         self.n1 = Negation(self.a1)
         self.n2 = Negation(self.n1)
+
+    def test_creating_prop_with_string_raises_error(self) -> None:
+        with self.assertRaises(TypeError):
+            n = Negation('word')
         
     def test_putting_more_than_one_prop_in_negation_raises_vaule_error(self) -> None:
         with self.assertRaises(ValueError):
@@ -83,6 +87,18 @@ class TestBinary(unittest.TestCase):
     def test_arity_is_2(self) -> None:
         for prop in (self.cj1, self.cd1, self.dj1): 
             self.assertEqual(2, prop.arity)
+
+    def test_creating_connective_with_improper_number_of_values_raises_value_error(self) -> None:
+        for t in Conjunction, Disjunction, Conditional:
+            with self.assertRaises(ValueError):
+                t(self.a1)
+            with self.assertRaises(ValueError):
+                t(self.a1, self.a2, self.a1)
+
+    def test_creating_connective_with_improper_type_raises_type_error(self) -> None:
+        for t in Conjunction, Disjunction, Conditional:
+            with self.assertRaises(TypeError):
+                t('oh no', 'errors')
    
     def test__complexity_is_one_plus_greatest_content_complexity(self) -> None:
         for propset in (self.conjunctions, self.conditionals, self.disjunctions):
