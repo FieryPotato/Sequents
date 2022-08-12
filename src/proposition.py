@@ -1,14 +1,9 @@
-import re
-
 from abc import ABC, abstractmethod
 from collections import namedtuple
 
 SIDES: set[str] = {'ant', 'con'}
 
 tupseq = namedtuple('tupseq', ['ant', 'con'])
-RE_BINARY = re.compile(r'(.+)( and | \& | implies | -\> | or | v )(.+)')
-RE_NOT = re.compile(r'(not |~ )(.+)')
-
 
 def deparenthesize(string: str) -> str:
     '''
@@ -104,29 +99,54 @@ class Proposition(ABC):
         Convert input string into the appropriate proposition type.
         '''
         string = deparenthesize(string)
-        if re_result := re.match(RE_BINARY, string):
-            return cls.format_binary(re_result)
-        elif re_result := re.match(RE_NOT, string):
-            return cls.format_not(re_result)
-        else:
-            return Atom(string)
+        broken_string: list[str] = cls.find_connective(string)
 
     @staticmethod
-    def format_binary(regex_match: re.Match) -> 'Proposition':
+    def find_connective(string: str) -> list[str]:
+        '''
+        Return a list of strings separating the connective from 
+        surrounding propositional material.
+
+        >>> Proposition.find_connective('A & B')
+        ['A', '&', 'B']
+        >>> Proposition.find_connective('not C')
+        ['not', 'C']
+        >>> Proposition.find_connective('anything')
+        ['anything']
+        '''
+        negations = {'~', 'not'}
+        binaries = {'&', 'v', 'and', 'or', '->', 'implies'}
+        word_list = string.split(' ')
+        if word_list[0] in negations:
+            sub_prop = ' '.join(word_list[1:])
+            return [word_list[0], deparenthesize(sub_prop)]
+        for i, word in enumerate(word_list):
+            if word in binaries:
+                l = ' '.join(word_list[:i])
+                r = ' '.join(word_list[i+1:])
+                return [l, word, r]
+        return [string]
+
+        
+    @staticmethod
+    def format_binary(match_list: list[str]) -> 'Proposition':
         '''
         Convert a string matched by RE_BINARY into the proposition
         it contains.
         '''
         match regex_match.groups():
             case [left, ' and ' | ' & ', right]:
-                return Conjunction(Atom(left), Atom(right))
+                return Conjunction(
+                    Proposition.from_string(left),
+                    Proposition.from_string(right)
+                )
             case [antecedent, ' implies ' |  ' -> ', consequent]:
                 return Conditional(Atom(antecedent), Atom(consequent))
             case [left, ' or ' | ' v ', right]:
                 return Disjunction(Atom(left), Atom(right))
 
     @staticmethod
-    def format_not(regex_match: re.Match) -> 'Proposition':
+    def format_not(match_list: list[str]) -> 'Proposition':
         '''
         Convert a string matched by RE_NOT into the negation it 
         contains.
