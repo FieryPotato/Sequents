@@ -13,6 +13,9 @@ class TestConversion(unittest.TestCase):
     conjunction = Conjunction(bin_atom_0, bin_atom_1) 
     conditional = Conditional(bin_atom_0, bin_atom_1) 
     disjunction = Disjunction(bin_atom_0, bin_atom_1) 
+    comp_conj = Conjunction(conjunction, conjunction)
+    comp_cond = Conditional(conditional, conditional)
+    comp_disj = Disjunction(disjunction, disjunction)
 
     def test_atom(self):
         string = self.un_test
@@ -51,13 +54,13 @@ class TestConversion(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_conditional_words_simple_no_parens(self):
-        string = 'if {} then {}'.format(*self.bin_test)
+        string = ' implies '.join(self.bin_test)
         expected = self.conditional
         actual = Proposition.from_string(string)
         self.assertEqual(expected, actual)
     
     def test_conditional_words_parens(self):
-        string = '(if {} then {})'.format(*self.bin_test)
+        string = '(' + ' implies '.join(self.bin_test) + ')'
         expected = self.conditional
         actual = Proposition.from_string(string)
         self.assertEqual(expected, actual)

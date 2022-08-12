@@ -6,8 +6,7 @@ from collections import namedtuple
 SIDES: set[str] = {'ant', 'con'}
 
 tupseq = namedtuple('tupseq', ['ant', 'con'])
-RE_BINARY = re.compile(r'(.+)( and | \& | -\> | or | v )(.+)')
-RE_IF = re.compile(r'(if )(.+)( then )(.+)')
+RE_BINARY = re.compile(r'(.+)( and | \& | implies | -\> | or | v )(.+)')
 RE_NOT = re.compile(r'(not |~ )(.+)')
 
 
@@ -107,8 +106,6 @@ class Proposition(ABC):
         string = deparenthesize(string)
         if re_result := re.match(RE_BINARY, string):
             return cls.format_binary(re_result)
-        elif re_result := re.match(RE_IF, string):
-            return cls.format_verbose_if(re_result)
         elif re_result := re.match(RE_NOT, string):
             return cls.format_not(re_result)
         else:
@@ -123,19 +120,10 @@ class Proposition(ABC):
         match regex_match.groups():
             case [left, ' and ' | ' & ', right]:
                 return Conjunction(Atom(left), Atom(right))
-            case [antecedent, ' -> ', consequent]:
+            case [antecedent, ' implies ' |  ' -> ', consequent]:
                 return Conditional(Atom(antecedent), Atom(consequent))
             case [left, ' or ' | ' v ', right]:
                 return Disjunction(Atom(left), Atom(right))
-
-    @staticmethod
-    def format_verbose_if(regex_match: re.Match) -> 'Proposition':
-        '''
-        Convert a string matched by RE_IF into the conditional it 
-        contains.
-        '''
-        if_, antecedent, then_, consequent = regex_match.groups()
-        return Conditional(Atom(antecedent), Atom(consequent))
 
     @staticmethod
     def format_not(regex_match: re.Match) -> 'Proposition':
