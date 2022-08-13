@@ -5,38 +5,6 @@ SIDES: set[str] = {'ant', 'con'}
 
 tupseq = namedtuple('tupseq', ['ant', 'con'])
 
-def deparenthesize(string: str) -> str:
-    '''
-    Remove all linked outer parentheses from input string.
-    
-    >>> deparenthesize('(one set)')
-    'one set'
-    >>> deparenthesize('((two sets))')
-    'two sets'
-    >>> deparenthesize('(nested (sets))')
-    'nested (sets)'
-    >>> deparenthesize('(unconnected) (sets)')
-    '(unconnected) (sets)'
-    '''
-    nest_map = {'(': 1, ')': -1}
-    # While string is bookended by parentheses.
-    while string[0] == '(' and string[-1] == ')':
-        nestedness = 0
-        for i, char in enumerate(string):
-
-            # nestedness += 1 for each '('
-            # nestedness -= 1 for each ')'
-            # no change for any other character
-            nestedness += nest_map[char] if char in nest_map else 0
-
-            # If the first and last parentheses are not connected
-            if nestedness <= 0 and ((i + 1) < len(string)):
-                return string
-        else:
-            string = string[1:-1]
-                
-    return string
-
 
 class Proposition(ABC): 
     '''
@@ -93,66 +61,6 @@ class Proposition(ABC):
             msg = f'{proposition} is an atom and cannot be decomposed.'
             super().__init__(msg)
 
-    @classmethod
-    def from_string(cls, string) -> 'Proposition':
-        '''
-        Convert input string into the appropriate proposition type.
-        '''
-        string = deparenthesize(string)
-        broken_string: list[str] = cls.find_connective(string)
-
-    @staticmethod
-    def find_connective(string: str) -> list[str]:
-        '''
-        Return a list of strings separating the connective from 
-        surrounding propositional material.
-
-        >>> Proposition.find_connective('A & B')
-        ['A', '&', 'B']
-        >>> Proposition.find_connective('not C')
-        ['not', 'C']
-        >>> Proposition.find_connective('anything')
-        ['anything']
-        '''
-        negations = {'~', 'not'}
-        binaries = {'&', 'v', 'and', 'or', '->', 'implies'}
-        word_list = string.split(' ')
-        if word_list[0] in negations:
-            sub_prop = ' '.join(word_list[1:])
-            return [word_list[0], deparenthesize(sub_prop)]
-        for i, word in enumerate(word_list):
-            if word in binaries:
-                l = ' '.join(word_list[:i])
-                r = ' '.join(word_list[i+1:])
-                return [l, word, r]
-        return [string]
-
-        
-    @staticmethod
-    def format_binary(match_list: list[str]) -> 'Proposition':
-        '''
-        Convert a string matched by RE_BINARY into the proposition
-        it contains.
-        '''
-        match regex_match.groups():
-            case [left, ' and ' | ' & ', right]:
-                return Conjunction(
-                    Proposition.from_string(left),
-                    Proposition.from_string(right)
-                )
-            case [antecedent, ' implies ' |  ' -> ', consequent]:
-                return Conditional(Atom(antecedent), Atom(consequent))
-            case [left, ' or ' | ' v ', right]:
-                return Disjunction(Atom(left), Atom(right))
-
-    @staticmethod
-    def format_not(match_list: list[str]) -> 'Proposition':
-        '''
-        Convert a string matched by RE_NOT into the negation it 
-        contains.
-        '''
-        not_, proposition = regex_match.groups()
-        return Negation(Atom(proposition))
 
 class BinaryProposition(Proposition):
     '''
