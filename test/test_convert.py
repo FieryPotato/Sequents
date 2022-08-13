@@ -21,9 +21,9 @@ class TestConversion(unittest.TestCase):
     comp_neg = Negation(negation)
 
     def complex(self, connective: str) -> str:
-        '''
+        """
         Helper function to generate complex propositions.
-        '''
+        """
         string = '({g} {c} {b}) {c} ({g} {c} {b})'
         return string.format(g=self.bin_test[0], b=self.bin_test[1], c=connective)
 

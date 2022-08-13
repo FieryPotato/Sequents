@@ -5,9 +5,9 @@ class Prover:
         self.outfile: str | None = None
 
     def import_(self, path: str, outfile=None) -> None:
-        '''
+        """
         Import contents of file to self and sets output file.
-        '''
+        """
         self.infile = path
         with open(path, 'r') as file:
             #self.contents = self.parse_file(file)
@@ -18,17 +18,17 @@ class Prover:
             self.outfile = outfile
 
     def export_(self) -> None:
-        '''
+        """
         Export self.contents to the outfile.
-        '''
+        """
         with open(self.outfile, 'w') as file:
             file.write(str(self.contents))
 
 #    def parse_file(self, file):
-#        '''
+#        """
 #        Return the contents of param file converted to sequents or
 #        trees.
-#        '''
+#        """
 #        match Path(file.name).stem:
 #            case '.txt':
 #                lines = file.readlines()

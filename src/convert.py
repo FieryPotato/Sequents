@@ -5,7 +5,7 @@ NEST_MAP = {'(': 1, ')': -1}
 
 
 def deparenthesize(string: str) -> str:
-    '''
+    """
     Remove all linked outer parentheses from input string.
     
     >>> deparenthesize('(one set)')
@@ -16,7 +16,7 @@ def deparenthesize(string: str) -> str:
     'nested (sets)'
     >>> deparenthesize('(unconnected) (sets)')
     '(unconnected) (sets)'
-    '''
+    """
     # While string is bookended by parentheses.
     while string[0] == '(' and string[-1] == ')':
         nestedness = 0
@@ -37,9 +37,9 @@ def deparenthesize(string: str) -> str:
 
 
 def string_to_proposition(string) -> Proposition: 
-    '''
+    """
     Convert input string into proposition of the appropriate type.
-    '''
+    """
     string = deparenthesize(string)
     broken_string: list[str] = find_connective(string)
     match broken_string:
@@ -67,7 +67,7 @@ def string_to_proposition(string) -> Proposition:
 
 
 def find_connective(string: str) -> list[str]:
-    '''
+    """
     Return a list of strings separating the connective from 
     surrounding propositional material. Deparenthesizes sub-
     propositions.
@@ -78,7 +78,7 @@ def find_connective(string: str) -> list[str]:
     ['not', 'C']
     >>> Proposition.find_connective('anything')
     ['anything']
-    '''
+    """
     negations = {'~', 'not'}
     binaries = {'&', 'v', 'and', 'or', '->', 'implies'}
     word_list = string.split(' ')

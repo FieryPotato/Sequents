@@ -7,9 +7,9 @@ tupseq = namedtuple('tupseq', ['ant', 'con'])
 
 
 class Proposition(ABC): 
-    '''
+    """
     Base class for propositions.
-    '''
+    """
 
     def __init__(self, *args):
         self.content = [arg for arg in args]
@@ -50,10 +50,10 @@ class Proposition(ABC):
 
     @abstractmethod
     def decomposed(self, side) -> tuple[tupseq]:
-        '''
+        """
         Return results of decomposing an instance of the current
         proposition on input side.
-        '''
+        """
         pass
 
     class AtomicDecompositionError(Exception):
@@ -63,9 +63,9 @@ class Proposition(ABC):
 
 
 class BinaryProposition(Proposition):
-    '''
+    """
     Super class for binary propositions.
-    '''
+    """
     arity = 2
 
     def __init__(self, *args):
@@ -79,9 +79,9 @@ class BinaryProposition(Proposition):
         return f'({self.content[0]} {self.symb} {self.content[1]})'
 
 class Atom(Proposition):
-    '''
+    """
     Proposition class with no logical content.
-    '''
+    """
     arity = 1
 
     def __init__(self, *args):
@@ -99,9 +99,9 @@ class Atom(Proposition):
 
 
 class Negation(Proposition):
-    '''
+    """
     Unary proposition signifying logical 'not ...'.
-    '''
+    """
     arity = 1
 
     def __init__(self, *args):
@@ -120,9 +120,9 @@ class Negation(Proposition):
         return tupseq([self.content[0]], []),
 
 class Conjunction(BinaryProposition):
-    '''
+    """
     Binary proposition signifying logical '... and ...'.
-    '''
+    """
     symb = '&'
 
     def __init__(self, *args):
@@ -136,9 +136,9 @@ class Conjunction(BinaryProposition):
 
 
 class Conditional(BinaryProposition):
-    '''
+    """
     Binary proposition signifying logical 'if ... then ...'
-    '''
+    """
     symb = '->'
 
     def __init__(self, *args):
@@ -152,9 +152,9 @@ class Conditional(BinaryProposition):
 
 
 class Disjunction(BinaryProposition):
-    '''
+    """
     Binary proposition signifying logical '... or ...'
-    '''
+    """
     symb = 'v'
 
     def __init__(self, *args):
