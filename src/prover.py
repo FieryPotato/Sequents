@@ -1,8 +1,11 @@
+from src.file_io import get_importer
+
 class Prover:
-    def __init__(self) -> None:
-        self.infile: str | None = None
-        self.contents: list | None = None
-        self.outfile: str | None = None
+    def __init__(self, path, outfile) -> None:
+        self.infile: path
+        self.outfile: outfile
+        importer = get_importer(path)
+        self.contents = importer.get_lines()
 
     def import_(self, path: str, outfile=None) -> None:
         """
@@ -16,24 +19,4 @@ class Prover:
             self.outfile = ''.join(path.split('.')[:-1]) + '_result.json'
         else:
             self.outfile = outfile
-
-    def export_(self) -> None:
-        """
-        Export self.contents to the outfile.
-        """
-        with open(self.outfile, 'w') as file:
-            file.write(str(self.contents))
-
-#    def parse_file(self, file):
-#        """
-#        Return the contents of param file converted to sequents or
-#        trees.
-#        """
-#        match Path(file.name).stem:
-#            case '.txt':
-#                lines = file.readlines()
-#                results = []
-#                for line in lines:
-#                    results.append(Convert(line).to_sequent())
-                    
 

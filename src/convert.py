@@ -1,5 +1,6 @@
 from src.proposition import Proposition, Atom,  Conjunction, Conditional,\
         Disjunction, Negation
+from src.sequent import Sequent
 
 NEST_MAP = {'(': 1, ')': -1}
 
@@ -98,4 +99,17 @@ def find_connective(string: str) -> list[str]:
             r = deparenthesize(' '.join(word_list[i+1:]))
             return [l, connective, r]
     return [string]
+
+
+def string_to_sequent(string: str) -> Sequent:
+    """
+    Return a sequent from input string.
+    """
+    ant_str, con_str = string.split(';')
+    antecedent = [string_to_proposition(s.strip(' ')) for s in ant_str.split(',')]
+    consequent = [string_to_proposition(s.strip(' ')) for s in con_str.split(',')]
+    return Sequent(
+        antecedent,
+        consequent
+    )
 
