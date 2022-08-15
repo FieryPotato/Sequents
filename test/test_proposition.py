@@ -58,6 +58,7 @@ class TestUnary(unittest.TestCase):
         self.assertEqual(con, self.n1.decomposed("con"))
 
 class TestBinary(unittest.TestCase):
+    maxdiff = 2000
     def setUp(self) -> None:
         self.a1 = Atom("p1")
         self.a2 = Atom("p2")

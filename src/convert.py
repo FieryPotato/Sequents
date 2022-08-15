@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 from src.proposition import Proposition, Atom,  Conjunction, Conditional,\
         Disjunction, Negation
 from src.sequent import Sequent
@@ -42,29 +44,23 @@ def string_to_proposition(string) -> Proposition:
     Convert input string into proposition of the appropriate type.
     """
     string = deparenthesize(string)
-    broken_string: list[str] = find_connective(string)
-    match broken_string:
+    split_string: list[str] = find_connective(string)
+
+    fac: PropositionFactory
+    match split_string:
         case [left, '&' | 'and', right]:
-            return Conjunction(
-                string_to_proposition(left),
-                string_to_proposition(right)
-            )
+            fac = ConjunctionFactory()
         case [left, '->' | 'implies', right]:
-            return Conditional(
-                string_to_proposition(left),
-                string_to_proposition(right)
-            )
+            fac = ConditionalFactory()
         case [left, 'v' | 'or', right]:
-            return Disjunction(
-                string_to_proposition(left),
-                string_to_proposition(right)
-            )
+            fac = DisjunctionFactory()
         case ['~' | 'not', negatum]:
-            return Negation(string_to_proposition(negatum))
+            fac = NegationFactory()
         case [proposition]:
-            return Atom(proposition)
+            fac = AtomFactory()
         case _:
             return
+    return fac.get_prop(*split_string)
 
 
 def find_connective(string: str) -> list[str]:
@@ -98,6 +94,7 @@ def find_connective(string: str) -> list[str]:
             l = deparenthesize(' '.join(word_list[:i]))
             r = deparenthesize(' '.join(word_list[i+1:]))
             return [l, connective, r]
+
     return [string]
 
 
@@ -112,4 +109,61 @@ def string_to_sequent(string: str) -> Sequent:
         antecedent,
         consequent
     )
+
+
+class PropositionFactory(ABC):
+    """Abstract Class for proposition factories."""
+
+    @abstractmethod
+    def get_prop(self, *content) -> Proposition:
+        """Return an instance of the correct proposition."""
+
+
+class AtomFactory(PropositionFactory):
+    """Factory for Atoms."""
+
+    def get_prop(self, content) -> Atom:
+        """Return an Atom instance."""
+        return Atom(content)
+
+
+class NegationFactory(PropositionFactory):
+    """Factory for Negations."""
+
+    def get_prop(self, _, prop) -> Negation:
+        """Return a Negation instance."""
+        return Negation(string_to_proposition(prop))
+
+
+class ConjunctionFactory(PropositionFactory):
+    """Factory for Conjunctions."""
+
+    def get_prop(self, left, _, right) -> Conjunction:
+        """Return a Conjunction instance."""
+        return Conjunction(
+            string_to_proposition(left),
+            string_to_proposition(right)
+        )
+
+
+class DisjunctionFactory(PropositionFactory):
+    """Factory for Disjunctions."""
+
+    def get_prop(self, left, _, right) -> Disjunction:
+        """Return a Disjunction instance."""
+        return Disjunction(
+            string_to_proposition(left),
+            string_to_proposition(right)
+        )
+
+
+class ConditionalFactory(PropositionFactory):
+    """Factory for Conditionals."""
+
+    def get_prop(self, ant, _, con) -> Conditional:
+        """Return a Conditional instance."""
+        return Conditional(
+            string_to_proposition(ant),
+            string_to_proposition(con)
+        )
 

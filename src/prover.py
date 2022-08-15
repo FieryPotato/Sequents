@@ -1,6 +1,10 @@
 from src.file_io import get_importer
 
 class Prover:
+    """
+    Gets sequent-like strings from a file and outputs a file with those
+    sequents developed into full trees.
+    """
     def __init__(self, path, outfile) -> None:
         self.infile: path
         self.outfile: outfile

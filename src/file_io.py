@@ -26,7 +26,9 @@ class TextImporter(Importer):
         self.path = path
 
     def import_lines(self) -> list[str]:
-        pass
+        with open(self.path, 'r') as file:
+            lines = [line.strip('\n') for line in file.readlines()]
+        return lines
 
     def import_dict(self) -> dict:
         pass
@@ -53,7 +55,7 @@ def get_importer(path: str) -> Importer:
         '.txt': TextImporter,
         '.json': JSONImporter
     }
-    path_suffix = Path(path).stub()
+    path_suffix = Path(path).suffix
     if path_suffix not in factories.keys():
         raise KeyError(f'{path_suffix} is not a supported import file type')
     return factories[path_suffix](path)
