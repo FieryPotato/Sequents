@@ -28,7 +28,7 @@ json_tree = {
     'B, C; B & C': {
         'B, C; B': {},
         'B, C; C': {}
-        
+
     },
     'C, C -> D; D': {
         'C; C': {},
@@ -49,7 +49,7 @@ json_universes = {
 
 class TestImportText(unittest.TestCase):
     file_path = 'test/io_testing/test_file.txt'
-    
+
     def setUp(self) -> None:
         with open(self.file_path, 'w') as file:
             file.write(text_content)
@@ -70,13 +70,14 @@ class TestImportText(unittest.TestCase):
         expected = text_content.split('\n')
         self.assertEqual(expected, actual)
 
+
 class TestImportJson:
     file_path = 'test/io_testing/test_file.json'
 
     def tearDown(self) -> None:
         if os.path.exists(self.file_path):
             os.remove(self.file_path)
-    
+
     def test_import_json_roots(self) -> None:
         with open(self.file_path, 'w') as f:
             json.dump(f, json_roots_only)
@@ -88,4 +89,3 @@ class TestImportJson:
 
 if __name__ == '__main__':
     unittest.main()
-

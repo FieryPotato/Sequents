@@ -2,12 +2,12 @@ from dataclasses import dataclass
 
 from src.proposition import tupseq, Proposition
 
+
 @dataclass(frozen=True, slots=True)
 class Sequent:
     ant: tuple
     con: tuple
 
-    
     @property
     def complexity(self) -> int:
         """
@@ -23,10 +23,10 @@ class Sequent:
         Return a list containing the result(s) of decomposing the left-
         most proposition in self.
         """
-        if self.complexity < 1:                       
-            raise self.SequentIsAtomicError(self)       
+        if self.complexity < 1:
+            raise self.SequentIsAtomicError(self)
         prop, side, index = self.first_complex_prop()
-        decomposed_proposition: tupseq = prop.decomposed(side)
+        decomposed_proposition: tuple[tupseq] = prop.decomposed(side)
         sequents = []
         for result in decomposed_proposition:
             ant, con = self.remove_decomposed_prop(side, index)
@@ -42,10 +42,10 @@ class Sequent:
         ant = self.ant
         con = self.con
         if side == 'ant':
-            ant = self.ant[:index] + self.ant[1+index:]
+            ant = self.ant[:index] + self.ant[1 + index:]
         elif side == 'con':
-            con = self.con[:index] + self.con[1+index:]
-        return tuple(ant), tuple(con)    
+            con = self.con[:index] + self.con[1 + index:]
+        return tuple(ant), tuple(con)
 
     @staticmethod
     def mix(*args) -> 'Sequent':
@@ -59,7 +59,7 @@ class Sequent:
             new_ant = new_ant + arg.ant
             new_con = new_con + arg.con
         return Sequent(new_ant, new_con)
-        
+
     def first_complex_prop(self) -> tuple[Proposition, str, int]:
         """
         Return the leftmost complex proposition in the sequent, the
@@ -74,4 +74,3 @@ class Sequent:
         def __init__(self, sequent):
             string = f'Sequent {sequent} is already atomic.'
             super().__init__(string)
-       

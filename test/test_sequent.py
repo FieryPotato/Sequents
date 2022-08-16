@@ -25,6 +25,7 @@ class TestSequent(unittest.TestCase):
         atomic_b = Sequent((self.p,), (self.p,))
         self.assertEqual(atomic_a, atomic_b)
         self.assertNotEqual(atomic_a, ((self.p,), (self.p,)))
+        self.assertNotEqual(c, d)
 
     def test_sequent_complexity(self) -> None:
         s_0 = Sequent((self.p,), (self.q,))
@@ -44,7 +45,7 @@ class TestSequent(unittest.TestCase):
         expected_0 = [Sequent((), (self.p,))]
         actual_0 = s_0.decomposed()
         self.assertEqual(expected_0, actual_0)
-        
+
         s_1 = Sequent((self.n, self.q), ())
         expected_1 = [Sequent((self.q,), (self.p,))]
         actual_1 = s_1.decomposed()
@@ -55,7 +56,7 @@ class TestSequent(unittest.TestCase):
         expected_0 = [Sequent((self.p,), ())]
         actual_0 = s_0.decomposed()
         self.assertEqual(expected_0, actual_0)
-        
+
     def test_decompose_lcj(self) -> None:
         s = Sequent((self.cj,), ())
         expected = [Sequent((self.p, self.q), ())]
@@ -67,7 +68,7 @@ class TestSequent(unittest.TestCase):
         expected = [Sequent((), (self.p,)), Sequent((), (self.q,))]
         actual = s.decomposed()
         self.assertEqual(expected, actual)
-        
+
     def test_decompose_ldj(self) -> None:
         s = Sequent((self.dj,), ())
         expected = [Sequent((self.p,), ()), Sequent((self.q,), ())]
@@ -89,7 +90,7 @@ class TestSequent(unittest.TestCase):
         s = Sequent((), (self.cd,))
         expected = [Sequent((self.p,), (self.q,))]
         self.assertEqual(expected, s.decomposed())
-         
+
+
 if __name__ == "__main__":
     unittest.main()
-

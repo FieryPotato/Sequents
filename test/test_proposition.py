@@ -1,6 +1,6 @@
 import unittest
 
-from src.proposition import Proposition, Atom, Negation, Conjunction, \
+from src.proposition import Atom, Negation, Conjunction, \
     Conditional, Disjunction, tupseq
 
 
@@ -12,6 +12,7 @@ class TestProposition(unittest.TestCase):
         self.assertEqual(a1, a2)
         self.assertNotEqual(a1, a3)
 
+
 class TestAtom(unittest.TestCase):
     def setUp(self) -> None:
         self.a1 = Atom('p1')
@@ -21,8 +22,8 @@ class TestAtom(unittest.TestCase):
 
     def test_putting_more_than_one_prop_in_atom_raises_value_error(self) -> None:
         with self.assertRaises(TypeError):
-            proposition = Atom('p1', 'p2')
-    
+            Atom('p1', 'p2')
+
     def test_atom_complexity_is_0(self) -> None:
         self.assertEqual(0, self.a1.complexity)
 
@@ -38,6 +39,7 @@ class TestAtom(unittest.TestCase):
         with self.assertRaises(Exception):
             self.a1.prop = 'hello'
 
+
 class TestNegation(unittest.TestCase):
     def setUp(self) -> None:
         self.a1 = Atom('p1')
@@ -46,11 +48,11 @@ class TestNegation(unittest.TestCase):
 
     def test_creating_prop_with_string_raises_error(self) -> None:
         with self.assertRaises(TypeError):
-            n = Negation('word')
-        
+            Negation('word')
+
     def test_putting_more_than_one_prop_in_negation_raises_value_error(self) -> None:
         with self.assertRaises(TypeError):
-            n = Negation(self.a1, self.a1)
+            Negation(self.a1, self.a1)
 
     def test_negation_arity_is_one(self) -> None:
         n = Negation(self.a1)
@@ -84,31 +86,31 @@ class TestBinary(unittest.TestCase):
     def setUp(self) -> None:
         self.a1 = Atom('p1')
         self.a2 = Atom('p2')
-        
+
         self.cj1 = Conjunction(self.a1, self.a2)
         self.cj2_0_1 = Conjunction(self.a1, self.cj1)
         self.cj2_1_1 = Conjunction(self.cj1, self.cj1)
-        
+
         self.cd1 = Conditional(self.a1, self.a2)
         self.cd2_0_1 = Conditional(self.a1, self.cd1)
         self.cd2_1_1 = Conditional(self.cd1, self.cd1)
-        
+
         self.dj1 = Disjunction(self.a1, self.a2)
         self.dj2_0_1 = Disjunction(self.a1, self.dj1)
         self.dj2_1_1 = Disjunction(self.dj1, self.dj1)
-        
+
         self.conjunctions = [
-                self.cj1, self.cj2_0_1, self.cj2_1_1
+            self.cj1, self.cj2_0_1, self.cj2_1_1
         ]
         self.conditionals = [
-                self.cd1, self.cd2_0_1, self.cd2_1_1
+            self.cd1, self.cd2_0_1, self.cd2_1_1
         ]
         self.disjunctions = [
-                self.dj1, self.dj2_0_1, self.dj2_1_1
+            self.dj1, self.dj2_0_1, self.dj2_1_1
         ]
 
     def test_arity_is_2(self) -> None:
-        for prop in (self.cj1, self.cd1, self.dj1): 
+        for prop in (self.cj1, self.cd1, self.dj1):
             with self.subTest(i=prop):
                 self.assertEqual(2, prop.arity)
 
@@ -125,7 +127,7 @@ class TestBinary(unittest.TestCase):
             with self.subTest(i=t):
                 with self.assertRaises(TypeError):
                     t('oh no', 'errors')
-   
+
     def test_complexity_is_one_plus_greatest_content_complexity(self) -> None:
         for propset in (self.conjunctions, self.conditionals, self.disjunctions):
             with self.subTest(i=propset):
@@ -154,7 +156,7 @@ class TestBinary(unittest.TestCase):
     def test_decompose_right_disjunction(self) -> None:
         expected = (tuple(), (self.a1, self.a2)),
         self.assertEqual(expected, self.dj1.decomposed('con'))
-    
+
     def test_decompose_left_conditional(self) -> None:
         expected = (tuple(), (self.a1,)), ((self.a2,), tuple())
         self.assertEqual(expected, self.cd1.decomposed('ant'))
@@ -171,7 +173,7 @@ class TestBinary(unittest.TestCase):
                 first = {t(a, a), t(b, b)}
                 second = {t(a, a), t(b, b)}
                 self.assertEqual(first, second)
-    
+
     def test_binaries_are_immutable(self) -> None:
         for prop in self.cj1, self.cd1, self.dj1:
             with self.subTest(i=prop):
@@ -181,4 +183,3 @@ class TestBinary(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

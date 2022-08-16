@@ -10,11 +10,11 @@ class Importer(ABC):
     path: str
 
     @abstractmethod
-    def import_lines(path: str) -> list[str]:
+    def import_lines(self) -> list[str]:
         """Import input file as lines"""
 
     @abstractmethod
-    def import_dict(path: str) -> dict:
+    def import_dict(self) -> dict:
         """Import input file as dictionary."""
 
 
@@ -39,10 +39,10 @@ class JSONImporter(Importer):
     Class for importing json files.
     """
 
-    def import_lines(path: str) -> list[str]:
+    def import_lines(self) -> list[str]:
         pass
 
-    def import_dict(path: str) -> dict:
+    def import_dict(self) -> dict:
         pass
 
 
@@ -59,6 +59,3 @@ def get_importer(path: str) -> Importer:
     if path_suffix not in factories.keys():
         raise KeyError(f'{path_suffix} is not a supported import file type')
     return factories[path_suffix](path)
-
-
-

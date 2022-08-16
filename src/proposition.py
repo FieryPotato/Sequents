@@ -6,8 +6,9 @@ SIDES: set[str] = {'ant', 'con'}
 
 tupseq = namedtuple('tupseq', ['ant', 'con'], defaults=[tuple(), tuple()])
 
+
 @dataclass(frozen=True, order=True)
-class Proposition(ABC): 
+class Proposition(ABC):
     """
     Base class for propositions.
     """
@@ -18,10 +19,10 @@ class Proposition(ABC):
     @abstractmethod
     def content(self) -> list:
         """Return this object's propositional content."""
-    
+
     @property
     def complexity(self) -> int:
-        return 1 + max(p.complexity for p in self.content) 
+        return 1 + max(p.complexity for p in self.content)
 
     @abstractmethod
     def decomposed(self, side) -> tuple[tupseq]:
@@ -39,6 +40,7 @@ class Proposition(ABC):
             msg = f'{proposition} is an atom and cannot be decomposed.'
             super().__init__(msg)
 
+
 @dataclass(slots=True, frozen=True)
 class BinaryProposition(Proposition):
     """
@@ -47,6 +49,7 @@ class BinaryProposition(Proposition):
     left: Proposition
     right: Proposition
     arity = 2
+    symb = None
 
     def __str__(self):
         return f'({self.content[0]} {self.symb} {self.content[1]})'
@@ -70,7 +73,7 @@ class Atom(Proposition):
     """
     prop: str
     arity = 1
-    
+
     def __str__(self) -> str:
         return f'{self.content[0]}'
 
@@ -92,7 +95,7 @@ class Atom(Proposition):
             )
 
     def decomposed(self, side) -> None:
-        raise self.AtomicDecompositionError()
+        raise self.AtomicDecompositionError(self)
 
 
 @dataclass(slots=True, frozen=True)
@@ -133,7 +136,7 @@ class Conjunction(BinaryProposition):
     def decomposed(self, side) -> tuple[tupseq]:
         assert side in SIDES
         if side == 'ant':
-            return tupseq(tuple(self.content),),
+            return tupseq(tuple(self.content), ),
         return tupseq(con=(self.content[0],)), tupseq(con=(self.content[1],))
 
 
@@ -143,7 +146,7 @@ class Conditional(BinaryProposition):
     Binary proposition signifying logical 'if ... then ...'
     """
     symb = '->'
-    
+
     def decomposed(self, side) -> tuple[tupseq]:
         assert side in SIDES
         if side == 'ant':
@@ -163,4 +166,3 @@ class Disjunction(BinaryProposition):
         if side == 'ant':
             return tupseq(ant=(self.content[0],)), tupseq(ant=(self.content[1],))
         return tupseq(con=tuple(self.content)),
-

@@ -1,10 +1,12 @@
 from src.file_io import get_importer
 
+
 class Prover:
     """
     Gets sequent-like strings from a file and outputs a file with those
     sequents developed into full trees.
     """
+
     def __init__(self, path, outfile) -> None:
         self.infile: path
         self.outfile: outfile
@@ -17,10 +19,9 @@ class Prover:
         """
         self.infile = path
         with open(path, 'r') as file:
-            #self.contents = self.parse_file(file)
+            # self.contents = self.parse_file(file)
             self.contents = file.readlines()
         if outfile is None:
             self.outfile = ''.join(path.split('.')[:-1]) + '_result.json'
         else:
             self.outfile = outfile
-

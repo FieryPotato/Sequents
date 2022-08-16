@@ -1,9 +1,9 @@
 import unittest
 
-from src.convert import deparenthesize, string_to_proposition,\
-        string_to_sequent, find_connective
-from src.proposition import Atom, Conditional, Conjunction,\
-        Disjunction, Negation
+from src.convert import deparenthesize, string_to_proposition, \
+    string_to_sequent, find_connective
+from src.proposition import Atom, Conditional, Conjunction, \
+    Disjunction, Negation
 from src.sequent import Sequent
 
 
@@ -15,9 +15,9 @@ class TestConvertProposition(unittest.TestCase):
     bin_atom_0 = Atom(bin_test[0])
     bin_atom_1 = Atom(bin_test[1])
     negation = Negation(atom)
-    conjunction = Conjunction(bin_atom_0, bin_atom_1) 
-    conditional = Conditional(bin_atom_0, bin_atom_1) 
-    disjunction = Disjunction(bin_atom_0, bin_atom_1) 
+    conjunction = Conjunction(bin_atom_0, bin_atom_1)
+    conditional = Conditional(bin_atom_0, bin_atom_1)
+    disjunction = Disjunction(bin_atom_0, bin_atom_1)
     comp_conj = Conjunction(conjunction, conjunction)
     comp_cond = Conditional(conditional, conditional)
     comp_disj = Disjunction(disjunction, disjunction)
@@ -133,7 +133,7 @@ class TestDeparenthesize(unittest.TestCase):
         expected = 'words'
         actual = deparenthesize(s)
         self.assertEqual(expected, actual)
-    
+
     def test_nested_set(self) -> None:
         s = '(nested (words))'
         expected = 'nested (words)'
@@ -142,7 +142,7 @@ class TestDeparenthesize(unittest.TestCase):
 
     def test_double_nested_set(self) -> None:
         s = '((double nested))'
-        expected ='double nested'
+        expected = 'double nested'
         actual = deparenthesize(s)
         self.assertEqual(expected, actual)
 
@@ -157,7 +157,7 @@ class TestConvertSequent(unittest.TestCase):
     def test_atomic_1_1_sequent(self) -> None:
         string = 'antecedent one; consequent one'
         expected = Sequent(
-            (Atom('antecedent one'),), 
+            (Atom('antecedent one'),),
             (Atom('consequent one'),)
         )
         self.assertEqual(expected, string_to_sequent(string))
@@ -190,4 +190,3 @@ class TestConvertSequent(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
