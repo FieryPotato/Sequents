@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 SIDES: set[str] = {'ant', 'con'}
 
-tupseq = namedtuple('tupseq', ['ant', 'con'])
+tupseq = namedtuple('tupseq', ['ant', 'con'], defaults=[tuple(), tuple()])
 
 @dataclass(frozen=True, order=True)
 class Proposition(ABC): 
@@ -74,6 +74,9 @@ class Atom(Proposition):
     def __str__(self) -> str:
         return f'{self.content[0]}'
 
+    def __repr__(self) -> str:
+        return f'Atom("{self.content[0]}")'
+
     @property
     def complexity(self) -> int:
         return 0
@@ -116,8 +119,8 @@ class Negation(Proposition):
     def decomposed(self, side) -> tuple[tupseq]:
         assert side in SIDES
         if side == 'ant':
-            return tupseq([], [self.content[0]]),
-        return tupseq([self.content[0]], []),
+            return tupseq(con=(self.content[0],)),
+        return tupseq(ant=(self.content[0],)),
 
 
 @dataclass(slots=True, frozen=True)
@@ -130,8 +133,8 @@ class Conjunction(BinaryProposition):
     def decomposed(self, side) -> tuple[tupseq]:
         assert side in SIDES
         if side == 'ant':
-            return tupseq(self.content, []),
-        return tupseq([], [self.content[0]]), tupseq([], [self.content[1]])
+            return tupseq(tuple(self.content),),
+        return tupseq(con=(self.content[0],)), tupseq(con=(self.content[1],))
 
 
 @dataclass(slots=True, frozen=True)
@@ -144,8 +147,8 @@ class Conditional(BinaryProposition):
     def decomposed(self, side) -> tuple[tupseq]:
         assert side in SIDES
         if side == 'ant':
-            return tupseq([], [self.content[0]]), tupseq([self.content[1]], [])
-        return tupseq([self.content[0]], [self.content[1]]),
+            return tupseq(con=(self.content[0],)), tupseq(ant=(self.content[1],))
+        return tupseq((self.content[0],), (self.content[1],)),
 
 
 @dataclass(slots=True, frozen=True)
@@ -158,6 +161,6 @@ class Disjunction(BinaryProposition):
     def decomposed(self, side) -> tuple[tupseq]:
         assert side in SIDES
         if side == 'ant':
-            return tupseq([self.content[0]], []), tupseq([self.content[1]], [])
-        return tupseq([], self.content),
+            return tupseq(ant=(self.content[0],)), tupseq(ant=(self.content[1],))
+        return tupseq(con=tuple(self.content)),
 

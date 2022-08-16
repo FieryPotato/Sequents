@@ -1,7 +1,7 @@
 import unittest
 
 from src.proposition import Proposition, Atom, Negation, Conjunction, \
-    Conditional, Disjunction
+    Conditional, Disjunction, tupseq
 
 
 class TestProposition(unittest.TestCase):
@@ -60,11 +60,15 @@ class TestNegation(unittest.TestCase):
         self.assertEqual(1, self.n1.complexity)
         self.assertEqual(2, self.n2.complexity)
 
-    def test_negation_decomposed_is_negatum(self) -> None:
-        ant = ([], [self.a1]),
-        con = ([self.a1], []),
-        self.assertEqual(ant, self.n1.decomposed('ant'))
-        self.assertEqual(con, self.n1.decomposed('con'))
+    def test_decomposed_negation_in_antecedent(self) -> None:
+        actual = self.n1.decomposed('ant')
+        expected = tupseq(con=(self.a1,)),
+        self.assertEqual(actual, expected)
+
+    def test_decomposed_negation_in_consequent(self) -> None:
+        actual = self.n1.decomposed('con')
+        expected = tupseq(ant=(self.a1,)),
+        self.assertEqual(actual, expected)
 
     def test_negation_is_hashable(self) -> None:
         a = {Negation(Atom('a')), Negation(Atom('b')), Negation(Atom('c'))}
@@ -136,27 +140,27 @@ class TestBinary(unittest.TestCase):
                 self.assertEqual(2, prop.arity)
 
     def test_decompose_left_conjunction(self) -> None:
-        expected = ([self.a1, self.a2], []),
+        expected = ((self.a1, self.a2), tuple()),
         self.assertEqual(expected, self.cj1.decomposed('ant'))
 
     def test_decompose_right_conjunction(self) -> None:
-        expected = ([], [self.a1]), ([], [self.a2])
+        expected = (tuple(), (self.a1,)), (tuple(), (self.a2,))
         self.assertEqual(expected, self.cj1.decomposed('con'))
 
     def test_decompose_left_disjunction(self) -> None:
-        expected = ([self.a1], []), ([self.a2], [])
+        expected = ((self.a1,), tuple()), ((self.a2,), tuple())
         self.assertEqual(expected, self.dj1.decomposed('ant'))
 
     def test_decompose_right_disjunction(self) -> None:
-        expected = ([], [self.a1, self.a2]),
+        expected = (tuple(), (self.a1, self.a2)),
         self.assertEqual(expected, self.dj1.decomposed('con'))
     
     def test_decompose_left_conditional(self) -> None:
-        expected = ([], [self.a1]), ([self.a2], [])
+        expected = (tuple(), (self.a1,)), ((self.a2,), tuple())
         self.assertEqual(expected, self.cd1.decomposed('ant'))
 
     def test_decompose_right_conditional(self) -> None:
-        expected = ([self.a1], [self.a2]),
+        expected = ((self.a1,), (self.a2,)),
         self.assertEqual(expected, self.cd1.decomposed('con'))
 
     def test_binaries_are_hashable(self) -> None:
