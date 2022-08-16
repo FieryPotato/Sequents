@@ -1,26 +1,12 @@
 from typing import Union
 from copy import deepcopy
+from dataclasses import dataclass
 
+@dataclass(frozen=True, slots=True)
 class Sequent:
-    side_strings: set = {"ant", "con"}
+    ant: tuple
+    con: tuple
 
-    def __init__(self, antecedent: list, consequent: list) -> None:
-        self.sides = self.ant, self.con = antecedent, consequent
-
-    def __repr__(self) -> str:
-        return f"Sequent(ant={self.ant}, con={self.con})"
-
-    def __eq__(self, other) -> bool:
-        if self.__class__ == other.__class__:
-            for side in ("ant", "con"):
-                if sorted(getattr(self, side)) != sorted(getattr(other, side)):
-                    break
-            else:
-                return True
-        return False
-
-    def __ne__(self, other) -> bool:
-        return not (self == other)
     
     @property
     def complexity(self) -> int:

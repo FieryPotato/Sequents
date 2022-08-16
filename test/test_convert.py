@@ -157,33 +157,33 @@ class TestConvertSequent(unittest.TestCase):
     def test_atomic_1_1_sequent(self) -> None:
         string = 'antecedent one; consequent one'
         expected = Sequent(
-            antecedent=[Atom('antecedent one')], 
-            consequent=[Atom('consequent one')]
+            (Atom('antecedent one'),), 
+            (Atom('consequent one'),)
         )
         self.assertEqual(expected, string_to_sequent(string))
 
     def test_atomic_2_2_sequent(self) -> None:
         string = 'antecedent one, antecedent two; consequent one, consequent two'
         expected = Sequent(
-            [Atom('antecedent one'), Atom('antecedent two')],
-            [Atom('consequent one'), Atom('consequent two')]
+            (Atom('antecedent one'), Atom('antecedent two')),
+            (Atom('consequent one'), Atom('consequent two'))
         )
         self.assertEqual(expected, string_to_sequent(string))
 
     def test_negation_sequent(self) -> None:
         string = 'not one; ~ two'
-        expected = Sequent([Negation(Atom('one'))], [Negation(Atom('two'))])
+        expected = Sequent((Negation(Atom('one')),), (Negation(Atom('two')),))
         self.assertEqual(expected, string_to_sequent(string))
 
     def test_binary_sequent(self) -> None:
         bare_string = 'left one {c} right one; left two {c} right two'
-        types = [Conjunction, Disjunction, Conditional] * 2
+        types = (Conjunction, Disjunction, Conditional) * 2
         for connective, prop_type in zip(self.binaries, types):
             with self.subTest(i=connective):
                 string = bare_string.format(c=connective)
                 expected = Sequent(
-                    [prop_type(Atom('left one'), Atom('right one'))],
-                    [prop_type(Atom('left two'), Atom('right two'))]
+                    (prop_type(Atom('left one'), Atom('right one')),),
+                    (prop_type(Atom('left two'), Atom('right two')),)
                 )
                 self.assertEqual(expected, string_to_sequent(string))
 
