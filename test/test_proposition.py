@@ -6,41 +6,32 @@ from src.proposition import Proposition, Atom, Negation, Conjunction, \
 
 class TestProposition(unittest.TestCase):
     def test_equals(self) -> None:
-        a1 = Atom('p1')
-        a2 = Atom('p1')
-        a3 = Atom('p2')
+        a1 = Atom("p1")
+        a2 = Atom("p1")
+        a3 = Atom("p2")
         self.assertEqual(a1, a2)
         self.assertNotEqual(a1, a3)
 
 class TestAtom(unittest.TestCase):
     def setUp(self) -> None:
-        self.a1 = Atom('p1')
+        self.a1 = Atom("p1")
 
     def test_atom_has_content(self) -> None:
-        self.assertEqual(['p1'], self.a1.content)
+        self.assertEqual(["p1"], self.a1.content)
 
     def test_putting_more_than_one_prop_in_atom_raises_value_error(self) -> None:
-        with self.assertRaises(TypeError):
-            proposition = Atom('p1', 'p2')
+        with self.assertRaises(ValueError):
+            proposition = Atom("p1", "p2")
     
     def test_atom_complexity_is_0(self) -> None:
         self.assertEqual(0, self.a1.complexity)
 
     def test_atom_arity_is_1(self) -> None:
         self.assertEqual(1, self.a1.arity)
-
-    def test_atom_is_hashable(self) -> None:
-        a = {Atom('a'), Atom('b'), Atom('c')}
-        b = {Atom('a'), Atom('b'), Atom('c')}
-        self.assertEqual(a, b)
-
-    def test_atom_is_immutable(self) -> None:
-        with self.assertRaises(Exception):
-            self.a1.prop = 'hello'
-
-class TestNegation(unittest.TestCase):
+      
+class TestUnary(unittest.TestCase):
     def setUp(self) -> None:
-        self.a1 = Atom('p1')
+        self.a1 = Atom("p1")
         self.n1 = Negation(self.a1)
         self.n2 = Negation(self.n1)
 
@@ -48,8 +39,8 @@ class TestNegation(unittest.TestCase):
         with self.assertRaises(TypeError):
             n = Negation('word')
         
-    def test_putting_more_than_one_prop_in_negation_raises_value_error(self) -> None:
-        with self.assertRaises(TypeError):
+    def test_putting_more_than_one_prop_in_negation_raises_vaule_error(self) -> None:
+        with self.assertRaises(ValueError):
             n = Negation(self.a1, self.a1)
 
     def test_negation_arity_is_one(self) -> None:
@@ -63,23 +54,14 @@ class TestNegation(unittest.TestCase):
     def test_negation_decomposed_is_negatum(self) -> None:
         ant = ([], [self.a1]),
         con = ([self.a1], []),
-        self.assertEqual(ant, self.n1.decomposed('ant'))
-        self.assertEqual(con, self.n1.decomposed('con'))
-
-    def test_negation_is_hashable(self) -> None:
-        a = {Negation(Atom('a')), Negation(Atom('b')), Negation(Atom('c'))}
-        b = {Negation(Atom('a')), Negation(Atom('b')), Negation(Atom('c'))}
-        self.assertEqual(a, b)
-
-    def test_negation_is_immutable(self) -> None:
-        with self.assertRaises(Exception):
-            self.n1.negatum = Atom('test')
-
+        self.assertEqual(ant, self.n1.decomposed("ant"))
+        self.assertEqual(con, self.n1.decomposed("con"))
 
 class TestBinary(unittest.TestCase):
+    maxdiff = 2000
     def setUp(self) -> None:
-        self.a1 = Atom('p1')
-        self.a2 = Atom('p2')
+        self.a1 = Atom("p1")
+        self.a2 = Atom("p2")
         
         self.cj1 = Conjunction(self.a1, self.a2)
         self.cj2_0_1 = Conjunction(self.a1, self.cj1)
@@ -105,76 +87,61 @@ class TestBinary(unittest.TestCase):
 
     def test_arity_is_2(self) -> None:
         for prop in (self.cj1, self.cd1, self.dj1): 
-            with self.subTest(i=prop):
-                self.assertEqual(2, prop.arity)
+            self.assertEqual(2, prop.arity)
 
     def test_creating_connective_with_improper_number_of_values_raises_value_error(self) -> None:
         for t in Conjunction, Disjunction, Conditional:
-            with self.subTest(i=t):
-                with self.assertRaises(TypeError):
-                    t(self.a1)
-                with self.assertRaises(TypeError):
-                    t(self.a1, self.a2, self.a1)
+            with self.assertRaises(ValueError):
+                t(self.a1)
+            with self.assertRaises(ValueError):
+                t(self.a1, self.a2, self.a1)
 
     def test_creating_connective_with_improper_type_raises_type_error(self) -> None:
         for t in Conjunction, Disjunction, Conditional:
-            with self.subTest(i=t):
-                with self.assertRaises(TypeError):
-                    t('oh no', 'errors')
+            with self.assertRaises(TypeError):
+                t('oh no', 'errors')
    
-    def test_complexity_is_one_plus_greatest_content_complexity(self) -> None:
+    def test__complexity_is_one_plus_greatest_content_complexity(self) -> None:
         for propset in (self.conjunctions, self.conditionals, self.disjunctions):
-            with self.subTest(i=propset):
-                p1, p201, p211 = propset
-                self.assertEqual(1, p1.complexity)
-                self.assertEqual(2, p201.complexity)
-                self.assertEqual(2, p211.complexity)
+            p1, p201, p211 = propset
+            self.assertEqual(1, p1.complexity)
+            self.assertEqual(2, p201.complexity)
+            self.assertEqual(2, p211.complexity)
 
-    def test_arity_is_2(self) -> None:
-        for prop in self.cd1, self.cj1, self.dj1:
-            with self.subTest(i=prop):
-                self.assertEqual(2, prop.arity)
+    def test_disjunction_arity_is_2(self) -> None:
+        self.assertEqual(2, self.dj1.arity)
+
+    def test_conditional_arity_is_2(self) -> None:
+        self.assertEqual(2, self.cd1.arity)
+
+    def test_conjunction_arity_is_2(self) -> None:
+        self.assertEqual(2, self.cj1.arity)
 
     def test_decompose_left_conjunction(self) -> None:
         expected = ([self.a1, self.a2], []),
-        self.assertEqual(expected, self.cj1.decomposed('ant'))
+        self.assertEqual(expected, self.cj1.decomposed("ant"))
 
     def test_decompose_right_conjunction(self) -> None:
         expected = ([], [self.a1]), ([], [self.a2])
-        self.assertEqual(expected, self.cj1.decomposed('con'))
+        self.assertEqual(expected, self.cj1.decomposed("con"))
 
     def test_decompose_left_disjunction(self) -> None:
         expected = ([self.a1], []), ([self.a2], [])
-        self.assertEqual(expected, self.dj1.decomposed('ant'))
+        self.assertEqual(expected, self.dj1.decomposed("ant"))
 
     def test_decompose_right_disjunction(self) -> None:
         expected = ([], [self.a1, self.a2]),
-        self.assertEqual(expected, self.dj1.decomposed('con'))
+        self.assertEqual(expected, self.dj1.decomposed("con"))
     
     def test_decompose_left_conditional(self) -> None:
         expected = ([], [self.a1]), ([self.a2], [])
-        self.assertEqual(expected, self.cd1.decomposed('ant'))
+        self.assertEqual(expected, self.cd1.decomposed("ant"))
 
     def test_decompose_right_conditional(self) -> None:
         expected = ([self.a1], [self.a2]),
-        self.assertEqual(expected, self.cd1.decomposed('con'))
-
-    def test_binaries_are_hashable(self) -> None:
-        a = Atom('test')
-        b = Atom('atom')
-        for t in Conjunction, Disjunction, Conditional:
-            with self.subTest(i=t):
-                first = {t(a, a), t(b, b)}
-                second = {t(a, a), t(b, b)}
-                self.assertEqual(first, second)
-    
-    def test_binaries_are_immutable(self) -> None:
-        for prop in self.cj1, self.cd1, self.dj1:
-            with self.subTest(i=prop):
-                with self.assertRaises(Exception):
-                    prop.left = 'anything, really'
+        self.assertEqual(expected, self.cd1.decomposed("con"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
 
