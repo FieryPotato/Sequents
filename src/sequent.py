@@ -8,6 +8,9 @@ class Sequent:
     ant: tuple
     con: tuple
 
+    def __iter__(self):
+        return iter(self.ant, self.con)
+
     @property
     def complexity(self) -> int:
         """
@@ -18,23 +21,23 @@ class Sequent:
         con_complexity = sum(prop.complexity for prop in self.con)
         return ant_complexity + con_complexity
 
-    def decomposed(self) -> list['Sequent']:
-        """
-        Return a list containing the result(s) of decomposing the left-
-        most proposition in self.
-        """
-        if self.complexity < 1:
-            raise self.SequentIsAtomicError(self)
-        prop, side, index = self.first_complex_prop()
-        decomposed_proposition: tuple[tupseq] = prop.decomposed(side)
-        sequents = []
-        for result in decomposed_proposition:
-            ant, con = self.remove_decomposed_prop(side, index)
-            copy = tupseq(ant, con)
-            sequents.append(Sequent.mix(copy, result))
-        return sequents
+#    def decomposed(self) -> list['Sequent']:
+#        """
+#        Return a list containing the result(s) of decomposing the left-
+#        most proposition in self.
+#        """
+#        if self.complexity < 1:
+#            raise self.SequentIsAtomicError(self)
+#        prop, side, index = self.first_complex_prop()
+#        decomposed_proposition: tuple[tupseq] = prop.decomposed(side)
+#        sequents = []
+#        for result in decomposed_proposition:
+#            ant, con = self.remove(side, index)
+#            copy = tupseq(ant, con)
+#            sequents.append(Sequent.mix(copy, result))
+#        return sequents
 
-    def remove_decomposed_prop(self, side: str, index: int) -> tuple:
+    def remove(self, side: str, index: int) -> tuple:
         """
         Return this sequent's antecedent and consequent after removing
         the proposition at index on side.
@@ -45,7 +48,7 @@ class Sequent:
             ant = self.ant[:index] + self.ant[1 + index:]
         elif side == 'con':
             con = self.con[:index] + self.con[1 + index:]
-        return tuple(ant), tuple(con)
+        return Sequent(ant, con)
 
     @staticmethod
     def mix(*args) -> 'Sequent':
@@ -60,6 +63,7 @@ class Sequent:
             new_con = new_con + arg.con
         return Sequent(new_ant, new_con)
 
+    @property
     def first_complex_prop(self) -> tuple[Proposition, str, int]:
         """
         Return the leftmost complex proposition in the sequent, the

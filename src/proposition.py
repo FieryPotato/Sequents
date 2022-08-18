@@ -104,6 +104,7 @@ class Negation(Proposition):
     Unary proposition signifying logical 'not ...'.
     """
     negatum: Proposition
+    symb = '~'
     arity = 1
 
     def __str__(self) -> str:

@@ -11,11 +11,11 @@ class Importer(ABC):
 
     @abstractmethod
     def import_lines(self) -> list[str]:
-        """Import input file as lines"""
+        """Import input file as lines for prover use."""
 
     @abstractmethod
     def import_dict(self) -> dict:
-        """Import input file as dictionary."""
+        """Import input file as dictionary for printer use."""
 
 
 class TextImporter(Importer):

@@ -5,13 +5,12 @@ from src.proposition import *
 
 
 class TestSequent(unittest.TestCase):
-    def setUp(self) -> None:
-        self.p = Atom("P")
-        self.q = Atom("Q")
-        self.n = Negation(self.p)
-        self.cj = Conjunction(self.p, self.q)
-        self.dj = Disjunction(self.p, self.q)
-        self.cd = Conditional(self.p, self.q)
+    p = Atom("P")
+    q = Atom("Q")
+    n = Negation(p)
+    cj = Conjunction(p, q)
+    dj = Disjunction(p, q)
+    cd = Conditional(p, q)
 
     def test_sequent_has_antecedent_and_consequent(self) -> None:
         s = Sequent((self.p,), (self.q,))
@@ -35,62 +34,7 @@ class TestSequent(unittest.TestCase):
         s_2 = Sequent((self.n,), (self.n,))
         self.assertEqual(2, s_2.complexity)
 
-    def test_atomic_sequent_cant_decompose(self) -> None:
-        s = Sequent((self.p,), (self.q,))
-        with self.assertRaises(Sequent.SequentIsAtomicError):
-            s.decomposed()
 
-    def test_decompose_lneg(self) -> None:
-        s_0 = Sequent((self.n,), ())
-        expected_0 = [Sequent((), (self.p,))]
-        actual_0 = s_0.decomposed()
-        self.assertEqual(expected_0, actual_0)
-
-        s_1 = Sequent((self.n, self.q), ())
-        expected_1 = [Sequent((self.q,), (self.p,))]
-        actual_1 = s_1.decomposed()
-        self.assertEqual(expected_1, actual_1)
-
-    def test_decompose_rneg(self) -> None:
-        s_0 = Sequent((), (self.n,))
-        expected_0 = [Sequent((self.p,), ())]
-        actual_0 = s_0.decomposed()
-        self.assertEqual(expected_0, actual_0)
-
-    def test_decompose_lcj(self) -> None:
-        s = Sequent((self.cj,), ())
-        expected = [Sequent((self.p, self.q), ())]
-        actual = s.decomposed()
-        self.assertEqual(expected, actual)
-
-    def test_decompose_rcj(self) -> None:
-        s = Sequent((), (self.cj,))
-        expected = [Sequent((), (self.p,)), Sequent((), (self.q,))]
-        actual = s.decomposed()
-        self.assertEqual(expected, actual)
-
-    def test_decompose_ldj(self) -> None:
-        s = Sequent((self.dj,), ())
-        expected = [Sequent((self.p,), ()), Sequent((self.q,), ())]
-        actual = s.decomposed()
-        self.assertEqual(expected, actual)
-
-    def test_decompose_rdj(self) -> None:
-        s = Sequent((), (self.dj,))
-        expected = [Sequent((), (self.p, self.q))]
-        actual = s.decomposed()
-        self.assertEqual(expected, actual)
-
-    def test_decompose_lcd(self) -> None:
-        s = Sequent((self.cd,), ())
-        expected = [Sequent((), (self.p,)), Sequent((self.q,), ())]
-        self.assertEqual(expected, s.decomposed())
-
-    def test_decompose_rcd(self) -> None:
-        s = Sequent((), (self.cd,))
-        expected = [Sequent((self.p,), (self.q,))]
-        self.assertEqual(expected, s.decomposed())
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()
+

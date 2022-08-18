@@ -16,5 +16,13 @@ test_text_lines = [
 ]
 
 
+@unittest.skip('Neither prover nor its tests are implemented')
+class TestProver(unittest.TestCase):
+    def test_something(self) -> None:
+        self.assertTrue(False)
+
+
+
+
 if __name__ == '__main__':
     unittest.main()

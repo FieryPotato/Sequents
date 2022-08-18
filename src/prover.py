@@ -1,27 +1,22 @@
-from src.file_io import get_importer
+import multiprocessing
+
+from src.convert import string_to_sequent
+from src.sequent import Sequent
 
 
 class Prover:
     """
-    Gets sequent-like strings from a file and outputs a file with those
-    sequents developed into full trees.
+    Class for converting a list of strings representing sequents into
+    sequent objects and then turning those objects into trees.
     """
 
-    def __init__(self, path, outfile) -> None:
-        self.infile: path
-        self.outfile: outfile
-        importer = get_importer(path)
-        self.contents = importer.get_lines()
+    def __init__(self, data: list[str]) -> None:
+        self.roots: list[Sequent] = [string_to_sequent(s) for s in data]
 
-    def import_(self, path: str, outfile=None) -> None:
+    def run(self) -> None:
         """
-        Import contents of file to self and sets output file.
+        Turn each sequent in self.roots into a full tree and add it to 
+        the forest.
         """
-        self.infile = path
-        with open(path, 'r') as file:
-            # self.contents = self.parse_file(file)
-            self.contents = file.readlines()
-        if outfile is None:
-            self.outfile = ''.join(path.split('.')[:-1]) + '_result.json'
-        else:
-            self.outfile = outfile
+        pass
+
