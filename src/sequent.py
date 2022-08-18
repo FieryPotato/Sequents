@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.proposition import tupseq, Proposition
+from src.proposition import Proposition
 
 
 @dataclass(frozen=True, slots=True)
@@ -39,8 +39,8 @@ class Sequent:
 
     def remove(self, side: str, index: int) -> tuple:
         """
-        Return this sequent's antecedent and consequent after removing
-        the proposition at index on side.
+        Return a new sequent object identical to this one but with the
+        proposition at side, index removed.
         """
         ant = self.ant
         con = self.con

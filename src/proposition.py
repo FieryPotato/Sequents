@@ -4,8 +4,6 @@ from dataclasses import dataclass
 
 SIDES: set[str] = {'ant', 'con'}
 
-tupseq = namedtuple('tupseq', ['ant', 'con'], defaults=[tuple(), tuple()])
-
 
 @dataclass(frozen=True, order=True)
 class Proposition(ABC):
@@ -17,19 +15,12 @@ class Proposition(ABC):
         self.validate_content()
 
     @abstractmethod
-    def content(self) -> list:
+    def content(self) -> tuple:
         """Return this object's propositional content."""
 
     @property
     def complexity(self) -> int:
         return 1 + max(p.complexity for p in self.content)
-
-    @abstractmethod
-    def decomposed(self, side) -> tuple[tupseq]:
-        """
-        Return results of decomposing an instance of the current
-        proposition on input side.
-        """
 
     @abstractmethod
     def validate_content(self) -> None:
@@ -62,8 +53,8 @@ class BinaryProposition(Proposition):
                 )
 
     @property
-    def content(self) -> list[Proposition, Proposition]:
-        return [self.left, self.right]
+    def content(self) -> tuple[Proposition, Proposition]:
+        return self.left, self.right
 
 
 @dataclass(slots=True, frozen=True)
@@ -85,18 +76,14 @@ class Atom(Proposition):
         return 0
 
     @property
-    def content(self) -> list[str]:
-        return [self.prop]
+    def content(self) -> tuple[str]:
+        return self.prop,
 
     def validate_content(self) -> None:
         if not isinstance(self.prop, str):
             raise TypeError(
                 f'{self.__class__} content requires string, not {type(self.prop)}.'
             )
-
-    def decomposed(self, side) -> None:
-        raise self.AtomicDecompositionError(self)
-
 
 @dataclass(slots=True, frozen=True)
 class Negation(Proposition):
@@ -111,20 +98,14 @@ class Negation(Proposition):
         return f'(~{self.content[0]})'
 
     @property
-    def content(self) -> list[Proposition]:
-        return [self.negatum]
+    def content(self) -> tuple[Proposition]:
+        return self.negatum, 
 
     def validate_content(self) -> None:
         if not isinstance(self.negatum, Proposition):
             raise TypeError(
                 f'{self.__class__} content requires Proposition, not {type(self.negatum)}.'
             )
-
-    def decomposed(self, side) -> tuple[tupseq]:
-        assert side in SIDES
-        if side == 'ant':
-            return tupseq(con=(self.content[0],)),
-        return tupseq(ant=(self.content[0],)),
 
 
 @dataclass(slots=True, frozen=True)
@@ -134,12 +115,6 @@ class Conjunction(BinaryProposition):
     """
     symb = '&'
 
-    def decomposed(self, side) -> tuple[tupseq]:
-        assert side in SIDES
-        if side == 'ant':
-            return tupseq(tuple(self.content), ),
-        return tupseq(con=(self.content[0],)), tupseq(con=(self.content[1],))
-
 
 @dataclass(slots=True, frozen=True)
 class Conditional(BinaryProposition):
@@ -148,13 +123,6 @@ class Conditional(BinaryProposition):
     """
     symb = '->'
 
-    def decomposed(self, side) -> tuple[tupseq]:
-        assert side in SIDES
-        if side == 'ant':
-            return tupseq(con=(self.content[0],)), tupseq(ant=(self.content[1],))
-        return tupseq((self.content[0],), (self.content[1],)),
-
-
 @dataclass(slots=True, frozen=True)
 class Disjunction(BinaryProposition):
     """
@@ -162,8 +130,3 @@ class Disjunction(BinaryProposition):
     """
     symb = 'v'
 
-    def decomposed(self, side) -> tuple[tupseq]:
-        assert side in SIDES
-        if side == 'ant':
-            return tupseq(ant=(self.content[0],)), tupseq(ant=(self.content[1],))
-        return tupseq(con=tuple(self.content)),

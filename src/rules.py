@@ -10,77 +10,98 @@ class Rule(ABC):
     def __init__(self, sequent: Sequent) -> None:
         self.sequent = sequent
 
-    @abstractmethod
     def apply(self) -> list[Sequent]:
         """Apply this rule to self.sequent."""
+        prop, side, index = self.sequent.first_complex_prop
+        decomposed: list[Sequent] = self.decompose(prop)
+
+        results = []
+        for sequent in decomposed:
+            new = self.sequent.remove(side, index)
+            results.append(Sequent.mix(new, sequent))
+
+        return results
+
+    @abstractmethod
+    def decompose(self, prop: Proposition) -> list[Sequent]:
+        """Return sequents resulting from decomposing prop."""
 
 class LNeg(Rule):
-    def apply(self) -> list[Sequent]:
+    def decompose(self, prop: Proposition) -> list[Sequent]:
         """Apply left negation rule to self.sequent."""
-        pass
+        return [Sequent(tuple(), (prop.content[0],))]
 
 class RNeg(Rule):
-    def apply(self) -> list[Sequent]:
+    def decompose(self, prop: Proposition) -> list[Sequent]:
         """Apply right negation rule to self.sequent."""
-        pass
+        return [Sequent((prop.content[0],), tuple())]        
 
 class MultLAnd(Rule):
-    def apply(self) -> list[Sequent]:
+    def decompose(self, prop: Proposition) -> list[Sequent]:
         """Apply multiplicative left conjunction rule to self.sequent."""
-        pass
+        return [Sequent(prop.content, tuple())]
 
 class AddLAnd(Rule):
-    def apply(self) -> list[Sequent]:
+    def decompose(self, prop: Proposition) -> list[Sequent]:
         """Apply additive left conjunction rule to self.sequent."""
         pass
 
 class MultRAnd(Rule):
-    def apply(self) -> list[Sequent]:
+    def decompose(self, prop: Proposition) -> list[Sequent]:
         """Apply multiplicative right conjunction rule to self.sequent."""
         pass
 
 class AddRAnd(Rule):
-    def apply(self) -> list[Sequent]:
+    def decompose(self, prop: Proposition) -> list[Sequent]:
         """Apply additive right conjunction rule to self.sequent."""
-        pass
+        return [
+            Sequent(tuple(), (prop.left,)),
+            Sequent(tuple(), (prop.right,))
+        ]
 
 class MultLOr(Rule):
-    def apply(self) -> list[Sequent]:
+    def decompose(self, prop: Proposition) -> list[Sequent]:
         """Apply multiplicative left disjunction rule to self.sequent."""
         pass
 
 class AddLOr(Rule):
-    def apply(self) -> list[Sequent]:
+    def decompose(self, prop: Proposition) -> list[Sequent]:
         """Apply additive left disjunction rule to self.sequent."""
-        pass
+        return [
+            Sequent((prop.left,), tuple()),
+            Sequent((prop.right,), tuple())
+        ]
 
 class MultROr(Rule):
-    def apply(self) -> list[Sequent]:
+    def decompose(self, prop: Proposition) -> list[Sequent]:
         """Apply multiplicative right disjunction rule to self.sequent."""
-        pass
+        return [Sequent(tuple(), prop.content)]
 
 class AddROr(Rule):
-    def apply(self) -> list[Sequent]:
+    def decompose(self, prop: Proposition) -> list[Sequent]:
         """Apply additive right disjunction rule to self.sequent."""
         pass
 
 class MultLIf(Rule):
-    def apply(self) -> list[Sequent]:
+    def decompose(self, prop: Proposition) -> list[Sequent]:
         """Apply multiplicative left conditional rule to self.sequent."""
         pass
 
 class AddLIf(Rule):
-    def apply(self) -> list[Sequent]:
+    def decompose(self, prop: Proposition) -> list[Sequent]:
         """Apply additive left conditional rule to self.sequent."""
-        pass
+        return [
+            Sequent(tuple(), (prop.left,)),
+            Sequent((prop.right,), tuple())   
+        ] 
 
-class MultRIf(Rule):
-    def apply(self) -> list[Sequent]:
-        """Apply multiplicative right conditional rule to self.sequent."""
-        pass
+class MultRIf(Rule): 
+    def decompose(self, prop: Proposition) -> list[Sequent]: 
+        """Apply multiplicative right conditional rule to self.sequent.""" 
+        return [Sequent((prop.left,), (prop.right,))]
 
 class AddRIf(Rule):
-    def apply(self) -> list[Sequent]:
+    def decompose(self, prop: Proposition) -> list[Sequent]:
         """Apply additive right conditional rule to self.sequent."""
         pass
 
@@ -151,6 +172,10 @@ RULES = {
 def get_rule(proposition: Proposition, side: str, /, t=None) -> Rule:
     """
     Return the appropriate function for decomposing a proposition.
+
+    :param proposition: A proposition object (atoms cause exceptions)
+    :param side: Either 'ant' or 'con'
+    :param t: Either None, 'mul', or 'add'
     """
     assert side in {'ant', 'con'}   
     if proposition.complexity < 1:
