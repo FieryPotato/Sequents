@@ -12,7 +12,7 @@ class Tree:
     leaves until each leaf at the extremes is atomic.
     """
     def __init__(self, root: Sequent) -> None:
-        self.braches = {root: {}}
+        self.braches = {}
 
     def compute_branch(self, sequent: Sequent) -> list[Sequent]:
         """
@@ -21,6 +21,8 @@ class Tree:
         """
         rule = get_rule(sequent)
         children = rule.apply()
-        return children
-
+        if rule.is_invertible:
+            # Do invertible branch
+        else:
+            # Do non-invertible branch
 

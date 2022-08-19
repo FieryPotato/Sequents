@@ -6,53 +6,80 @@ from src.sequent import Sequent
 
 class Rule(ABC):
     """Abstract class for rules."""
-
+    
     def __init__(self, sequent: Sequent) -> None:
         self.sequent = sequent
+        self.prop, side, index = sequent.first_complex_prop
+        self.main_prop_removed = sequent.remove(side, index)
 
-    def apply(self) -> list[Sequent]:
-        """Apply this rule to self.sequent."""
-        prop, side, index = self.sequent.first_complex_prop
-        decomposed: list[Sequent] = self.decompose(prop)
+    def apply(self) -> list:
+        """
+        Apply this rule to self.sequent and return the results as a dict.
+        """
+        # decomposed is a list of sequents for invertible rules
+        # decomposed is a list of lists of sequents for non-invertible rules
+        decomposed = self.decompose()
+        return self.process(decomposed)
 
-        results = []
-        for sequent in decomposed:
-            new = self.sequent.remove(side, index)
-            results.append(Sequent.mix(new, sequent))
-
-        return results
+    @abstractmethod 
+    def decompose(self) -> list[Sequent] | set[list[Sequent]]:
+        """Return the results of applying this rule to self.sequent."""
 
     @abstractmethod
-    def decompose(self, prop: Proposition) -> list[Sequent]:
-        """Return sequents resulting from decomposing prop."""
+    def process(self, decomposed: list[Sequent] | list[list[Sequent]]) -> list:
+        """Convert sequents resulting from decomposition into a dict."""
 
-class LNeg(Rule):
-    def decompose(self, prop: Proposition) -> list[Sequent]:
+
+class InvertibleRule(Rule, ABC):
+    """Abstract class for invertible rules."""
+    is_invertible = True
+
+    def process(self, decomposed: list[Sequent]) -> list[Sequent]:
+        results = []
+        for decomp_result in decomposed:
+            new_sequent = Sequent.mix(decomp_result, self.main_prop_removed)
+            results.append(new_sequent)
+        return results
+
+
+class NonInvertibleRule(Rule, ABC):
+    """Abstract class for non-invertible rules."""
+    is_invertible = False
+
+    def process(self, decomposed: list[list[Sequent]]) -> list[Sequent]:
+        
+
+
+class LNeg(InvertibleRule):
+    def decompose(self) -> list[Sequent]:
         """Apply left negation rule to self.sequent."""
         return [Sequent(tuple(), (prop.content[0],))]
 
-class RNeg(Rule):
-    def decompose(self, prop: Proposition) -> list[Sequent]:
+
+class RNeg(InvertibleRule):
+    def decompose(self) -> list[Sequent]:
         """Apply right negation rule to self.sequent."""
         return [Sequent((prop.content[0],), tuple())]        
 
-class MultLAnd(Rule):
-    def decompose(self, prop: Proposition) -> list[Sequent]:
+class MultLAnd(InvertibleRule):
+    def decompose(self) -> list[Sequent]:
         """Apply multiplicative left conjunction rule to self.sequent."""
         return [Sequent(prop.content, tuple())]
 
 class AddLAnd(Rule):
-    def decompose(self, prop: Proposition) -> list[Sequent]:
+    is_invertible = False
+    def decompose(self) -> list[Sequent]:
         """Apply additive left conjunction rule to self.sequent."""
         pass
 
 class MultRAnd(Rule):
-    def decompose(self, prop: Proposition) -> list[Sequent]:
+    is_invertible = False
+    def decompose(self) -> list[Sequent]:
         """Apply multiplicative right conjunction rule to self.sequent."""
         pass
 
-class AddRAnd(Rule):
-    def decompose(self, prop: Proposition) -> list[Sequent]:
+class AddRAnd(InvertibleRule):
+    def decompose(self) -> list[Sequent]:
         """Apply additive right conjunction rule to self.sequent."""
         return [
             Sequent(tuple(), (prop.left,)),
@@ -60,48 +87,53 @@ class AddRAnd(Rule):
         ]
 
 class MultLOr(Rule):
-    def decompose(self, prop: Proposition) -> list[Sequent]:
+    is_invertible = False
+    def decompose(self) -> list[Sequent]:
         """Apply multiplicative left disjunction rule to self.sequent."""
         pass
 
-class AddLOr(Rule):
-    def decompose(self, prop: Proposition) -> list[Sequent]:
+class AddLOr(InvertibleRule):
+    def decompose(self) -> list[Sequent]:
         """Apply additive left disjunction rule to self.sequent."""
         return [
             Sequent((prop.left,), tuple()),
             Sequent((prop.right,), tuple())
         ]
 
-class MultROr(Rule):
-    def decompose(self, prop: Proposition) -> list[Sequent]:
+class MultROr(InvertibleRule):
+    def decompose(self) -> list[Sequent]:
         """Apply multiplicative right disjunction rule to self.sequent."""
         return [Sequent(tuple(), prop.content)]
 
 class AddROr(Rule):
-    def decompose(self, prop: Proposition) -> list[Sequent]:
+    is_invertible = False
+    def decompose(self) -> list[Sequent]:
         """Apply additive right disjunction rule to self.sequent."""
         pass
 
 class MultLIf(Rule):
-    def decompose(self, prop: Proposition) -> list[Sequent]:
+    is_invertible = False
+    def decompose(self) -> list[Sequent]:
         """Apply multiplicative left conditional rule to self.sequent."""
         pass
 
-class AddLIf(Rule):
-    def decompose(self, prop: Proposition) -> list[Sequent]:
+class AddLIf(InvertibleRule):
+    def decompose(self) -> list[Sequent]:
         """Apply additive left conditional rule to self.sequent."""
         return [
             Sequent(tuple(), (prop.left,)),
             Sequent((prop.right,), tuple())   
         ] 
 
-class MultRIf(Rule): 
-    def decompose(self, prop: Proposition) -> list[Sequent]: 
+class MultRIf(InvertibleRule): 
+    is_invertible = True
+    def decompose(self) -> list[Sequent]: 
         """Apply multiplicative right conditional rule to self.sequent.""" 
         return [Sequent((prop.left,), (prop.right,))]
 
 class AddRIf(Rule):
-    def decompose(self, prop: Proposition) -> list[Sequent]:
+    is_invertible = False
+    def decompose(self) -> list[Sequent]:
         """Apply additive right conditional rule to self.sequent."""
         pass
 

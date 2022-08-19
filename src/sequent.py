@@ -1,3 +1,5 @@
+import itertools 
+
 from dataclasses import dataclass
 
 from src.proposition import Proposition
@@ -9,7 +11,16 @@ class Sequent:
     con: tuple
 
     def __iter__(self):
-        return iter(self.ant, self.con)
+        yield from (self.ant, self.con)
+
+    @property
+    def is_atomic(self) -> bool:
+        """Return whether all propositions in self are atomic."""
+        for side in self:
+            for prop in side:
+                if prop.complexity > 0:
+                    return False
+        return True
 
     @property
     def complexity(self) -> int:
@@ -21,23 +32,7 @@ class Sequent:
         con_complexity = sum(prop.complexity for prop in self.con)
         return ant_complexity + con_complexity
 
-#    def decomposed(self) -> list['Sequent']:
-#        """
-#        Return a list containing the result(s) of decomposing the left-
-#        most proposition in self.
-#        """
-#        if self.complexity < 1:
-#            raise self.SequentIsAtomicError(self)
-#        prop, side, index = self.first_complex_prop()
-#        decomposed_proposition: tuple[tupseq] = prop.decomposed(side)
-#        sequents = []
-#        for result in decomposed_proposition:
-#            ant, con = self.remove(side, index)
-#            copy = tupseq(ant, con)
-#            sequents.append(Sequent.mix(copy, result))
-#        return sequents
-
-    def remove(self, side: str, index: int) -> tuple:
+    def remove(self, side: str, index: int) -> 'Sequent':
         """
         Return a new sequent object identical to this one but with the
         proposition at side, index removed.
@@ -74,7 +69,30 @@ class Sequent:
                 if prop.complexity >= 1:
                     return prop, side, i
 
-    class SequentIsAtomicError(Exception):
+    @property
+    def possible_mix_parents(self) -> list[tuple['Sequent']]:
+        """
+        Return a list of all possible parents this sequent may have had
+        from an application of mix or another non-invertible rule.
+        """
+        def two_parent_combinations(props):
+            """Yield possible combinations for props into two groups."""
+            combinations = itertools.product([True, False], repeat=len(props))
+            for combination in combinations:
+                x = [props[i] for i, v in enumerate(combination) if v]
+                y = [props[i] for i, v in enumerate(combination) if not v]
+                yield tuple(x), tuple(y)
+
+        results = []
+        for antecedents in two_parent_combinations(self.ant):
+            for consequents in two_parent_combinations(self.con):
+                left = Sequent(antecedents[0], consequents[0])
+                right = Sequent(antecedents[1], consequents[1])
+                results.append((left, right))
+        return results
+
+    class AtomicDecompositionError(Exception):
         def __init__(self, sequent):
-            string = f'Sequent {sequent} is already atomic.'
+            string = f'Sequent {sequent} is atomic and cannot be decomposed.'
             super().__init__(string)
+

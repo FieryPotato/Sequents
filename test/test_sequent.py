@@ -17,7 +17,7 @@ class TestSequent(unittest.TestCase):
         self.assertEqual(self.p, s.ant[0])
         self.assertEqual(self.q, s.con[0])
 
-    def test_sequent_equality(self) -> None:
+    def test_equality(self) -> None:
         c = Conditional(self.p, self.p)
         d = Disjunction(self.p, self.p)
         atomic_a = Sequent((self.p,), (self.p,))
@@ -26,13 +26,63 @@ class TestSequent(unittest.TestCase):
         self.assertNotEqual(atomic_a, ((self.p,), (self.p,)))
         self.assertNotEqual(c, d)
 
-    def test_sequent_complexity(self) -> None:
+    def test_complexity(self) -> None:
         s_0 = Sequent((self.p,), (self.q,))
         self.assertEqual(0, s_0.complexity)
         s_1 = Sequent((self.n,), ())
         self.assertEqual(1, s_1.complexity)
         s_2 = Sequent((self.n,), (self.n,))
         self.assertEqual(2, s_2.complexity)
+
+    def test_first_complex_prop(self) -> None:
+        s_0 = Sequent((self.p, self.q, self.n), (self.dj, self.cj))
+        expected = self.n, 'ant', 2
+        actual = s_0.first_complex_prop
+        self.assertEqual(expected, actual)
+        
+        s_1 = Sequent((self.p, self.q), (self.q, self.cj, self.dj))
+        expected = self.cj, 'con', 1
+        actual = s_1.first_complex_prop
+        self.assertEqual(expected, actual)
+
+    def test_possible_mix_parents(self) -> None:
+        s_0 = Sequent((self.p,), (self.q,))
+        expected = [
+            (Sequent((self.p,), (self.q,)), Sequent(tuple(), tuple())),
+            (Sequent((self.p,), tuple()), Sequent(tuple(), (self.q,))),
+            (Sequent(tuple(), (self.q,)), Sequent((self.p,), tuple())),
+            (Sequent(tuple(), tuple()), Sequent((self.p,), (self.q,)))
+        ]
+        self.assertEqual(expected, s_0.possible_mix_parents)
+
+        s_1 = Sequent((self.p, self.q), (self.cj, self.cd))
+        expected = [
+            (Sequent((self.p, self.q), (self.cj, self.cd)), Sequent(tuple(), tuple())),
+            (Sequent((self.p, self.q), (self.cj,)), Sequent(tuple(), (self.cd,))),
+            (Sequent((self.p, self.q), (self.cd,)), Sequent(tuple(), (self.cj,))),
+            (Sequent((self.p, self.q), tuple()), Sequent(tuple(), (self.cj, self.cd))),
+            (Sequent((self.p,), (self.cj, self.cd)), Sequent((self.q,), tuple())),
+            (Sequent((self.p,), (self.cj,)), Sequent((self.q,), (self.cd,))),
+            (Sequent((self.p,), (self.cd,)), Sequent((self.q,), (self.cj,))),
+            (Sequent((self.p,), tuple()), Sequent((self.q,), (self.cj, self.cd))),
+            (Sequent((self.q,), (self.cj, self.cd)), Sequent((self.p,), tuple())),
+            (Sequent((self.q,), (self.cj,)), Sequent((self.p,), (self.cd,))),
+            (Sequent((self.q,), (self.cd,)), Sequent((self.p,), (self.cj,))),
+            (Sequent((self.q,), tuple()), Sequent((self.p,), (self.cj, self.cd))),
+            (Sequent(tuple(), (self.cj, self.cd)), Sequent((self.p, self.q), tuple())),
+            (Sequent(tuple(), (self.cj,)), Sequent((self.p, self.q), (self.cd,))),
+            (Sequent(tuple(), (self.cd,)), Sequent((self.p, self.q), (self.cj,))),
+            (Sequent(tuple(), tuple()), Sequent((self.p, self.q), (self.cj, self.cd))),
+        ]
+        self.assertEqual(expected, s_1.possible_mix_parents)
+
+
+    def test_is_atomic(self) -> None:
+        a = Sequent((self.p,), (self.q,))
+        self.assertTrue(a.is_atomic)
+
+        c = Sequent((self.n,), (self.q,))
+        self.assertFalse(c.is_atomic)
 
 
 if __name__ == '__main__':
