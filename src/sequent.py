@@ -37,11 +37,11 @@ class Sequent:
         Return a new sequent object identical to this one but with the
         proposition at side, index removed.
         """
-        ant = self.ant
-        con = self.con
         if side == 'ant':
             ant = self.ant[:index] + self.ant[1 + index:]
+            con = self.con
         elif side == 'con':
+            ant = self.ant
             con = self.con[:index] + self.con[1 + index:]
         return Sequent(ant, con)
 
@@ -91,8 +91,9 @@ class Sequent:
                 results.append((left, right))
         return results
 
-    class AtomicDecompositionError(Exception):
-        def __init__(self, sequent):
-            string = f'Sequent {sequent} is atomic and cannot be decomposed.'
-            super().__init__(string)
+@dataclass(frozen=True, slots=True)
+class Axiom(Sequent):
+    ant: None
+    con: None
+
 

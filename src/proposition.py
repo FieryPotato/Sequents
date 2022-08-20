@@ -14,6 +14,9 @@ class Proposition(ABC):
     def __post_init__(self) -> None:
         self.validate_content()
 
+    def __getitem__(self, index) -> 'Proposition':
+        return self.content[0]
+
     @abstractmethod
     def content(self) -> tuple:
         """Return this object's propositional content."""
