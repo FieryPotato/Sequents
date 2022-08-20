@@ -91,9 +91,3 @@ class Sequent:
                 results.append((left, right))
         return results
 
-@dataclass(frozen=True, slots=True)
-class Axiom(Sequent):
-    ant: None
-    con: None
-
-
