@@ -2,7 +2,7 @@ import json
 import os
 import unittest
 
-from src.file_io import TextImporter, JSONImporter, get_importer
+from file_io import TextImporter, JSONImporter, get_importer
 
 text_content = 'a bird in hand is worth two in the bush; a bird in hand is worth two in the bush'
 json_roots_only = {
@@ -70,17 +70,24 @@ class TestImportText(unittest.TestCase):
         expected = text_content.split('\n')
         self.assertEqual(expected, actual)
 
+    def test_importing_incorrect_file_extension_causes_exception(self) -> None:
+        with self.assertRaises(KeyError):
+            importer = get_importer('test.tar.gz')
 
-class TestImportJson:
+
+class TestImportJson(unittest.TestCase):
     file_path = 'test/io_testing/test_file.json'
-
+    
     def tearDown(self) -> None:
         if os.path.exists(self.file_path):
             os.remove(self.file_path)
 
     def test_import_json_roots(self) -> None:
+        # setUp
         with open(self.file_path, 'w') as f:
-            json.dump(f, json_roots_only)
+            json.dump(json_roots_only, f, indent=4)
+        
+        # test
         importer = JSONImporter(self.file_path)
         actual = importer.import_dict()
         expected = json_roots_only

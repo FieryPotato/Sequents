@@ -1,7 +1,7 @@
 import unittest
 
-from src.sequent import Sequent
-from src.proposition import *
+from sequent import Sequent
+from proposition import *
 
 
 class TestSequent(unittest.TestCase):
@@ -45,34 +45,40 @@ class TestSequent(unittest.TestCase):
         actual = s_1.first_complex_prop
         self.assertEqual(expected, actual)
 
+    def test_atomic_first_complex_prop(self) -> None:
+        s = Sequent((self.p,), (self.q,))
+        expected = None, None, None
+        actual = s.first_complex_prop
+        self.assertEqual(expected, actual)
+
     def test_possible_mix_parents(self) -> None:
         s_0 = Sequent((self.p,), (self.q,))
         expected = [
-            (Sequent((self.p,), (self.q,)), Sequent(tuple(), tuple())),
-            (Sequent((self.p,), tuple()), Sequent(tuple(), (self.q,))),
-            (Sequent(tuple(), (self.q,)), Sequent((self.p,), tuple())),
-            (Sequent(tuple(), tuple()), Sequent((self.p,), (self.q,)))
+            (Sequent((self.p,), (self.q,)), Sequent((), ())),
+            (Sequent((self.p,), ()), Sequent((), (self.q,))),
+            (Sequent((), (self.q,)), Sequent((self.p,), ())),
+            (Sequent((), ()), Sequent((self.p,), (self.q,)))
         ]
         self.assertEqual(expected, s_0.possible_mix_parents)
 
         s_1 = Sequent((self.p, self.q), (self.cj, self.cd))
         expected = [
-            (Sequent((self.p, self.q), (self.cj, self.cd)), Sequent(tuple(), tuple())),
-            (Sequent((self.p, self.q), (self.cj,)), Sequent(tuple(), (self.cd,))),
-            (Sequent((self.p, self.q), (self.cd,)), Sequent(tuple(), (self.cj,))),
-            (Sequent((self.p, self.q), tuple()), Sequent(tuple(), (self.cj, self.cd))),
-            (Sequent((self.p,), (self.cj, self.cd)), Sequent((self.q,), tuple())),
+            (Sequent((self.p, self.q), (self.cj, self.cd)), Sequent((), ())),
+            (Sequent((self.p, self.q), (self.cj,)), Sequent((), (self.cd,))),
+            (Sequent((self.p, self.q), (self.cd,)), Sequent((), (self.cj,))),
+            (Sequent((self.p, self.q), ()), Sequent((), (self.cj, self.cd))),
+            (Sequent((self.p,), (self.cj, self.cd)), Sequent((self.q,), ())),
             (Sequent((self.p,), (self.cj,)), Sequent((self.q,), (self.cd,))),
             (Sequent((self.p,), (self.cd,)), Sequent((self.q,), (self.cj,))),
-            (Sequent((self.p,), tuple()), Sequent((self.q,), (self.cj, self.cd))),
-            (Sequent((self.q,), (self.cj, self.cd)), Sequent((self.p,), tuple())),
+            (Sequent((self.p,), ()), Sequent((self.q,), (self.cj, self.cd))),
+            (Sequent((self.q,), (self.cj, self.cd)), Sequent((self.p,), ())),
             (Sequent((self.q,), (self.cj,)), Sequent((self.p,), (self.cd,))),
             (Sequent((self.q,), (self.cd,)), Sequent((self.p,), (self.cj,))),
-            (Sequent((self.q,), tuple()), Sequent((self.p,), (self.cj, self.cd))),
-            (Sequent(tuple(), (self.cj, self.cd)), Sequent((self.p, self.q), tuple())),
-            (Sequent(tuple(), (self.cj,)), Sequent((self.p, self.q), (self.cd,))),
-            (Sequent(tuple(), (self.cd,)), Sequent((self.p, self.q), (self.cj,))),
-            (Sequent(tuple(), tuple()), Sequent((self.p, self.q), (self.cj, self.cd))),
+            (Sequent((self.q,), ()), Sequent((self.p,), (self.cj, self.cd))),
+            (Sequent((), (self.cj, self.cd)), Sequent((self.p, self.q), ())),
+            (Sequent((), (self.cj,)), Sequent((self.p, self.q), (self.cd,))),
+            (Sequent((), (self.cd,)), Sequent((self.p, self.q), (self.cj,))),
+            (Sequent((), ()), Sequent((self.p, self.q), (self.cj, self.cd))),
         ]
         self.assertEqual(expected, s_1.possible_mix_parents)
 

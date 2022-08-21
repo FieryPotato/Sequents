@@ -1,10 +1,10 @@
 import unittest
 
-from src.convert import deparenthesize, string_to_proposition, \
+from convert import deparenthesize, string_to_proposition, \
     string_to_sequent, find_connective
-from src.proposition import Atom, Conditional, Conjunction, \
+from proposition import Atom, Conditional, Conjunction, \
     Disjunction, Negation
-from src.sequent import Sequent
+from sequent import Sequent
 
 
 class TestConvertProposition(unittest.TestCase):
