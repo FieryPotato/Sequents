@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from src.proposition import Proposition
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True, frozen=True)
 class Sequent:
     ant: tuple
     con: tuple
@@ -59,15 +59,21 @@ class Sequent:
         return Sequent(new_ant, new_con)
 
     @property
-    def first_complex_prop(self) -> tuple[Proposition, str, int]:
+    def first_complex_prop(self) ->\
+            tuple[Proposition, str, int] | tuple[None, None, None]:
         """
         Return the leftmost complex proposition in the sequent, the
-        side of the sequent it's on, and its index on that side.
+        side of the sequent it's on, and its index on that side. If
+        self.is_atomic, return None, None, None. Results are stored
+        in self.fcp.
         """
         for side in ('ant', 'con'):
             for i, prop in enumerate(getattr(self, side)):
                 if prop.complexity >= 1:
                     return prop, side, i
+        else:
+            return None, None, None
+        
 
     @property
     def possible_mix_parents(self) -> list[tuple['Sequent']]:
@@ -82,6 +88,7 @@ class Sequent:
                 x = [props[i] for i, v in enumerate(combination) if v]
                 y = [props[i] for i, v in enumerate(combination) if not v]
                 yield tuple(x), tuple(y)
+            return (), ()
 
         results = []
         for antecedents in two_parent_combinations(self.ant):

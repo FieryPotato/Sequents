@@ -65,6 +65,7 @@ class Atom(Proposition):
     """
     Proposition class with no logical content.
     """
+    symb = ''
     prop: str
     arity = 1
 

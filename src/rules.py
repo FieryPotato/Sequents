@@ -1,7 +1,10 @@
+import json
+
 from abc import ABC, abstractmethod
+from typing import Any
 
 from src.proposition import Proposition
-from src.sequent import Sequent, Axiom
+from src.sequent import Sequent
 
 
 class Decomposer(ABC):
@@ -9,23 +12,15 @@ class Decomposer(ABC):
     num_parents: int
     is_invertible: bool
 
-    def __init__(self, sequent: Sequent, rule: Rule) -> None:
+    def __init__(self, sequent: Sequent) -> None:
         self.sequent = sequent
         prop, side, index = sequent.first_complex_prop
         self.removed_main_prop = sequent.remove(side, index)
-        self.rule = rule(self.prop)
+        self.rule = get_rule(prop, side)
 
     @abstractmethod
     def decompose(self) -> Any:
         """Apply self.rule to self.sequent."""
-
-class DecomposeAtom(Decomposer):
-    """Decomposer for atoms."""
-    num_parents = 0
-    is_invertible = True
-
-    def decompose(self) -> Axiom:
-        return Axiom()
 
 class DecomposeInvertibleOneParent(Decomposer):
     """Decomposer for invertible single-parent rules."""
@@ -84,7 +79,7 @@ class Rule(ABC):
         """Apply this rule."""
 
 
-class Atom(Rule):
+class Axiom(Rule):
     def decompose(self) -> None:
         return None
 
@@ -93,7 +88,7 @@ class LNeg(Rule):
     is_invertible = True
     num_parents = 1
 
-    def decompose(self) -> Sequent:
+    def apply(self) -> Sequent:
         """Apply left negation rule to self.sequent."""
         return Sequent(tuple(), self.proposition.content)
 
@@ -102,7 +97,7 @@ class RNeg(Rule):
     is_invertible = True
     num_parents = 1
 
-    def decompose(self) -> Sequent:
+    def apply(self) -> Sequent:
         """Apply right negation rule to self.sequent."""
         return Sequent(self.proposition.content, tuple())  
 
@@ -110,7 +105,7 @@ class MultLAnd(Rule):
     is_invertible = True
     num_parents = 1
 
-    def decompose(self) -> Sequent:
+    def apply(self) -> Sequent:
         """Apply multiplicative left conjunction rule to self.sequent."""
         return Sequent(self.proposition.content, tuple())
 
@@ -118,7 +113,7 @@ class AddLAnd(Rule):
     is_invertible = False
     num_parents = 1
 
-    def decompose(self) -> tuple[Sequent]:
+    def apply(self) -> tuple[Sequent]:
         """Apply additive left conjunction rule to self.sequent."""
         pass
         #return (Sequent((self.proposition[0],), tuple(),
@@ -128,7 +123,7 @@ class MultRAnd(Rule):
     is_invertible = False
     num_parents = 2
 
-    def decompose(self) -> tuple[Sequent]:
+    def apply(self) -> tuple[Sequent]:
         """Apply multiplicative right conjunction rule to self.sequent."""
         pass
 
@@ -136,18 +131,18 @@ class AddRAnd(Rule):
     is_invertible = True
     num_parents = 2
 
-    def decompose(self) -> tuple[Sequent]:
+    def apply(self) -> tuple[Sequent]:
         """Apply additive right conjunction rule to self.sequent."""
         return (
-            Sequent(tuple(), (prop.left,)),
-            Sequent(tuple(), (prop.right,))
+            Sequent(tuple(), (self.proposition.left,)),
+            Sequent(tuple(), (self.proposition.right,))
         )
 
 class MultLOr(Rule):
     is_invertible = False
     num_parents = 2
 
-    def decompose(self) -> tuple[Sequent]:
+    def apply(self) -> tuple[Sequent]:
         """Apply multiplicative left disjunction rule to self.sequent."""
         pass
 
@@ -155,26 +150,26 @@ class AddLOr(Rule):
     is_invertible = True
     num_parents = 2
 
-    def decompose(self) -> tuple[Sequent]:
+    def apply(self) -> tuple[Sequent]:
         """Apply additive left disjunction rule to self.sequent."""
         return (
-            Sequent((prop.left,), tuple()),
-            Sequent((prop.right,), tuple())
+            Sequent((self.proposition.left,), tuple()),
+            Sequent((self.proposition.right,), tuple())
         )
 
 class MultROr(Rule):
     is_invertible = True
     num_parents = 1
 
-    def decompose(self) -> Sequent:
+    def apply(self) -> Sequent:
         """Apply multiplicative right disjunction rule to self.sequent."""
-        return Sequent(tuple(), prop.content)
+        return Sequent(tuple(), self.proposition.content)
 
 class AddROr(Rule):
     is_invertible = False
     num_parents = 1
 
-    def decompose(self) -> tuple[Sequent]:
+    def apply(self) -> tuple[Sequent]:
         """Apply additive right disjunction rule to self.sequent."""
         pass
 
@@ -182,7 +177,7 @@ class MultLIf(Rule):
     is_invertible = False
     num_parents = 2
 
-    def decompose(self) -> tuple[Sequent]:
+    def apply(self) -> tuple[Sequent]:
         """Apply multiplicative left conditional rule to self.sequent."""
         pass
 
@@ -190,108 +185,134 @@ class AddLIf(Rule):
     is_invertible = True
     num_parents = 2
 
-    def decompose(self) -> tuple[Sequent]:
+    def apply(self) -> tuple[Sequent]:
         """Apply additive left conditional rule to self.sequent."""
         return (
-            Sequent(tuple(), (prop.left,)),
-            Sequent((prop.right,), tuple())   
+            Sequent(tuple(), (self.proposition.left,)),
+            Sequent((self.proposition.right,), tuple())   
         )
 
 class MultRIf(Rule): 
     is_invertible = True
     num_parents = 1
 
-    def decompose(self) -> Sequent: 
+    def apply(self) -> Sequent: 
         """Apply multiplicative right conditional rule to self.sequent.""" 
-        return Sequent((prop.left,), (prop.right,))
+        return Sequent((self.proposition.left,), (self.proposition.right,))
 
 class AddRIf(Rule):
     is_invertible = False
     num_parents = 1
 
-    def decompose(self) -> tuple[Sequent]:
+    def apply(self) -> tuple[Sequent]:
         """Apply additive right conditional rule to self.sequent."""
         pass
 
-# Ketonen rules are used by default.
-DEFAULTS = {
-    '~': {
-        'ant': 'mul',
-        'con': 'mul',
-    },
-    '&': {
-        'ant': 'mul',
-        'con': 'add',
-    },
-    'v': {
-        'ant': 'add',
-        'con': 'mul',
-    },
-    '->': {
-        'ant': 'add',
-        'con': 'mul'
-    }
-}
 
-RULES = {
-    '~': {
-        'ant': {
+rules = {
+    '~': { 'ant': {
             'add': LNeg,
             'mul': LNeg
-        },
-        'con': {
+        }, 'con': {
             'add': RNeg,
             'mul': RNeg
-        },
-    },
-    '&': {
-        'ant': {
+        }, },
+    '&': { 'ant': {
             'add': AddLAnd,
             'mul': MultLAnd
-        },
-        'con': {
+        }, 'con': {
             'add': AddRAnd,
             'mul': MultRAnd
-        },
-    },
-    'v': {
-        'ant': {
+        }, },
+    'v': { 'ant': {
             'add': AddLOr,
             'mul': MultLOr
-        },
-        'con': {
+        }, 'con': {
             'add': AddROr,
             'mul': MultROr
-        },
-    },
-    '->': {
-        'ant': {
+        }, },
+    '->': { 'ant': {
             'add': AddLIf,
             'mul': MultLIf
-        },
-        'con': {
+        }, 'con': {
             'add': AddRIf,
             'mul': MultRIf
-        },
-    }
+        }, }
 }
 
 
-def get_rule(proposition: Proposition, side: str, /, t=None) -> Rule:
+decomposers = {
+    '~': { 'ant': {
+            'add': DecomposeInvertibleOneParent,
+            'mul': DecomposeInvertibleOneParent
+        }, 'con': {
+            'add': DecomposeInvertibleOneParent,
+            'mul': DecomposeInvertibleOneParent
+        }, },
+    '&': { 'ant': {
+            'add': DecomposeNonInvertibleOneParent,
+            'mul': DecomposeInvertibleOneParent
+        }, 'con': {
+            'add': DecomposeInvertibleTwoParent,
+            'mul': DecomposeNonInvertibleTwoParent
+        }, },
+    'v': { 'ant': {
+            'add': DecomposeInvertibleTwoParent,
+            'mul': DecomposeNonInvertibleTwoParent
+        }, 'con': {
+            'add': DecomposeNonInvertibleOneParent,
+            'mul': DecomposeInvertibleOneParent
+        }, },
+    '->': { 'ant': {
+            'add': DecomposeInvertibleTwoParent,
+            'mul': DecomposeNonInvertibleTwoParent
+        }, 'con': {
+            'add': DecomposeNonInvertibleOneParent,
+            'mul': DecomposeInvertibleOneParent
+        }, }
+    
+}
+
+
+rule_settings = {}
+
+
+def load_rule_settings() -> None:
+    """Initialize global rule_settings variable."""
+    global rule_settings 
+
+    with open('config.json', 'r') as file:
+        settings = json.load(file)
+    rule_settings = settings['connective_type']
+
+
+def get_rule_setting(connective, side) -> str:
+    if not rule_settings:
+        load_rule_settings()
+    return rule_settings[connective][side]
+
+
+def get_rule(proposition: Proposition, side: str) -> Rule:
     """
     Return the appropriate function for decomposing a proposition.
 
     :param proposition: A proposition object (atoms cause exceptions)
     :param side: Either 'ant' or 'con'
-    :param t: Either None, 'mul', or 'add'
     """
     assert side in {'ant', 'con'}   
-    if proposition.complexity < 1:
-        raise Proposition.AtomicDecompositionError(proposition)
+
     connective = proposition.symb
-    if t is None:
-        t = DEFAULTS[connective][side]
-    rule = RULES[connective][side][t]
+    decomp_type = get_rule_setting(connective, side)
+    rule = rules[connective][side][decomp_type]
     return rule(proposition)
+
+
+def get_decomposer(sequent: Sequent) -> Decomposer:
+    """Return the appropriate decomposer for a given sequent."""
+    prop, side, index = sequent.first_complex_prop
+    connective = prop.symb
+    decomp_type = get_rule_setting(connective, side)
+    decomposer = decomposers[connective][side][decomp_type]
+    return decomposer(sequent)
     
 
