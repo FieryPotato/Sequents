@@ -1,11 +1,10 @@
 import unittest
-
 from unittest.mock import patch
 
 from proposition import Atom, Negation, Conditional, Conjunction, \
-    Disjunction, Proposition
-from sequent import Sequent
+    Disjunction
 from rules import get_decomposer
+from sequent import Sequent
 
 
 class TestRules(unittest.TestCase):
