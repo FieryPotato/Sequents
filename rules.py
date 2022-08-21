@@ -1,6 +1,6 @@
 import json
 from abc import ABC, abstractmethod
-from typing import Any, Tuple
+from typing import Any
 
 from proposition import Proposition
 from sequent import Sequent
@@ -157,9 +157,12 @@ class MultLOr(Rule):
     is_invertible = False
     num_parents = 2
 
-    def apply(self) -> tuple[Sequent]:
+    def apply(self) -> tuple[Sequent, Sequent]:
         """Apply multiplicative left disjunction rule to self.sequent."""
-        pass
+        return (
+            Sequent((self.proposition.left,), ()),
+            Sequent((self.proposition.right,), ())
+        )
 
 
 class AddLOr(Rule):
@@ -199,9 +202,12 @@ class MultLIf(Rule):
     is_invertible = False
     num_parents = 2
 
-    def apply(self) -> tuple[Sequent]:
+    def apply(self) -> tuple[Sequent, Sequent]:
         """Apply multiplicative left conditional rule to self.sequent."""
-        pass
+        return (
+            Sequent((), (self.proposition.left,)),
+            Sequent((self.proposition.right,), ())
+        )
 
 
 class AddLIf(Rule):
