@@ -38,7 +38,7 @@ class DecomposeAtom(Decomposer):
     def decompose(self) -> None:
         return self.rule.apply()
 
-    def get_parent_dict(self) -> None:
+    def get_parents(self) -> None:
         return None
 
 class DecomposeInvertibleOneParent(Decomposer):
