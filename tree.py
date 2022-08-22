@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 
 from sequent import Sequent
-from rules import get_rule
+from rules import get_rule, get_decomposer
+
 
 @dataclass(slots=True)
 class Tree:
@@ -18,18 +19,11 @@ class Tree:
 
     @property
     def is_full(self) -> bool:
-        def deepest_node_is_none(d: dict) -> bool:
-            for v in d.values():
-                if v is None:
-                    return True
-                elif not v:
-                    return False
-                return deepest_node_is_none(v)
-
+        """Return whether tree has been fully proved."""
         for value in self.branches.values():
             if value is None:
                 continue
-            elif not deepest_node_is_none(value):
+            elif not deepest_nodes_are_none(value):
                 return False
         return True
 
@@ -39,5 +33,38 @@ class Tree:
         in None.
         """
         while not self.is_full:
-            raise NotImplementedError
+            for root, d in self.branches.items():
+                if d == {}:
+                    decomposer = get_decomposer(root)
+                    result = decomposer.decompose()
+                    if result is None:
+                        self.branches[root] = None
+                    else:
+                        self.branches[root] = {
+                            result: {}
+                        }
+                else:
+                    for sequent, sub_tree in d.items():
+                        if sub_tree == {}:
+                            decomposer = get_decomposer(sequent)
+                            result = decomposer.decompose()
+                            if result is None:
+                                d[sequent] = None
+                            else:
+                                d[sequent] = {
+                                    result: {}
+                                }
 
+
+def deepest_nodes_are_none(d: dict) -> bool:
+    """
+    Return True if all branches in d terminate with None.
+    Return False if any node terminates in an empty dict.
+    """
+    if d == {}:
+        return False
+    for v in d.values():
+        if v is None:
+            continue
+        return deepest_nodes_are_none(v)
+    return True

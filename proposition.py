@@ -64,8 +64,8 @@ class Atom(Proposition):
     Proposition class with no logical content.
     """
     symb = ''
-    prop: str
     arity = 1
+    prop: str
 
     def __str__(self) -> str:
         return f'{self[0]}'

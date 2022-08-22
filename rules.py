@@ -13,15 +13,26 @@ class Decomposer(ABC):
     num_parents: int
     is_invertible: bool
 
-    def __init__(self, sequent: Sequent) -> None:
+    def __init__(self, sequent: Sequent = None) -> None:
         self.sequent = sequent
         prop, side, index = sequent.first_complex_prop
         self.removed_main_prop = sequent.remove(side, index)
         self.rule = get_rule(prop, side)
 
+
     @abstractmethod
     def decompose(self) -> Any:
         """Apply self.rule to self.sequent."""
+
+
+class DecomposeAtom(Decomposer):
+    """Decomposer for axioms."""
+    def __init__(self, sequent=Sequent) -> None:
+        self.sequent = sequent
+        self.rule = Axiom()
+
+    def decompose(self) -> None:
+        return self.rule.apply()
 
 
 class DecomposeInvertibleOneParent(Decomposer):
@@ -29,9 +40,11 @@ class DecomposeInvertibleOneParent(Decomposer):
     num_parents = 1
     is_invertible = True
 
-    def decompose(self) -> Sequent:
+    def decompose(self) -> Sequent | None:
         rule_result = self.rule.apply()
-        return Sequent.mix(self.removed_main_prop, rule_result)
+        if rule_result is not None:
+            return Sequent.mix(self.removed_main_prop, rule_result)
+        return None
 
 
 class DecomposeInvertibleTwoParent(Decomposer):
@@ -79,7 +92,7 @@ class DecomposeNonInvertibleTwoParent(Decomposer):
 class Rule(ABC):
     """Abstract class for rules."""
 
-    def __init__(self, proposition: Proposition) -> None:
+    def __init__(self, proposition: Proposition = None) -> None:
         self.proposition = proposition
 
     @abstractmethod
@@ -88,7 +101,7 @@ class Rule(ABC):
 
 
 class Axiom(Rule):
-    def apply(self) -> Sequent | tuple[Sequent] | None:
+    def apply(self) -> None:
         return None
 
 
@@ -331,6 +344,8 @@ def get_rule(proposition: Proposition, side: str) -> Rule:
     :param side: Either 'ant' or 'con'
     """
     connective = proposition.symb
+    if not connective:
+        return Axiom(proposition)
     decomp_type = get_rule_setting(connective, side)
     rule = rules[connective][side][decomp_type]
     return rule(proposition)
@@ -338,6 +353,8 @@ def get_rule(proposition: Proposition, side: str) -> Rule:
 
 def get_decomposer(sequent: Sequent) -> Decomposer:
     """Return the appropriate decomposer for a given sequent."""
+    if sequent.is_atomic:
+        return DecomposeAtom(sequent)
     prop, side, index = sequent.first_complex_prop
     connective = prop.symb
     decomp_type = get_rule_setting(connective, side)
