@@ -63,6 +63,20 @@ class TestTree(unittest.TestCase):
         }
         self.assertEqual(expected, actual)
 
+    def test_tree_grows_two_parent_invertible(self) -> None:
+        sequent = Sequent((self.dj,), ())
+        tree = Tree(sequent)
+        tree.grow()
+        actual = tree.branches
+        expected = {
+            sequent: {
+                Sequent((self.p,), ()): None,
+                Sequent((self.q,), ()): None
+
+            }
+        }
+        self.assertEqual(expected, actual)
+
 
 if __name__ == '__main__':
     unittest.main()

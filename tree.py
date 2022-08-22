@@ -1,7 +1,19 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from typing import Any
 
 from sequent import Sequent
-from rules import get_rule, get_decomposer
+from rules import get_decomposer
+
+
+class Grower:
+    def __init__(self, sequent: Sequent) -> None:
+        self.sequent = sequent
+
+    def process(self) -> dict:
+        """Process self.sequent and return results."""
+
+
 
 
 @dataclass(slots=True)
@@ -39,10 +51,17 @@ class Tree:
                     result = decomposer.decompose()
                     if result is None:
                         self.branches[root] = None
-                    else:
+                    elif isinstance(result, Sequent):
                         self.branches[root] = {
                             result: {}
                         }
+                    elif isinstance(result, tuple):
+                        for sequent in result:
+                            self.branches[root].update(
+                                {
+                                    sequent: {}
+                                }
+                            )
                 else:
                     for sequent, sub_tree in d.items():
                         if sub_tree == {}:
