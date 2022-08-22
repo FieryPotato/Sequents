@@ -1,28 +1,43 @@
-from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
 
-from proposition import Proposition
 from sequent import Sequent
 from rules import get_rule
 
-
+@dataclass(slots=True)
 class Tree:
     """
     Class representing proof-trees with a Sequent object as the root.
     Applications of sequent rules to each leaf on the tree yield more
     leaves until each leaf at the extremes is atomic.
     """
-    def __init__(self, root: Sequent) -> None:
-        self.braches = {}
+    root: Sequent
+    branches: dict = field(default_factory=dict)
 
-    def compute_branch(self, sequent: Sequent) -> list[Sequent]:
+    def __post_init__(self) -> None:
+        self.branches.update({self.root: {}})
+
+    @property
+    def is_full(self) -> bool:
+        def deepest_node_is_none(d: dict) -> bool:
+            for v in d.values():
+                if v is None:
+                    return True
+                elif not v:
+                    return False
+                return deepest_node_is_none(v)
+
+        for value in self.branches.values():
+            if value is None:
+                continue
+            elif not deepest_node_is_none(value):
+                return False
+        return True
+
+    def grow(self):
         """
-        Return a list containing the result(s) of decomposing the left-
-        most proposition in self.
+        Solve the root and each branch it creates until all leaves end
+        in None.
         """
-        rule = get_rule(sequent)
-        children = rule.apply()
-        if rule.is_invertible:
-            # Do invertible branch
-        else:
-            # Do non-invertible branch
+        while not self.is_full:
+            raise NotImplementedError
 
