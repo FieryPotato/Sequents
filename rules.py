@@ -49,7 +49,6 @@ class DecomposeInvertibleOneParent(Decomposer):
 
     def decompose(self) -> Sequent | None:
         rule_result = self.rule.apply()
-        # todo: move this check and return none out
         if rule_result is not None:
             return Sequent.mix(self.removed_main_prop, rule_result)
         return None

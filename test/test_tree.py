@@ -1,5 +1,7 @@
 import unittest
 
+from unittest.mock import patch
+
 from proposition import Atom, Conjunction, Negation, Disjunction, Conditional
 from sequent import Sequent
 from tree import Tree
@@ -34,7 +36,7 @@ class TestTree(unittest.TestCase):
         }
         self.assertEqual(expected, actual)
 
-    def test_tree_grows_one_parent_invertible(self) -> None:
+    def test_tree_grows_one_parent_invertible_only(self) -> None:
         sequent = Sequent((self.cj,), ())
         tree = Tree(sequent)
         tree.grow()
@@ -46,7 +48,7 @@ class TestTree(unittest.TestCase):
         }
         self.assertEqual(expected, actual)
 
-    def test_tree_grows_two_parent_invertible(self) -> None:
+    def test_tree_grows_two_parent_invertible_only(self) -> None:
         sequent = Sequent((self.dj,), ())
         tree = Tree(sequent)
         tree.grow()
@@ -60,13 +62,55 @@ class TestTree(unittest.TestCase):
         }
         self.assertEqual(expected, actual)
 
-
     def test_tree_can_only_be_grown_once(self) -> None:
         sequent = Sequent((), ())
         tree = Tree(sequent)
         tree.grow()
         with self.assertRaises(Tree.TreeIsGrownError):
             tree.grow()
+
+    def test_tree_grows_one_parent_non_invertible_only(self) -> None:
+        with patch('rules.get_rule_setting', return_value='add'):
+            sequent = Sequent((self.cj,), ())
+            tree = Tree(sequent)
+            tree.grow()
+            expected = {
+                sequent: [
+                    {
+                        Sequent((self.p,), ()): None,
+                    },
+                    {
+                        Sequent((self.q,), ()): None,
+                    }
+                ]
+            }
+            actual = tree.branches
+            self.assertEqual(expected, actual)
+
+    def test_tree_grows_one_parent_non_invertible_two_parent_invertible(self) -> None:
+        with patch('rules.get_rule_setting', return_value='add'):
+            sequent = Sequent((self.cj,), (self.cj,))
+            tree = Tree(sequent)
+            tree.grow()
+            expected = {
+                sequent: [
+                    {
+                        Sequent((self.p,), (self.cj,)): {
+                            Sequent((self.p,), (self.p,)): None,
+                            Sequent((self.p,), (self.q,)): None
+                        },
+                    },
+                    {
+                        Sequent((self.q,), (self.cj,)): {
+                            Sequent((self.q,), (self.p,)): None,
+                            Sequent((self.q,), (self.q,)): None
+                        },
+                    }
+                ]
+            }
+            actual = tree.branches
+            self.assertEqual(expected, actual)
+
 
 if __name__ == '__main__':
     unittest.main()
