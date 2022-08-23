@@ -22,24 +22,7 @@ class TestTree(unittest.TestCase):
     def test_tree_starts_not_full(self) -> None:
         sequent = Sequent((self.p,), (self.q,))
         tree = Tree(sequent)
-        self.assertFalse(tree.is_full)
-
-    def test_solved_tree_is_full(self) -> None:
-        sequent = Sequent((self.p,), (self.q,))
-        tree = Tree(sequent)
-        tree.branches[sequent] = None
-        self.assertTrue(tree.is_full)
-
-    def test_mid_solved_tree_is_not_full(self) -> None:
-        sequent = Sequent((self.cd, self.p), (self.p,))
-        tree = Tree(sequent)
-        tree.branches = {
-            sequent: {
-                Sequent((self.p,), (self.p, self.p)): None,
-                Sequent((self.q, self.p), (self.p,)): {}
-            }
-        }
-        self.assertFalse(tree.is_full)
+        self.assertFalse(tree.is_grown)
 
     def test_tree_grows_atom_to_none(self) -> None:
         sequent = Sequent((self.p,), (self.q,))
@@ -77,6 +60,13 @@ class TestTree(unittest.TestCase):
         }
         self.assertEqual(expected, actual)
 
+
+    def test_tree_can_only_be_grown_once(self) -> None:
+        sequent = Sequent((), ())
+        tree = Tree(sequent)
+        tree.grow()
+        with self.assertRaises(Tree.TreeIsGrownError):
+            tree.grow()
 
 if __name__ == '__main__':
     unittest.main()

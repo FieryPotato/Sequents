@@ -19,18 +19,18 @@ class Decomposer(ABC):
         self.removed_main_prop = sequent.remove(side, index)
         self.rule = get_rule(prop, side)
 
-
     @abstractmethod
     def decompose(self) -> Any:
         """Apply self.rule to self.sequent."""
-        
+
     @abstractmethod
     def get_parents(self) -> dict | list | None:
-        """Return self.sequent's parents as a dict for tree branches.""" 
+        """Return self.sequent's parents as a dict for tree branches."""
 
 
 class DecomposeAtom(Decomposer):
     """Decomposer for axioms."""
+
     def __init__(self, sequent=Sequent) -> None:
         self.sequent = sequent
         self.rule = Axiom()
@@ -40,6 +40,7 @@ class DecomposeAtom(Decomposer):
 
     def get_parents(self) -> None:
         return None
+
 
 class DecomposeInvertibleOneParent(Decomposer):
     """Decomposer for invertible single-parent rules."""
@@ -52,10 +53,10 @@ class DecomposeInvertibleOneParent(Decomposer):
         if rule_result is not None:
             return Sequent.mix(self.removed_main_prop, rule_result)
         return None
-        
+
     def get_parents(self) -> dict:
         parent = self.decompose()
-        return {parent: {}}
+        return {parent: None}
 
 
 class DecomposeInvertibleTwoParent(Decomposer):
@@ -69,13 +70,13 @@ class DecomposeInvertibleTwoParent(Decomposer):
             Sequent.mix(self.removed_main_prop, rule_result[0]),
             Sequent.mix(self.removed_main_prop, rule_result[1])
         )
-        
-    def get_parents(self) -> dict: 
+
+    def get_parents(self) -> dict:
         left, right = self.decompose()
         return {
-            left: {},
-            right: {}
-        } 
+            left: None,
+            right: None
+        }
 
 
 class DecomposeNonInvertibleOneParent(Decomposer):
@@ -89,12 +90,12 @@ class DecomposeNonInvertibleOneParent(Decomposer):
             Sequent.mix(self.removed_main_prop, rule_result[0]),
             Sequent.mix(self.removed_main_prop, rule_result[1])
         ]
-    
+
     def get_parents(self) -> list:
         a, b = self.decompose()
         return [
-                a: {},
-                b: {}
+            {a: None},
+            {b: None}
         ]
 
 
@@ -113,16 +114,17 @@ class DecomposeNonInvertibleTwoParent(Decomposer):
             decomp_results.append((l_result, r_result))
         return decomp_results
 
-    def get_parents(self) -> dict:
+    def get_parents(self) -> list:
         decomp_results = self.decompose()
         parents = []
-        for left, right in results:
+        for left, right in decomp_results:
             sub_dict = {
-                left: {},
-                right: {}
+                left: None,
+                right: None
             }
-            parents.append(sub_dict) 
-        return parents 
+            parents.append(sub_dict)
+        return parents
+
 
 class Rule(ABC):
     """Abstract class for rules."""

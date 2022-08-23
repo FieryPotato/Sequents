@@ -6,16 +6,6 @@ from sequent import Sequent
 from rules import get_decomposer
 
 
-class Grower:
-    def __init__(self, sequent: Sequent) -> None:
-        self.sequent = sequent
-
-    def process(self) -> dict:
-        """Process self.sequent and return results."""
-
-
-
-
 @dataclass(slots=True)
 class Tree:
     """
@@ -25,54 +15,50 @@ class Tree:
     """
     root: Sequent
     branches: dict = field(default_factory=dict)
+    _is_grown: bool = False
 
     def __post_init__(self) -> None:
         self.branches.update({self.root: {}})
 
     @property
-    def is_full(self) -> bool:
+    def is_grown(self) -> bool:
         """Return whether tree has been fully proved."""
-        for value in self.branches.values():
-            if value is None:
-                continue
-            elif not deepest_nodes_are_none(value):
-                return False
-        return True
+        return self._is_grown
 
     def grow(self):
         """
-        Solve the root and each branch it creates until all leaves end
-        in None.
+        Solve the root, then recursively solve each branch.
         """
-        while not self.is_full:
-            for root, d in self.branches.items():
-                if d == {}:
-                    decomposer = get_decomposer(root)
-                    result = decomposer.decompose()
-                    if result is None:
-                        self.branches[root] = None
-                    elif isinstance(result, Sequent):
-                        self.branches[root] = {
-                            result: {}
-                        }
-                    elif isinstance(result, tuple):
-                        for sequent in result:
-                            self.branches[root].update(
-                                {
-                                    sequent: {}
-                                }
-                            )
-                else:
-                    for sequent, sub_tree in d.items():
-                        if sub_tree == {}:
-                            decomposer = get_decomposer(sequent)
-                            result = decomposer.decompose()
-                            if result is None:
-                                d[sequent] = None
-                            else:
-                                d[sequent] = {
-                                    result: {}
-                                }
+        if self.is_grown:
+            raise self.TreeIsGrownError(self)
+        decomposer = get_decomposer(self.root)
+        parents = decomposer.get_parents()
+        self.branches[self.root] = parents
+        if parents is not None:
+            results = {}
+            for parent in self.branches[self.root]:
+                if (result := self.grow_branch(parent)) is None:
+                    continue
+                results.update(result)
+            self.branches.update(results)
+        self._is_grown = True
+
+    def grow_branch(self, sequent) -> dict | None:
+        results = {}
+        decomposer = get_decomposer(sequent)
+        if (parents := decomposer.get_parents()) is None:
+            return None
+        else:
+            for sequent in parents:
+                sub_parents = self.grow_branch(sequent)
+                results.update(sub_parents)
+        return results
+
+    class TreeIsGrownError(Exception):
+        def __init__(self, tree) -> None:
+            m = f'The tree beginning in {tree.root} has already been decomposed.'
+            super().__init__(m)
+
 
 
 def deepest_nodes_are_none(d: dict) -> bool:
