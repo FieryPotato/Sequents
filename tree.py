@@ -68,8 +68,11 @@ class Tree:
         results = {}
         parent: Sequent
         for parent in seq_dict:
-            if (result := self.grow_branch(parent)) is None:
+            branch = self.grow_branch(parent)
+            if branch is None:
                 result = {parent: None}
+            else:
+                result = {parent: branch}
             results.update(result)
         return results
 
