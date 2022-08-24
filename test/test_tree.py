@@ -108,6 +108,21 @@ class TestTree(unittest.TestCase):
             }
             actual = tree.branches
             self.assertEqual(expected, actual)
+            
+    def test_tree_grows_opi_opi(self) -> None:
+        with patch('rules.get_rule_setting', return_value='mul'):
+            sequent = Sequent((self.cj,), (self.dj,))
+            tree = Tree(sequent)
+            tree.grow()
+            expected = {
+                sequent: {
+                    Sequent((self.p, self.q), (self.dj,)): {
+                        Sequent((self.p, self.q), (self.p, self.q)): None
+                    }
+                }
+            }
+            actual = tree.branches
+            self.assertEqual(expected, actual)
 
     def test_tree_grows_one_parent_non_invertible_two_parent_invertible(self) -> None:
         with patch('rules.get_rule_setting', return_value='add'):
