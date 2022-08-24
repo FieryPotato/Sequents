@@ -54,12 +54,10 @@ class Tree:
             parent: self.grow_branch(parent) for parent in seq_dict
         }
 
-    def grow_branch(self, sequent) -> dict | None:
+    def grow_branch(self, sequent) -> dict | list | None:
         """
-        Return a dict whose only key is sequent and whose value is the
-        tree representing the continuation of the proof from it.
+        Return the body of the tree whose root is sequent.
         """
-        results = {}
         decomposer = get_decomposer(sequent)
         parents: dict[Sequent, None] | list[dict[Sequent, None]] | None
         if (parents := decomposer.get_parents()) is None:
