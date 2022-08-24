@@ -125,8 +125,8 @@ class TestTree(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     def test_tree_grows_opi_tpi(self) -> None:
-        types = ['mul', 'mul', 'add', 'add']
-        with patch('rules.get_rule_setting', side_effect=types):
+        s_e = ['mul', 'mul', 'add', 'add']
+        with patch('rules.get_rule_setting', side_effect=s_e):
             sequent = Sequent((self.cj,), (self.cj,))
             tree = Tree(sequent)
             tree.grow()
@@ -142,8 +142,8 @@ class TestTree(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     def test_tree_grows_opi_opni(self) -> None:
-        types = ['mul', 'mul', 'add', 'add']
-        with patch('rules.get_rule_setting', side_effect=types):
+        s_e = ['mul', 'mul', 'add', 'add']
+        with patch('rules.get_rule_setting', side_effect=s_e):
             sequent = Sequent((self.cj,), (self.dj,))
             tree = Tree(sequent)
             tree.grow()
@@ -189,8 +189,8 @@ class TestTree(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     def test_tree_grows_tpi_opi(self) -> None:
-        types = ['add', 'add', 'mul', 'mul', 'mul', 'mul']
-        with patch('rules.get_rule_setting', side_effect=types):
+        s_e = ['add', 'add', 'mul', 'mul', 'mul', 'mul']
+        with patch('rules.get_rule_setting', side_effect=s_e):
             sequent = Sequent((self.dj,), (self.dj,))
             tree = Tree(sequent)
             tree.grow()
@@ -208,8 +208,8 @@ class TestTree(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     def test_tree_grows_tpi_tpi(self) -> None:
-        types = ['add', 'add', 'add', 'add', 'add', 'add']
-        with patch('rules.get_rule_setting', side_effect=types):
+        s_e = ['add', 'add', 'add', 'add', 'add', 'add']
+        with patch('rules.get_rule_setting', side_effect=s_e):
             sequent = Sequent((self.dj,), (self.cj,))
             tree = Tree(sequent)
             tree.grow()
@@ -229,8 +229,8 @@ class TestTree(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     def test_tree_grows_tpi_opni(self) -> None:
-        types = ['add', 'add', 'add', 'add', 'add', 'add']
-        with patch('rules.get_rule_setting', side_effect=types):
+        s_e = ['add', 'add', 'add', 'add', 'add', 'add']
+        with patch('rules.get_rule_setting', side_effect=s_e):
             sequent = Sequent((self.dj,), (self.dj,))
             tree = Tree(sequent)
             tree.grow()
@@ -250,8 +250,8 @@ class TestTree(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     def test_tree_grows_tpi_tpni(self) -> None:
-        types = ['add', 'add', 'mul', 'mul', 'mul', 'mul']
-        with patch('rules.get_rule_setting', side_effect=types):
+        s_e = ['add', 'add', 'mul', 'mul', 'mul', 'mul']
+        with patch('rules.get_rule_setting', side_effect=s_e):
             sequent = Sequent((self.dj,), (self.cj,))
             tree = Tree(sequent)
             tree.grow()
@@ -283,8 +283,8 @@ class TestTree(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     def test_tree_grows_opni_opi(self) -> None:
-        types = ['add', 'add', 'mul', 'mul', 'mul', 'mul']
-        with patch('rules.get_rule_setting', side_effect=types):
+        s_e = ['add', 'add', 'mul', 'mul', 'mul', 'mul']
+        with patch('rules.get_rule_setting', side_effect=s_e):
             sequent = Sequent((self.cj,), (self.dj,))
             tree = Tree(sequent)
             tree.grow()
@@ -330,6 +330,75 @@ class TestTree(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     def test_tree_grows_opni_opni(self) -> None:
+        with patch('rules.get_rule_setting', return_value='add'):
+            sequent = Sequent((self.cj,), (self.dj,))
+            tree = Tree(sequent)
+            tree.grow()
+            expected = {
+                sequent: [
+                    {
+                        Sequent((self.p,), (self.dj,)): [
+                            {
+                                Sequent((self.p,), (self.p,)): None
+                            },
+                            {
+                                Sequent((self.p,), (self.q,)): None
+                            }
+                        ]
+                    },
+                    {
+                        Sequent((self.q,), (self.dj,)): [
+                            {
+                                Sequent((self.q,), (self.p,)): None
+                            },
+                            {
+                                Sequent((self.q,), (self.q,)): None
+                            }
+                        ]
+                    }
+                ]
+            }
+            actual = tree.branches
+            self.assertEqual(expected, actual)
+
+    def test_tree_grows_opni_tpni(self) -> None:
+        s_e = ['add', 'add', 'mul', 'mul', 'mul', 'mul']
+        with patch('rules.get_rule_setting', side_effect=s_e):
+            sequent = Sequent((self.cj,), (self.cj,))
+            tree = Tree(sequent)
+            tree.grow()
+            expected = {
+                sequent: [
+                    {
+                        Sequent((self.p,), (self.cj,)): [
+                            {
+                                Sequent((self.p,), (self.p,)): None,
+                                Sequent((), (self.q,)): None
+                            },
+                            {
+                                Sequent((), (self.p,)): None,
+                                Sequent((self.p,), (self.q,)): None
+                            }
+                        ]
+                    },
+                    {
+                        Sequent((self.q,), (self.cj,)): [
+                            {
+                                Sequent((self.q,), (self.p,)): None,
+                                Sequent((), (self.q,)): None
+                            },
+                            {
+                                Sequent((), (self.p,)): None,
+                                Sequent((self.q,), (self.q,)): None
+                            }
+                        ]
+                    }
+                ]
+            }
+            actual = tree.branches
+            self.assertEqual(expected, actual)
+
+    def test_tree_grows_tpni_opi(self) -> None:
         self.assertTrue(False)
 
 
