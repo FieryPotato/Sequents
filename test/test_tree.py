@@ -423,7 +423,8 @@ class TestTree(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     def test_tree_grows_tpni_tpi(self) -> None:
-        with patch('rules.get_rule_setting', return_value='add'):
+        s_e = ['mul', 'mul', 'add', 'add', 'add', 'add']
+        with patch('rules.get_rule_setting', side_effect=s_e):
             sequent = Sequent((self.dj,), (self.cj,))
             tree = Tree(sequent)
             tree.grow()
