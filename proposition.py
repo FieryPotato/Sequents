@@ -44,7 +44,7 @@ class BinaryProposition(Proposition):
     symb = None
 
     def __str__(self):
-        return f'({self[0]} {self.symb} {self[1]})'
+        return f'({str(self[0])} {self.symb} {str(self[1])})'
 
     def validate_content(self) -> None:
         for prop in self.content:
@@ -95,7 +95,7 @@ class Negation(Proposition):
     arity = 1
 
     def __str__(self) -> str:
-        return f'~ ({self[0]})'
+        return f'~ {str(self[0])}'
 
     @property
     def content(self) -> tuple[Proposition]:

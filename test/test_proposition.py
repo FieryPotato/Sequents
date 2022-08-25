@@ -59,8 +59,8 @@ class TestNegation(unittest.TestCase):
         self.n2 = Negation(self.n1)
 
     def test_string(self) -> None:
-        expected_0 = '~ (p1)'
-        expected_1 = '~ (~ (p1))'
+        expected_0 = '~ p1'
+        expected_1 = '~ ~ p1'
         self.assertEqual(expected_0, str(self.n1))
         self.assertEqual(expected_1, str(self.n2))
 

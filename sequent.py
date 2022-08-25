@@ -13,6 +13,11 @@ class Sequent:
     def __iter__(self):
         yield from (self.ant, self.con)
 
+    def __str__(self) -> str:
+        ant_str = ', '.join([str(prop) for prop in self.ant])
+        con_str = ', '.join([str(prop) for prop in self.con])
+        return f'{ant_str}; {con_str}'
+
     @property
     def is_atomic(self) -> bool:
         """Return whether all propositions in self are atomic."""

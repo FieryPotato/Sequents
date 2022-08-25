@@ -5,8 +5,8 @@ from proposition import *
 
 
 class TestSequent(unittest.TestCase):
-    p = Atom("P")
-    q = Atom("Q")
+    p = Atom("p")
+    q = Atom("q")
     n = Negation(p)
     cj = Conjunction(p, q)
     dj = Disjunction(p, q)
@@ -16,6 +16,34 @@ class TestSequent(unittest.TestCase):
         s = Sequent((self.p,), (self.q,))
         self.assertEqual(self.p, s.ant[0])
         self.assertEqual(self.q, s.con[0])
+
+    def test_sequent_string(self) -> None:
+        s_0 = Sequent((self.p,), (self.q,))
+        self.assertEqual('p; q', str(s_0))
+        s_1 = Sequent((self.cj, self.dj), (self.cd, self.n))
+        string = '(p & q), (p v q); (p -> q), ~ p'
+        self.assertEqual(string, str(s_1))
+        s_2 = Sequent(
+            (
+                Conjunction(
+                    Disjunction(
+                        self.p, 
+                        self.q
+                    ), 
+                    self.p
+                ),
+            ), 
+            (
+                Negation(
+                    Conditional(
+                        self.q, 
+                        self.n
+                    )
+                ),
+            )
+        )
+        string = '((p v q) & p); ~ (q -> ~ p)'
+        self.assertEqual(string, str(s_2))
 
     def test_equality(self) -> None:
         c = Conditional(self.p, self.p)

@@ -452,10 +452,95 @@ class TestTree(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     def test_tree_grows_tpni_opni(self) -> None:
-        pass
+        s_e = ['mul', 'mul', 'add', 'add', 'add', 'add']
+        with patch('rules.get_rule_setting', side_effect=s_e):
+            sequent = Sequent((self.dj,), (self.dj,))
+            tree = Tree(sequent)
+            tree.grow()
+            expected = {
+                sequent: [
+                    {
+                        Sequent((self.p,), (self.dj,)): [
+                            {
+                                Sequent((self.p,), (self.p,)): None,
+                            },
+                            {
+                                Sequent((self.p,), (self.q,)): None,
+                            }
+                        ],
+                        Sequent((self.q,), ()): None,
+                    },
+                    {
+                        Sequent((self.p,), ()): None,
+                        Sequent((self.q,), (self.dj,)): [
+                            {
+                                Sequent((self.q,), (self.p,)): None,
+                            },
+                            {
+                                Sequent((self.q,), (self.q,)): None,
+                            }
+                        ]
+                    }
+                ]
+            }
+            actual = tree.branches
+            self.assertEqual(expected, actual)
 
     def test_tree_grows_tpni_tpni(self) -> None:
-        pass
+        with patch('rules.get_rule_setting', return_value='mul'):
+            sequent = Sequent((self.dj,), (self.cj,))
+            tree = Tree(sequent)
+            tree.grow()
+            expected = {
+                sequent: [
+                    {
+                        Sequent((self.p,), (self.cj,)): [
+                            {
+                                Sequent((self.p,), (self.p,)): None,
+                                Sequent((), (self.q,)): None
+                            },
+                            {
+                                Sequent((), (self.p,)): None,
+                                Sequent((self.p,), (self.q,)): None
+                            }
+                        ],
+                        Sequent((self.q,), ()): None
+                    },
+                    {
+                        Sequent((self.p,), ()): None,
+                        Sequent((self.q,), (self.cj,)): [
+                            {
+                                Sequent((self.q,), (self.p,)): None,
+                                Sequent((), (self.q,)): None
+                            },
+                            {
+                                Sequent((), (self.p,)): None,
+                                Sequent((self.q,), (self.q,)): None
+                            }
+                        ],
+                    }
+                ]
+            }
+            actual = tree.branches
+            self.assertEqual(expected, actual)
+
+    def test_from_dict(self) -> None:
+        test = {
+            Sequent((self.n, self.cj), (self.cd, self.n)): {
+                Sequent((self.cj,), (self.cd, self.n, self.p)): {
+                    Sequent((self.p, self.q), (self.cd, self.n, self.p)): {
+                        Sequent((self.p, self.q, self.p), (self.n, self.p, self.q)): {
+                            Sequent((self.p, self.q, self.p, self.p), (self.p, self.q)): None
+                        }
+                    }
+                }
+            }
+        }
+        tree = Tree.from_dict(test)
+        self.assertEqual(tree.branches, test)
+        t2 = Tree(Sequent((self.n, self.cj), (self.cd, self.n)))
+        t2.grow()
+        self.assertEqual(t2, tree)
 
 
 if __name__ == '__main__':

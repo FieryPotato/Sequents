@@ -15,8 +15,8 @@ class Tree:
     {atomic_sequent: None}).
     """
     root: Sequent
+    is_grown: bool = field(default=False)
     branches: dict = field(default_factory=dict, init=False)
-    is_grown: bool = field(default=False, init=False)
 
     def __post_init__(self) -> None:
         self.branches.update({self.root: None})
@@ -69,7 +69,15 @@ class Tree:
                 results = self.grow_list_branch(parents)
         return results
 
+    @classmethod
+    def from_dict(cls, d) -> 'Tree':
+        first_key = next(iter(d.keys()))
+        tree = cls(first_key, is_grown=True)
+        tree.branches = d
+        return tree
+
     class TreeIsGrownError(Exception):
         def __init__(self, tree) -> None:
             m = f'The tree beginning in {tree.root} has already been decomposed.'
             super().__init__(m)
+
