@@ -2,7 +2,7 @@ import json
 import os
 import unittest
 
-from file_io import TextImporter, JSONImporter, get_importer
+from import_file import TextImporter, JSONImporter, get_importer
 
 text_content = 'a bird in hand is worth two in the bush; a bird in hand is worth two in the bush'
 json_roots_only = {
