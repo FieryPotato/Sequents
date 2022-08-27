@@ -2,50 +2,49 @@ import json
 import os
 import unittest
 
-from import_file import TextImporter, JSONImporter, get_importer
+from import_file import TextImporter, JSONImporter, ByteImporter, get_importer
 
 text_content = 'a bird in hand is worth two in the bush; a bird in hand is worth two in the bush'
 json_roots_only = {
-    'A v B; A, B': {},
-    'A, B; A v B': {},
-    'B & C; B, C': {},
-    'B, C; B & C': {},
-    'C, C -> D; D': {},
-    'D; C -> D, C': {},
-    'E; E': {},
+    'A v B; A, B': None,
+    'A, B; A v B': None,
+    'B & C; B, C': None,
+    'B, C; B & C': None,
+    'C, C -> D; D': None,
+    'D; C -> D, C': None,
+    'E; E': None,
 }
 json_tree = {
     'A v B; A, B': {
-        'A; A, B': {},
-        'B; A, B': {}
+        'A; A, B': None,
+        'B; A, B': None
     },
     'A, B; A v B': {
-        'A, B; A, B': {}
+        'A, B; A, B': None
     },
     'B & C; B, C': {
-        'B, C; B, C': {}
+        'B, C; B, C': None
     },
     'B, C; B & C': {
-        'B, C; B': {},
-        'B, C; C': {}
+        'B, C; B': None,
+        'B, C; C': None
 
     },
     'C, C -> D; D': {
-        'C; C': {},
-        'D; D': {}
+        'C; C': None,
+        'D; D': None
     },
     'D; C -> D, C': {
-        'C, D; D, C': {}
+        'C, D; D, C': None
     },
-    'E; E': {},
+    'E; E': None,
 }
 json_universes = {
     'P & Q; R': [
-        {'P; R': {}},
-        {'Q; R': {}}
+        {'P; R': None},
+        {'Q; R': None}
     ]
 }
-
 
 class TestImportText(unittest.TestCase):
     file_path = 'test/io_testing/test_file.txt'
@@ -66,7 +65,7 @@ class TestImportText(unittest.TestCase):
 
     def test_import_lines(self) -> None:
         importer = TextImporter(self.file_path)
-        actual = importer.import_lines()
+        actual = importer.import_()
         expected = text_content.split('\n')
         self.assertEqual(expected, actual)
 
@@ -77,21 +76,29 @@ class TestImportText(unittest.TestCase):
 
 class TestImportJson(unittest.TestCase):
     file_path = 'test/io_testing/test_file.json'
+
+    def setUp(self) -> None:
+        with open(self.file_path, 'w') as f:
+            json.dump(json_roots_only, f, indent=4)
     
     def tearDown(self) -> None:
         if os.path.exists(self.file_path):
             os.remove(self.file_path)
 
     def test_import_json_roots(self) -> None:
-        # setUp
-        with open(self.file_path, 'w') as f:
-            json.dump(json_roots_only, f, indent=4)
-        
-        # test
         importer = JSONImporter(self.file_path)
-        actual = importer.import_dict()
+        actual = importer.import_()
         expected = json_roots_only
         self.assertEqual(expected, actual)
+
+class TestImportBytes(unittest.TestCase):
+    file_path = 'test/io_testing/byte_test'
+
+    def test_import_bytes_trees(self) -> None:
+        importer = ByteImporter(self.file_path)
+        actual = importer.import_()
+        self.assertEqual(type(actual), list)
+        self.assertEqual(len(actual), 2)
 
 
 if __name__ == '__main__':

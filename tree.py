@@ -22,9 +22,7 @@ class Tree:
         self.branches.update({self.root: None})
 
     def grow(self):
-        """
-        Solve the root, then recursively solve each branch.
-        """
+        """Solve the root, then recursively solve each branch."""
         if self.is_grown:
             raise self.TreeIsGrownError(self)
         self.branches[self.root] = self.grow_branch(self.root)

@@ -1,6 +1,8 @@
 import json 
+import pickle
 
 from pathlib import Path
+from typing import Any
 
 from abc import ABC, abstractmethod
 
@@ -15,50 +17,49 @@ class Importer(ABC):
         self.path = path
 
     @abstractmethod
-    def import_lines(self) -> list[str]:
+    def import_(self) -> list[str]:
         """Import input file as lines for prover use."""
-
-    @abstractmethod
-    def import_dict(self) -> dict:
-        """Import input file as dictionary for printer use."""
 
 
 class TextImporter(Importer):
     """
     Class for importing text files.
     """
-    def import_lines(self) -> list[str]:
+    def import_(self) -> list[str]:
         with open(self.path, 'r') as file:
             lines = [line.strip('\n') for line in file.readlines()]
         return lines
-
-    def import_dict(self) -> dict:
-        pass
 
 
 class JSONImporter(Importer):
     """
     Class for importing json files.
     """
-    def import_lines(self) -> list[str]:
-        pass
-
-    def import_dict(self) -> dict:
+    def import_(self) -> dict[str, None]:
         with open(self.path, 'r') as file:
             data = json.load(file)
+        return data
+
+class ByteImporter(Importer):
+    """
+    Class for importing bytes-like objects.
+    """
+    def import_(self) -> Any:
+        with open(self.path, 'rb') as file:
+            data = pickle.load(file)
         return data
 
 
 def get_importer(path: str) -> Importer:
     """
-    Return the correct factory type for given input.
+    Return the correct Importer type for given input.
     """
 
-    factories = {
+    importers = {
         '.txt': TextImporter,
         '.json': JSONImporter
     }
     path_suffix = Path(path).suffix
-    if path_suffix not in factories.keys():
+    if path_suffix not in importers.keys():
         raise KeyError(f'{path_suffix} is not a supported import file type')
-    return factories[path_suffix](path)
+    return importers[path_suffix](path)
