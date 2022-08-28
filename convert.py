@@ -21,6 +21,8 @@ def deparenthesize(string: str) -> str:
     '(unconnected) (sets)'
     """
     # While string is bookended by parentheses.
+    if not string:
+        return ''
     while string[0] == '(' and string[-1] == ')':
         nestedness = 0
         for i, char in enumerate(string):
@@ -56,6 +58,8 @@ def string_to_proposition(string) -> Proposition:
             fac = DisjunctionFactory()
         case ['~' | 'not', negatum]:
             fac = NegationFactory()
+        case '':
+            return None
         case _:
             fac = AtomFactory()
     return fac.get_prop(*split_string)
@@ -74,6 +78,8 @@ def find_connective(string: str) -> list[str]:
     >>> Proposition.find_connective('anything')
     ['anything']
     """
+    if not string: 
+        return ''
     negations = {'~', 'not'}
     binaries = {'&', 'v', 'and', 'or', '->', 'implies'}
     word_list = string.split(' ')

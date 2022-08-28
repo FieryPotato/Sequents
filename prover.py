@@ -21,18 +21,13 @@ class Prover:
         the forest.
         """
         with Pool() as pool:
-            results = pool.imap_unordered(self.mk_tree, self.roots)
-        self.forest.extend(results)
+             trees = pool.imap_unordered(self.mk_tree, self.roots)
+             for tree in trees:
+                 self.forest.append(tree)
 
     def mk_tree(self, sequent) -> Tree:
         """Return Tree object grown from sequent."""
         tree = Tree(sequent)
         tree.grow()
         return tree
-
-    def export_as_strings(self) -> list:
-        trees_list = []
-        
-            
-            
 

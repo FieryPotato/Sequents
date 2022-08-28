@@ -57,7 +57,7 @@ class TestImportText(unittest.TestCase):
         if os.path.exists(self.file_path):
             os.remove(self.file_path)
 
-    def test_import_txt_file(self) -> None:
+    def test_get_text_importer(self) -> None:
         importer = get_importer(self.file_path)
         expected = TextImporter(self.file_path)
         self.assertEqual(expected.__class__, importer.__class__)
@@ -85,11 +85,18 @@ class TestImportJson(unittest.TestCase):
         if os.path.exists(self.file_path):
             os.remove(self.file_path)
 
+    def test_get_json_importer(self) -> None:
+        importer = get_importer(self.file_path)
+        expected = JSONImporter(self.file_path)
+        self.assertEqual(expected.__class__, importer.__class__)
+        self.assertEqual(expected.path, importer.path)
+
     def test_import_json_roots(self) -> None:
         importer = JSONImporter(self.file_path)
         actual = importer.import_()
         expected = json_roots_only
         self.assertEqual(expected, actual)
+
 
 class TestImportBytes(unittest.TestCase):
     file_path = 'test/io_testing/byte_test'
@@ -99,7 +106,14 @@ class TestImportBytes(unittest.TestCase):
         actual = importer.import_()
         self.assertEqual(type(actual), list)
         self.assertEqual(len(actual), 2)
+        for tree in actual:
+            self.assertEqual(str(type(tree)), '<class \'tree.Tree\'>')
 
+    def test_get_bytes_importer(self) -> None:
+        importer = get_importer(self.file_path)
+        expected = ByteImporter(self.file_path)
+        self.assertEqual(expected.__class__, importer.__class__)
+        self.assertEqual(expected.path, importer.path)
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,0 +1,5 @@
+(A -> B), (C & D), (E v F), ~ G; (H -> I), (J & K), (L v M), ~ N
+Socrates is human, all humans are mortal; Socrates is mortal
+; (((P -> Q) -> P) -> P)
+(P & (~ P));
+~ (P v (~ P)); (((Dionysus eats bagels or Elephants like to crash Funerals) & (~ Dionysus eats bagels)) -> Elephants like to crash Funerals)

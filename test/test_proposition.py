@@ -213,5 +213,10 @@ class TestBinary(unittest.TestCase):
                 self.assertEqual(e, str(a))
 
 
+# class TestNestedStrings(unittest.TestCase):
+#     def test_negation_inside_conjunction(self) -> None:
+#         expected = '
+# 
+
 if __name__ == '__main__':
     unittest.main()
