@@ -1,0 +1,20 @@
+{
+    "connective_type": {
+        "&": {
+            "ant": "mul",
+            "con": "add"
+        },
+        "v": {
+            "ant": "add",
+            "con": "mul"
+        },
+        "->": {
+            "ant": "add",
+            "con": "mul"
+        },
+        "~": {
+            "ant": "mul",
+            "con": "mul"
+        }
+    }
+}

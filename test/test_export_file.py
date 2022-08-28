@@ -5,7 +5,7 @@ import pickle
 from proposition import *
 from sequent import Sequent
 from tree import Tree
-from export_file import TreeExporter, PickleExporter
+from export_file import Pickler, PickleExporter
 
 
 class TestExportTxtFile(unittest.TestCase):
@@ -27,8 +27,8 @@ class TestExportTxtFile(unittest.TestCase):
                 {Sequent((self.p,),(self.q,)): None}
         }
         tree = Tree.from_dict(d)
-        exporter = TreeExporter(tree)
-        actual = exporter.pickled()
+        converter = Pickler(tree)
+        actual = converter.convert()
         self.assertEqual(tree, pickle.loads(actual))
 
     def test_saving_tree_to_file(self) -> None:

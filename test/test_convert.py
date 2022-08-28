@@ -188,10 +188,20 @@ class TestConvertSequent(unittest.TestCase):
                 self.assertEqual(expected, string_to_sequent(string))
 
     def test_convert_empty_antecedent(self) -> None:
-        string = '; no antecedent'
-        actual = string_to_sequent(string)
         expected = Sequent((), (Atom('no antecedent'),))
-        self.assertEqual(expected, actual)
+        test_strings = '; no antecedent', ' ; no antecedent'
+        for string in test_strings:
+            with self.subTest(i=string):
+                actual = string_to_sequent(string)
+                self.assertEqual(expected, actual)
+
+    def test_convert_empty_consequent(self) -> None:
+        expected = Sequent((Atom('no consequent'),), ())
+        test_strings = 'no consequent; ', 'no consequent;'
+        for string in test_strings:
+            with self.subTest(i=string):
+                actual = string_to_sequent(string)
+                self.assertEqual(expected, actual)
 
 
 if __name__ == '__main__':

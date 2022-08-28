@@ -59,7 +59,7 @@ def string_to_proposition(string) -> Proposition:
         case ['~' | 'not', negatum]:
             fac = NegationFactory()
         case '':
-            return None
+            raise ValueError('Cannot convert empty string to proposition.')
         case _:
             fac = AtomFactory()
     return fac.get_prop(*split_string)
@@ -110,23 +110,23 @@ def string_to_sequent(string: str) -> Sequent:
 
     # Convert antecedents
     antecedents = []
-    if (split_ants := ant_str.split(',')) != '':
-        for ant in split_ants:
-            prop = string_to_proposition(ant.strip(' '))
-            antecedents.append(prop)
+    split_ants: list[str] = ant_str.split(',')
+    for ant in split_ants:
+        if not (ant := ant.strip(' ')):
+            break
+        antecedents.append(string_to_proposition(ant))
 
     # Convert consequents
     consequents = []
-    if (split_cons := con_str.split(',')) != '':
-        for con in split_cons:
-            prop = string_to_proposition(con.strip(' '))
-            consequents.append(prop)
+    split_cons: list[str] = con_str.split(',')
+    for con in split_cons:
+        if not (con := con.strip(' ')):
+            break
+        consequents.append(string_to_proposition(con))
 
-    antecedent, consequent = tuple(antecedents), tuple(consequents)
-	
     return Sequent(
-        antecedent,
-        consequent
+        tuple(antecedents),
+        tuple(consequents)
     )
 
 
