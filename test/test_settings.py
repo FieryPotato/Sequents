@@ -31,7 +31,6 @@ class TestSettings(unittest.TestCase):
     def test_load_settings(self) -> None:
         with patch('settings._Settings.file', self.file):
             s = Settings()
-            
             self.assertEqual(test_config, s.dict)
 
 
