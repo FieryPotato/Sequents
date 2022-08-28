@@ -16,6 +16,7 @@ class TestProposition(unittest.TestCase):
         atom = Atom('p1')
         self.assertEqual('p1', atom[0])
 
+
 class TestAtom(unittest.TestCase):
     def setUp(self) -> None:
         self.a1 = Atom('p1')
