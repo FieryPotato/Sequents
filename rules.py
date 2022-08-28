@@ -4,8 +4,7 @@ from typing import Any
 
 from proposition import Proposition
 from sequent import Sequent
-
-CONFIG_FILE = 'config.json'
+from settings import Settings
 
 
 class Decomposer(ABC):
@@ -354,22 +353,9 @@ decomposers = {
     }, }
 }
 
-rule_settings = {}
-
-
-def load_rule_settings() -> None:
-    """Initialize global rule_settings variable."""
-    global rule_settings
-
-    with open(CONFIG_FILE, 'r') as file:
-        settings = json.load(file)
-    rule_settings = settings['connective_type']
-
 
 def get_rule_setting(connective, side) -> str:
-    if not rule_settings:
-        load_rule_settings()
-    return rule_settings[connective][side]
+    return Settings().rules(connective, side)
 
 
 def get_rule(proposition: Proposition, side: str) -> Rule:
