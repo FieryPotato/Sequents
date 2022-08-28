@@ -1,9 +1,14 @@
 import json 
+import os 
+
+from pathlib import Path
 
 from typing import Any
 
+parent_dir = Path.cwd()
+
 class _Settings(dict):
-    file = 'config.json'
+    file = os.path.join(parent_dir, 'Sequents/config.json')
 
     def __init__(self) -> None:
         super().__init__()
