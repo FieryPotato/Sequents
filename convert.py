@@ -107,8 +107,23 @@ def string_to_sequent(string: str) -> Sequent:
     Return a sequent from input string.
     """
     ant_str, con_str = string.split(';')
-    antecedent = tuple(string_to_proposition(s.strip(' ')) for s in ant_str.split(','))
-    consequent = tuple(string_to_proposition(s.strip(' ')) for s in con_str.split(','))
+
+    # Convert antecedents
+    antecedents = []
+    if (split_ants := ant_str.split(',')) != '':
+        for ant in split_ants:
+            prop = string_to_proposition(ant.strip(' '))
+            antecedents.append(prop)
+
+    # Convert consequents
+    consequents = []
+    if (split_cons := con_str.split(',')) != '':
+        for con in split_cons:
+            prop = string_to_proposition(con.strip(' '))
+            consequents.append(prop)
+
+    antecedent, consequent = tuple(antecedents), tuple(consequents)
+	
     return Sequent(
         antecedent,
         consequent
