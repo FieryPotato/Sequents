@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="62329d0e-5f06-4a19-92ea-109f579418a9" name="Changes" comment="Once again it was buggy tests" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectId" id="2CgPfh5corzKvbJF4iNGNACm9Bf" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+  </component>
+  <component name="RunManager" selected="Python tests.Python tests in test">
+    <configuration name="Python tests for test_tree.TestTree" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="Sequents" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="$PROJECT_DIR$/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_tree.TestTree&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_tree.TestTree.test_tree_grows_opni_tpni" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="Sequents" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="$PROJECT_DIR$/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_tree.TestTree.test_tree_grows_opni_tpni&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_tree.TestTree.test_tree_grows_tpni_opi" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="Sequents" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="$PROJECT_DIR$/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_tree.TestTree.test_tree_grows_tpni_opi&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_tree.TestTree.test_tree_grows_tpni_tpi" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="Sequents" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="$PROJECT_DIR$/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_tree.TestTree.test_tree_grows_tpni_tpi&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_tree.TestTree.test_tree_grows_tpni_tpni" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="Sequents" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="$PROJECT_DIR$/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_tree.TestTree.test_tree_grows_tpni_tpni&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests in test" type="tests" factoryName="Autodetect" nameIsGenerated="true">
+      <module name="Sequents" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/test&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Autodetect">
+      <module name="Sequents" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="$PROJECT_DIR$/bin/python" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Unittests">
+      <module name="Sequents" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="$PROJECT_DIR$/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_pattern" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python tests.Python tests in test" />
+      <item itemvalue="Python tests.Python tests for test_tree.TestTree.test_tree_grows_opni_tpni" />
+      <item itemvalue="Python tests.Python tests for test_tree.TestTree" />
+      <item itemvalue="Python tests.Python tests for test_tree.TestTree.test_tree_grows_tpni_opi" />
+      <item itemvalue="Python tests.Python tests for test_tree.TestTree.test_tree_grows_tpni_tpi" />
+      <item itemvalue="Python tests.Python tests for test_tree.TestTree.test_tree_grows_tpni_tpni" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python tests.Python tests for test_tree.TestTree.test_tree_grows_tpni_tpni" />
+        <item itemvalue="Python tests.Python tests for test_tree.TestTree.test_tree_grows_tpni_tpi" />
+        <item itemvalue="Python tests.Python tests for test_tree.TestTree.test_tree_grows_tpni_opi" />
+        <item itemvalue="Python tests.Python tests for test_tree.TestTree" />
+        <item itemvalue="Python tests.Python tests for test_tree.TestTree.test_tree_grows_opni_tpni" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="62329d0e-5f06-4a19-92ea-109f579418a9" name="Changes" comment="" />
+      <created>1659221360114</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1659221360114</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Changed triple-single quotes to triple-double quotes for docstrings because apparently thant's the standard.">
+      <created>1660369370199</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1660369370199</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Pep 8'ed the code">
+      <created>1660675038015</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1660675038015</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Moved .src files to main scope to make this a proper module">
+      <created>1661115500643</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1661115500643</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Moved .src files to main scope to make this a proper module, minor edits, implemented non-invertible rule decomposition">
+      <created>1661115544063</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1661115544063</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Minor changes">
+      <created>1661115552815</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1661115552815</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Implemented all 2-parent non-invertible decomposition rules.">
+      <created>1661116218252</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1661116218252</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Removed unused import">
+      <created>1661116251150</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1661116251150</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Updated .gitignore">
+      <created>1661116813214</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1661116813214</updated>
+    </task>
+    <task id="LOCAL-00009" summary="formatted comments">
+      <created>1661116909042</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1661116909042</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Implemented is_full property for trees and started work on tree growth.">
+      <created>1661142774899</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1661142774899</updated>
+    </task>
+    <task id="LOCAL-00011" summary="First level of Tree.grow is implemented.">
+      <created>1661190607836</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1661190607836</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Tree.grow is implemented for two-parent invertible rules; I'd like to refactor because it's a mess.">
+      <created>1661191687870</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1661191687870</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Refactored and cleaned up tree.grow">
+      <created>1661269944712</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1661269944712</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Implemented Tree.grow for single-parent non-invertible sequents followed by an invertible two-parent sequent.">
+      <created>1661279738288</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1661279738288</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Refactored and added more tests for tree growth.">
+      <created>1661360021089</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1661360021089</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Tests added, only two-parent non-invertible rules are left">
+      <created>1661365302442</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1661365302442</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Test fails to grow two-parent-non-invertible two-parent-invertible.">
+      <created>1661366259539</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1661366259539</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Once again it was buggy tests">
+      <created>1661441112449</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1661441112449</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Changed triple-single quotes to triple-double quotes for docstrings because apparently thant's the standard." />
+    <MESSAGE value="Pep 8'ed the code" />
+    <MESSAGE value="Moved .src files to main scope to make this a proper module" />
+    <MESSAGE value="Moved .src files to main scope to make this a proper module, minor edits, implemented non-invertible rule decomposition" />
+    <MESSAGE value="Minor changes" />
+    <MESSAGE value="Implemented all 2-parent non-invertible decomposition rules." />
+    <MESSAGE value="Removed unused import" />
+    <MESSAGE value="Updated .gitignore" />
+    <MESSAGE value="formatted comments" />
+    <MESSAGE value="Implemented is_full property for trees and started work on tree growth." />
+    <MESSAGE value="First level of Tree.grow is implemented." />
+    <MESSAGE value="Tree.grow is implemented for two-parent invertible rules; I'd like to refactor because it's a mess." />
+    <MESSAGE value="Refactored and cleaned up tree.grow" />
+    <MESSAGE value="Implemented Tree.grow for single-parent non-invertible sequents followed by an invertible two-parent sequent." />
+    <MESSAGE value="Refactored and added more tests for tree growth." />
+    <MESSAGE value="Tests added, only two-parent non-invertible rules are left" />
+    <MESSAGE value="Test fails to grow two-parent-non-invertible two-parent-invertible." />
+    <MESSAGE value="Once again it was buggy tests" />
+    <option name="LAST_COMMIT_MESSAGE" value="Once again it was buggy tests" />
+  </component>
+</project>
