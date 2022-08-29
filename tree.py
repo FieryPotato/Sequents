@@ -68,10 +68,10 @@ class Tree:
         return results
 
     @classmethod
-    def from_dict(cls, d) -> 'Tree':
-        first_key = next(iter(d.keys()))
-        tree = cls(first_key, is_grown=True)
-        tree.branches = d
+    def from_dict(cls, dictionary: dict, is_grown: bool = True) -> 'Tree':
+        first_key = next(iter(dictionary.keys()))
+        tree = cls(first_key, is_grown=is_grown)
+        tree.branches = dictionary
         return tree
 
     class TreeIsGrownError(Exception):
