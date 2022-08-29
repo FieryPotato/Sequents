@@ -4,9 +4,10 @@ import sys
 
 from pathlib import Path
 
+from export_file import get_exporter
 from import_file import get_importer
 from prover import Prover
-from export_file import get_exporter
+from settings import Settings
 
 
 solve_help = 'decompose sequents in infile and export the results to '\
@@ -70,17 +71,17 @@ def normalize_rule_args(args) -> tuple[str, str, str]:
     side: str
     value: str
    
-   for key, c_set in connectives.items():
+    for key, c_set in connectives.items():
         if args.connective in c_set:
             connective = key
             break
    
-   for key, s_set in sides.items():
+    for key, s_set in sides.items():
         if args.side in s_set:
             side = key
             break
    
-   for key, v_set in values.items():
+    for key, v_set in values.items():
         if args.value in v_set:
             value = key
             break
@@ -95,17 +96,18 @@ def main():
 
     # create solver subparser
     solver = subparsers.add_parser('solve', help=solve_help)
-    solver.add_argument('infile')
-    solver.add_argument('outfile', default=None, nargs='?')
+    solver.add_argument('infile', help='file to be imported')
+    solver.add_argument('outfile', default=None, 
+            nargs='?', help='destination for results file')
 
     # create subparser for setting rules
     set_rule = subparsers.add_parser('set_rule', help='edit rule settings')
-    set_rule.add_argument('side')
-    set_rule.add_argument('connective')
-    set_rule.add_argument('value')
+    set_rule.add_argument('side', help='\'ant\' or \'con\'')
+    set_rule.add_argument('connective', help='any connective word or symbol')
+    set_rule.add_argument('value', help='\'add\' or \'mul\'')
 
     # create subparser for viewing rules
-    view_rule = subparsers.add_parser('view_rule', help='view current rule settings')
+    view_rules = subparsers.add_parser('view_rules', help='view current rule settings')
 
     # Parse arguments
     args = parser.parse_args()
@@ -116,7 +118,7 @@ def main():
     elif args.subcommand == 'set_rule':
         connective, side, value = normalize_rule_args(args)
         Settings().set_rule(connective, side, value)
-    elif args.subcommand == 'view_rule':
+    elif args.subcommand == 'view_rules':
         Settings().print_rules()
     else:
         print('Unknown command.')
