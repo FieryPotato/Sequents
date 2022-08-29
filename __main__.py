@@ -69,19 +69,24 @@ def normalize_rule_args(args) -> tuple[str, str, str]:
     connective: str
     side: str
     value: str
-    for key, c_set in connectives.items():
+   
+   for key, c_set in connectives.items():
         if args.connective in c_set:
             connective = key
             break
-    for key, s_set in sides.items():
+   
+   for key, s_set in sides.items():
         if args.side in s_set:
             side = key
             break
-    for key, v_set in values.items():
+   
+   for key, v_set in values.items():
         if args.value in v_set:
             value = key
             break
+
     return connective, side, t
+
 
 def main():
     # Set up parser
@@ -93,16 +98,14 @@ def main():
     solver.add_argument('infile')
     solver.add_argument('outfile', default=None, nargs='?')
 
-    # create printer subparser
-    printer = subparsers.add_parser('print')
-    printer.add_argument('infile')
-    printer.add_argument('outfile', default=None, nargs='?')
-
     # create subparser for setting rules
     set_rule = subparsers.add_parser('set_rule', help='edit rule settings')
     set_rule.add_argument('side')
     set_rule.add_argument('connective')
     set_rule.add_argument('value')
+
+    # create subparser for viewing rules
+    view_rule = subparsers.add_parser('view_rule', help='view current rule settings')
 
     # Parse arguments
     args = parser.parse_args()
@@ -110,13 +113,13 @@ def main():
     # run command
     if args.subcommand == 'solve':
         solve(args.infile, args.outfile)
-    elif args.subcommand == 'print':
-        print('Printing outfile to infile (Not implemented)')
     elif args.subcommand == 'set_rule':
         connective, side, value = normalize_rule_args(args)
         Settings().set_rule(connective, side, value)
+    elif args.subcommand == 'view_rule':
+        Settings().print_rules()
     else:
-        print('Something went wrong.')
+        print('Unknown command.')
 
 if __name__ == '__main__':
     main()

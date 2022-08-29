@@ -27,6 +27,17 @@ class PickleExporter(Exporter):
             pickle.dump(self.data, f)
 
 
+class JSONExporter(Exporter):
+    """Class for exporting data to a .json file."""
+    def export(self) -> None:
+        raise NotImplementedError
+
+class HTMLExporter(Exporter):
+    """Class for exporting data to an .html file for viewing."""
+    def export(self) -> None:
+        raise NotImplementedError
+
+
 def get_exporter(dst: str, data: Any) -> Exporter:
     """Return the desired exporter object."""
     # JSON and HTML exporters not yet implemented.

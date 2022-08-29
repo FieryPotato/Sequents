@@ -9,15 +9,21 @@ class Proposition(ABC):
     """
     Base class for propositions.
     """
-    left = None
-    right = None
-    arity = None
-    symb = None
+    arity = None  # How many propositions this object contains.
+    symb = None  # The logical symbol this object assumes.
 
     def __post_init__(self) -> None:
         self.validate_content()
 
     def __getitem__(self, index) -> 'Proposition':
+        """
+        Allows slicing into self, eg.:
+        >>> cj = Conjunction(p, q)  # NB: p and q are Atom objects
+        >>> cj[0] == p == cj.left
+        True
+        >>> cj[1] == q == cj.right
+        True
+        """
         return self.content[index]
 
     @abstractmethod
@@ -26,11 +32,12 @@ class Proposition(ABC):
 
     @property
     def complexity(self) -> int:
+        """Return this object's logical complexity."""
         return 1 + max(p.complexity for p in self.content)
 
     @abstractmethod
     def validate_content(self) -> None:
-        """Raises error if content has incorrect type."""
+        """Raise error if content has incorrect type."""
 
 
 @dataclass(slots=True, frozen=True)
@@ -130,3 +137,4 @@ class Disjunction(BinaryProposition):
     Binary proposition signifying logical '... or ...'
     """
     symb = 'v'
+

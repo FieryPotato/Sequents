@@ -20,6 +20,7 @@ class Prover:
         Turn each sequent in self.roots into a full tree and add it to 
         the forest.
         """
+        # Done with multiprocessing to speed up work on big trees.
         with Pool() as pool:
              trees = pool.imap_unordered(self.mk_tree, self.roots)
              for tree in trees:

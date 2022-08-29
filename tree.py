@@ -69,12 +69,15 @@ class Tree:
 
     @classmethod
     def from_dict(cls, dictionary: dict, is_grown: bool = True) -> 'Tree':
+        """Initialize a Tree object from input dictionary."""
         first_key = next(iter(dictionary.keys()))
         tree = cls(first_key, is_grown=is_grown)
         tree.branches = dictionary
         return tree
 
+
     class TreeIsGrownError(Exception):
+        """Trees should only be able to be grown once."""
         def __init__(self, tree) -> None:
             m = f'The tree beginning in {tree.root} has already been decomposed.'
             super().__init__(m)

@@ -54,13 +54,13 @@ def get_importer(path: str) -> Importer:
     """
     Return the correct Importer type for given input.
     """
-
     importers = {
         '.txt': TextImporter,
         '.json': JSONImporter,
         '': ByteImporter
     }
-    path_suffix = Path(path).suffix
+    
+    path_suffix = Path(path).suffix  # the file extension
     if path_suffix not in importers.keys():
         raise KeyError(f'{path_suffix} is not a supported import file type')
     return importers[path_suffix](path)

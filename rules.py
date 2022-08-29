@@ -136,6 +136,7 @@ class Rule(ABC):
 
 
 class Axiom(Rule):
+    """Rule for terminating tree branches."""
     def apply(self) -> None:
         return None
 
@@ -355,6 +356,7 @@ decomposers = {
 
 
 def get_rule_setting(connective, side) -> str:
+    """Return 'add' or 'mul' from config.json for this rule."""
     return Settings().get_rule(connective, side)
 
 
@@ -382,3 +384,4 @@ def get_decomposer(sequent: Sequent) -> Decomposer:
     decomp_type = get_rule_setting(connective, side)
     decomposer = decomposers[connective][side][decomp_type]
     return decomposer(sequent)
+

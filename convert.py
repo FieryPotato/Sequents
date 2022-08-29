@@ -20,9 +20,11 @@ def deparenthesize(string: str) -> str:
     >>> deparenthesize('(unconnected) (sets)')
     '(unconnected) (sets)'
     """
-    # While string is bookended by parentheses.
+    # Return early if there is not string.
     if not string:
         return ''
+
+    # While string is bookended by parentheses.
     while string[0] == '(' and string[-1] == ')':
         nestedness = 0
         for i, char in enumerate(string):
@@ -78,11 +80,16 @@ def find_connective(string: str) -> list[str]:
     >>> Proposition.find_connective('anything')
     ['anything']
     """
+    # Return early if the string is empty.
     if not string: 
         return ''
+
+    # connective keywords
     negations = {'~', 'not'}
     binaries = {'&', 'v', 'and', 'or', '->', 'implies'}
+
     word_list = string.split(' ')
+
     # Check for negation as main connective.
     if word_list[0] in negations:
         sub_prop = ' '.join(word_list[1:])
@@ -112,6 +119,7 @@ def string_to_sequent(string: str) -> Sequent:
     antecedents = []
     split_ants: list[str] = ant_str.split(',')
     for ant in split_ants:
+        # Ignore empty strings.
         if not (ant := ant.strip(' ')):
             break
         antecedents.append(string_to_proposition(ant))
@@ -120,6 +128,8 @@ def string_to_sequent(string: str) -> Sequent:
     consequents = []
     split_cons: list[str] = con_str.split(',')
     for con in split_cons:
+
+        # Ignore empty strings.
         if not (con := con.strip(' ')):
             break
         consequents.append(string_to_proposition(con))

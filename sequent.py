@@ -53,8 +53,8 @@ class Sequent:
     @staticmethod
     def mix(*args) -> 'Sequent':
         """
-        Return a combination of self and other. Other can be a sequent
-        or tupseq (or any object with .ant and .con properties).
+        Return a sequent whose antecedent is the combined antecedents
+        of all seqeunts in args, and likewise for consequents.
         """
         new_ant = ()
         new_con = ()
@@ -98,8 +98,8 @@ class Sequent:
         results = []
         for antecedents in two_parent_combinations(self.ant):
             for consequents in two_parent_combinations(self.con):
-                left = Sequent(antecedents[0], consequents[0])
-                right = Sequent(antecedents[1], consequents[1])
-                results.append((left, right))
+                left_parent = Sequent(antecedents[0], consequents[0])
+                right_parent = Sequent(antecedents[1], consequents[1])
+                results.append((left_parent, right_parent))
         return results
 
