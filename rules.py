@@ -355,7 +355,7 @@ decomposers = {
 
 
 def get_rule_setting(connective, side) -> str:
-    return Settings().rules(connective, side)
+    return Settings().get_rule(connective, side)
 
 
 def get_rule(proposition: Proposition, side: str) -> Rule:
