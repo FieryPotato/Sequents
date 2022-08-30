@@ -1,6 +1,8 @@
+import json
 import pickle
 
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Any
 
 from tree import Tree
@@ -30,7 +32,10 @@ class PickleExporter(Exporter):
 class JSONExporter(Exporter):
     """Class for exporting data to a .json file."""
     def export(self) -> None:
-        raise NotImplementedError
+        """Process self.data and save to self.file."""
+        with open(self.file, 'w') as f:
+            json.dump(self.data, f)
+
 
 class HTMLExporter(Exporter):
     """Class for exporting data to an .html file for viewing."""
@@ -40,6 +45,14 @@ class HTMLExporter(Exporter):
 
 def get_exporter(dst: str, data: Any) -> Exporter:
     """Return the desired exporter object."""
-    # JSON and HTML exporters not yet implemented.
-    return PickleExporter(dst, data) 
+    exporters = {
+        '': PickleExporter,
+        '.json': JSONExporter,
+        '.html': HTMLExporter
+    }
+    if (suffix := Path(dst).suffix) in exporters:
+        exporter = exporters[suffix]
+    else: 
+        raise ValueError(f'{suffix} is not an accepted file extension')
+    return exporter(dst, data) 
 

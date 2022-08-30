@@ -13,16 +13,32 @@ from settings import Settings
 solve_help = 'decompose sequents in infile and export the results to '\
              'outfile (if given) or infile_results'
 
+side_help = '\'ant\', \'antecedent\', \'left\' '\
+            'or \'con\', \'consequent\', \'right\''
 
+add_mul_help = '\'add\', \'additive\', \'+\' '\
+               'or \'mul\', \'multiplicative\', \'*\', \'x\''
 
-def solve(infile, outfile):
+connective_help = '\'->\', \'implies\', \'conditional\' '\
+                  'or \'v\', \'or\', \'disjunction\' '\
+                  'or \'&\', \'and\', \'conjunction\' '\
+                  'or \'~\', \'not\', \'negation\''
+
+def solve(infile, outfile, filetype) -> None:
+    # Create path for outfile if outfile is not specified
     if outfile is None:
+        # Set outfile to infile plus _results
         in_path = Path(infile)
-        outfile = in_path.stem + '_results'
-    elif (of := Path(outfile)).suffix:  # Trim path suffix of outfile
-        while of != of.stem:        # if it has one
-            of = of.stem
-        outfile = of
+        new_name = f'{infile.name}_results'
+        outfile = str(in_path.with_name(new_name))  # same path, different filename
+    else:
+        # Remove file extension from outfile
+        out_path = Path(outfile)
+        outfile = str(out_path.with_suffix(''))  # same path & filename, different suffix
+
+    # Apply desired filetype
+    if filetype is not None:
+        outfile = apply_filetype(outfile, filetype)
 
     # Import file
     importer = get_importer(infile)
@@ -35,12 +51,21 @@ def solve(infile, outfile):
     # Export data
     exporter = get_exporter(outfile, prover.forest)
     exporter.export()
-    
+
+
+def apply_filetype(outfile: str, filetype: str) -> str:
+    """Ensure outfile has the desired extension.""" 
+    o_f = Path(outfile)
+    if o_f.suffix == filetype:
+        return outfile
+    else:
+        return str(o_f.with_suffix(filetype))
+
 
 def normalize_rule_args(args) -> tuple[str, str, str]:
     """
     Return args namespace values converted to a format that this
-    package expects.
+    package expects. 
     """
     cj = {'and', 'conjunction', '&'}
     dj = {'or', 'disjunction', 'v'}
@@ -70,21 +95,20 @@ def normalize_rule_args(args) -> tuple[str, str, str]:
     connective: str
     side: str
     value: str
+
+    def get_item(arg, d) -> str:
+        for key, _set in d.items():
+            if arg in _set:
+                return key
+        raise KeyError
    
-    for key, c_set in connectives.items():
-        if args.connective in c_set:
-            connective = key
-            break
-   
-    for key, s_set in sides.items():
-        if args.side in s_set:
-            side = key
-            break
-   
-    for key, v_set in values.items():
-        if args.value in v_set:
-            value = key
-            break
+    try:
+        connective = get_item(args.connective, connectives)
+        side = get_item(args.side, sides)
+        value = get_item(args.value, values)
+
+    except KeyError:
+        raise ValueError('Unknown input.')
 
     return connective, side, t
 
@@ -94,33 +118,56 @@ def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest='subcommand')
 
-    # create solver subparser
+    # Create solver subparser
     solver = subparsers.add_parser('solve', help=solve_help)
+
+    # Add file-type optional argument
+    file_type = solver.add_mutually_exclusive_group()
+    file_type.add_argument('--json', help='save results in a .json file.', action='store_true')
+    file_type.add_argument('--html', help='save results in an .html file.', action='store_true')
+
+    # Add solver main arguments.
     solver.add_argument('infile', help='file to be imported')
     solver.add_argument('outfile', default=None, 
             nargs='?', help='destination for results file')
 
-    # create subparser for setting rules
+    # Create subparser for setting rules
     set_rule = subparsers.add_parser('set_rule', help='edit rule settings')
-    set_rule.add_argument('side', help='\'ant\' or \'con\'')
-    set_rule.add_argument('connective', help='any connective word or symbol')
-    set_rule.add_argument('value', help='\'add\' or \'mul\'')
+    set_rule.add_argument('side', help=side_help)
+    set_rule.add_argument('connective', help=connective_help)
+    set_rule.add_argument('value', help=add_mul_help)
 
-    # create subparser for viewing rules
+    # Create subparser for viewing rules
     view_rules = subparsers.add_parser('view_rules', help='view current rule settings')
 
     # Parse arguments
     args = parser.parse_args()
-
-    # run command
+    
+    # Run command
     if args.subcommand == 'solve':
-        solve(args.infile, args.outfile)
+        # Get file type option
+        filetype = None
+        if args.json:
+            filetype = '.json'
+        elif args.html:
+            filetype = '.html'
+        
+        # Run solver
+        solve(args.infile, args.outfile, filetype)
+
     elif args.subcommand == 'set_rule':
+        
+        # Set rules in config.json 
         connective, side, value = normalize_rule_args(args)
         Settings().set_rule(connective, side, value)
+
     elif args.subcommand == 'view_rules':
+        # Display currently selected rules
         Settings().print_rules()
+
     else:
+        # Argparse prevents this from ever executing, 
+        # but I put it here for completeness.
         print('Unknown command.')
 
 if __name__ == '__main__':

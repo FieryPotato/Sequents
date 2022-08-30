@@ -8,7 +8,7 @@ from tree import Tree
 from export_file import PickleExporter
 
 
-class TestExportTxtFile(unittest.TestCase):
+class TestExportFile(unittest.TestCase):
     file = 'test/io_testing/export'
     p = Atom('p')
     q = Atom('q')
@@ -21,15 +21,6 @@ class TestExportTxtFile(unittest.TestCase):
         if os.path.exists(self.file):
             os.remove(self.file)
         
-    def test_saving_one_parent_rule_as_pickle(self) -> None:
-        d = { 
-            Sequent((),(self.cd,)):
-                {Sequent((self.p,),(self.q,)): None}
-        }
-        tree = Tree.from_dict(d)
-        actual = pickle.dumps(tree)
-        self.assertEqual(tree, pickle.loads(actual))
-
     def test_saving_tree_to_file(self) -> None:
         d_0 = {
             Sequent((),(self.cd,)):
@@ -54,6 +45,7 @@ class TestExportTxtFile(unittest.TestCase):
             actual = pickle.load(f)
         
         self.assertEqual(tree_list, actual)
+
 
 
 if __name__ == '__main__':
