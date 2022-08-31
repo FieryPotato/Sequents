@@ -162,6 +162,16 @@ class TestConvertSequent(unittest.TestCase):
         )
         self.assertEqual(expected, string_to_sequent(string))
 
+    def test_atomic_ant_sequent(self) -> None:
+        string = 'proposition; '
+        expected = Sequent((Atom('proposition'),), ())
+        self.assertEqual(expected, string_to_sequent(string))
+    
+    def test_atomic_con_sequent(self) -> None:
+        string = '; proposition'
+        expected = Sequent((), (Atom('proposition'),))
+        self.assertEqual(expected, string_to_sequent(string))
+
     def test_atomic_2_2_sequent(self) -> None:
         string = 'antecedent one, antecedent two; consequent one, consequent two'
         expected = Sequent(

@@ -22,9 +22,9 @@ class Prover:
         """
         # Done with multiprocessing to speed up work on big trees.
         with Pool() as pool:
-             trees = pool.imap_unordered(self.mk_tree, self.roots)
-             for tree in trees:
-                 self.forest.append(tree)
+            trees = pool.imap_unordered(self.mk_tree, self.roots)
+            for i, tree in enumerate(trees):
+                self.forest.append(tree)
 
     def mk_tree(self, sequent) -> Tree:
         """Return Tree object grown from sequent."""

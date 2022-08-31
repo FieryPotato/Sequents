@@ -1,6 +1,4 @@
 import argparse
-import os
-import sys
 
 from pathlib import Path
 
@@ -19,7 +17,7 @@ side_help = '\'ant\', \'antecedent\', \'left\' '\
 add_mul_help = '\'add\', \'additive\', \'+\' '\
                'or \'mul\', \'multiplicative\', \'*\', \'x\''
 
-connective_help = '\'->\', \'implies\', \'conditional\' '\
+connective_help = '\'->\', \'implies\', \'if\',\'conditional\' '\
                   'or \'v\', \'or\', \'disjunction\' '\
                   'or \'&\', \'and\', \'conjunction\' '\
                   'or \'~\', \'not\', \'negation\''
@@ -29,7 +27,7 @@ def solve(infile, outfile, filetype) -> None:
     if outfile is None:
         # Set outfile to infile plus _results
         in_path = Path(infile)
-        new_name = f'{infile.name}_results'
+        new_name = f'{in_path.name}_results'
         outfile = str(in_path.with_name(new_name))  # same path, different filename
     else:
         # Remove file extension from outfile
@@ -49,8 +47,8 @@ def solve(infile, outfile, filetype) -> None:
     prover.run()
 
     # Export data
-    exporter = get_exporter(outfile, prover.forest)
-    exporter.export()
+    exporter = get_exporter(outfile)
+    exporter.export(prover.forest)
 
 
 def apply_filetype(outfile: str, filetype: str) -> str:
@@ -69,7 +67,7 @@ def normalize_rule_args(args) -> tuple[str, str, str]:
     """
     cj = {'and', 'conjunction', '&'}
     dj = {'or', 'disjunction', 'v'}
-    cd = {'implies', 'conditional', '->'}
+    cd = {'implies', 'conditional', '->', 'if'}
     n = {'not', 'negation', '~'}
     connectives = {
         '&': cj, 
@@ -108,9 +106,9 @@ def normalize_rule_args(args) -> tuple[str, str, str]:
         value = get_item(args.value, values)
 
     except KeyError:
-        raise ValueError('Unknown input.')
+        raise ValueError('Unknown input in .')
 
-    return connective, side, t
+    return connective, side, value
 
 
 def main():
@@ -132,10 +130,10 @@ def main():
             nargs='?', help='destination for results file')
 
     # Create subparser for setting rules
-    set_rule = subparsers.add_parser('set_rule', help='edit rule settings')
-    set_rule.add_argument('side', help=side_help)
-    set_rule.add_argument('connective', help=connective_help)
-    set_rule.add_argument('value', help=add_mul_help)
+    set = subparsers.add_parser('set', help='edit rule settings')
+    set.add_argument('side', help=side_help)
+    set.add_argument('connective', help=connective_help)
+    set.add_argument('value', help=add_mul_help)
 
     # Create subparser for viewing rules
     view_rules = subparsers.add_parser('view_rules', help='view current rule settings')
@@ -150,12 +148,13 @@ def main():
         if args.json:
             filetype = '.json'
         elif args.html:
-            filetype = '.html'
+            raise NotImplementedError('.html is not yet supported')
+            # filetype = '.html'
         
         # Run solver
         solve(args.infile, args.outfile, filetype)
 
-    elif args.subcommand == 'set_rule':
+    elif args.subcommand == 'set':
         
         # Set rules in config.json 
         connective, side, value = normalize_rule_args(args)

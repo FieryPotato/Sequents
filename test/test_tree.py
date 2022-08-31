@@ -1,3 +1,4 @@
+import json
 import unittest
 
 from unittest.mock import patch
@@ -541,6 +542,95 @@ class TestTree(unittest.TestCase):
         t2 = Tree(Sequent((self.n, self.cj), (self.cd, self.n)))
         t2.grow()
         self.assertEqual(t2, tree)
+
+    def test_to_dict_atomic(self) -> None:
+        test = {
+            Sequent((self.p,), (self.q,)): None
+        }
+        tree = Tree.from_dict(test)
+        expected = {
+            'p; q': None
+        }
+        actual = tree.to_dict()
+        self.assertEqual(expected, actual)
+
+    def test_to_dict_c_1_opi(self) -> None:
+        test = {
+            Sequent((self.p, self.n), ()): {
+                Sequent((self.p,), (self.p,)): None
+            }
+        }
+        tree = Tree.from_dict(test)
+        expected = {
+            'p, ~ p; ': {
+                'p; p': None
+            }
+        }
+        actual = tree.to_dict()
+        self.assertEqual(expected, actual)
+
+    def test_to_json_c_1_tpi(self) -> None:
+        test = {
+            Sequent((self.cd,), ()): {
+                Sequent((), (self.p,)): None,
+                Sequent((self.q,), ()): None
+            }
+        }
+        tree = Tree.from_dict(test)
+        expected = {
+            '(p -> q); ': {
+                '; p': None,
+                'q; ': None
+            }
+        }
+        actual = tree.to_dict()
+        self.assertEqual(expected, actual)
+
+    def test_to_json_c_1_opni(self) -> None:
+        test = {
+            Sequent((self.cj,), ()): [
+                {Sequent((self.p,), ()): None},
+                {Sequent((self.q,), ()): None}
+            ]
+        }
+        tree = Tree.from_dict(test)
+        expected = {
+            '(p & q); ': [
+                {'p; ': None},
+                {'q; ': None}
+            ]
+        }
+        actual = tree.to_dict()
+        self.assertEqual(expected, actual)
+
+    def test_to_json_c_1_tpni(self) -> None:
+        test = {
+            Sequent((self.p,), (self.dj,)): [
+                {
+                    Sequent((self.p,), (self.p,)): None,
+                    Sequent((), (self.q,)): None
+                },
+                {
+                    Sequent((), (self.p,)): None,
+                    Sequent((self.p,), (self.q)): None
+                }
+            ]
+        }
+        tree = Tree.from_dict(test)
+        expected = {
+            'p; (p v q)': [
+                {
+                    'p; p': None,
+                    '; q': None
+                },
+                {   
+                    '; p': None,
+                    'p; q': None
+                }
+            ]
+        }
+        actual = tree.to_dict()
+        self.assertEqual(expected, actual)
 
 
 if __name__ == '__main__':

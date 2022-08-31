@@ -11,40 +11,40 @@ from prover import Prover
     
 class Exporter(ABC):
     """Abstract class for exporters."""
-    def __init__(self, file, data) -> None:
+    def __init__(self, file) -> None:
         self.file = file
-        self.data = data
 
     @abstractmethod
-    def export(self) -> None:
-        """Process self.data and save to self.file."""
+    def export(self, data) -> None:
+        """Process data and save to self.file."""
 
 
 class PickleExporter(Exporter):
     """Class for exporting data as a pickled bytestring."""
 
-    def export(self) -> None:
-        """Process self.data and save to self.file."""
+    def export(self, data) -> None:
+        """Process data and save to self.file."""
         with open(self.file, 'wb') as f:
-            pickle.dump(self.data, f)
+            pickle.dump(data, f)
 
 
 class JSONExporter(Exporter):
     """Class for exporting data to a .json file."""
-    def export(self) -> None:
-        """Process self.data and save to self.file."""
+    def export(self, data) -> None:
+        """Process data and save to self.file."""
         with open(self.file, 'w') as f:
-            json.dump(self.data, f)
+            result = [tree.to_dict() for tree in data]
+            json.dump(result, f, indent=4)
 
 
 class HTMLExporter(Exporter):
     """Class for exporting data to an .html file for viewing."""
-    def export(self) -> None:
+    def export(self, data) -> None:
         raise NotImplementedError
 
 
-def get_exporter(dst: str, data: Any) -> Exporter:
-    """Return the desired exporter object."""
+def get_exporter(dst: str) -> Exporter:
+    """Return the desired exporter object based on dst suffix."""
     exporters = {
         '': PickleExporter,
         '.json': JSONExporter,
@@ -54,5 +54,5 @@ def get_exporter(dst: str, data: Any) -> Exporter:
         exporter = exporters[suffix]
     else: 
         raise ValueError(f'{suffix} is not an accepted file extension')
-    return exporter(dst, data) 
+    return exporter(dst) 
 

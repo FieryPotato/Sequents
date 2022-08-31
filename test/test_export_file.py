@@ -38,8 +38,8 @@ class TestExportFile(unittest.TestCase):
         t_1 = Tree.from_dict(d_1)
         tree_list = [t_0, t_1]
                         
-        exporter = PickleExporter(self.file, tree_list)
-        exporter.export()
+        exporter = PickleExporter(self.file)
+        exporter.export(tree_list)
 
         with open(self.file, 'rb') as f:
             actual = pickle.load(f)

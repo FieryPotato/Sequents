@@ -1,3 +1,5 @@
+import json 
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any
@@ -74,6 +76,24 @@ class Tree:
         tree = cls(first_key, is_grown=is_grown)
         tree.branches = dictionary
         return tree
+
+
+    def to_dict(self) -> dict:
+        """Return self as a dict."""
+        def convert(data):
+            """Recursively make elements of data json-serializable."""
+            result = None
+            if isinstance(data, dict):
+                result = {}
+                for key, element in data.items():
+                    result[str(key)] = convert(element)
+            elif isinstance(data, list):
+                result = []
+                for element in data:
+                    result.append(convert(element))
+            return result
+
+        return {str(self.root): convert(self.branches[self.root])}
 
 
     class TreeIsGrownError(Exception):
