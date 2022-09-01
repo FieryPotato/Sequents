@@ -31,20 +31,15 @@ class Tree:
         self.branches[self.root] = self.grow_branch(self.root)
         self.is_grown = True
 
-    def grow_list_branch(self, seq_list: list[dict[Sequent, None]]) \
+    def grow_list_branch(self, seq_dict_list: list[dict[Sequent, None]]) \
             -> list[dict[Sequent, Sequent | None]]:
         """
-        Return branches expanded from sequents in seq_list.
+        Return branches expanded from sequents in seq_dict_list.
         (For non-invertible rules only.)
         """
-        result = []
-        for universe in seq_list:
-            p = {
-                parent: self.grow_branch(parent)
-                for parent in universe
-            }
-            result.append(p)
-        return result
+        return [
+            self.grow_dict_branch(sequent) for sequent in seq_dict_list
+        ]
 
     def grow_dict_branch(self, seq_dict: dict[Sequent, None]) \
             -> dict[Sequent, Sequent | None]:
@@ -53,7 +48,7 @@ class Tree:
         (For invertible rules only.)
         """
         return {
-            parent: self.grow_branch(parent) for parent in seq_dict
+            sequent: self.grow_branch(sequent) for sequent in seq_dict.keys()
         }
 
     def grow_branch(self, sequent) -> dict | list | None:
