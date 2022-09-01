@@ -28,18 +28,17 @@ test_config = {
     }
 }
 
-
-@patch('settings._Settings.file', test_config_path)
 class TestSettings(unittest.TestCase): 
     def setUp(self) -> None:
-        self.s = _Settings()
+        with patch('settings._Settings.file', test_config_path):
+            self.s = _Settings()
 
     def tearDown(self) -> None:
         with open(test_config_path, 'w') as f:
             json.dump(test_config, f, indent=4)
 
     def test_load_settings(self) -> None:
-            self.assertEqual(test_config, self.s._dict)
+        self.assertEqual(test_config, self.s._dict)
 
     def test_update(self) -> None:
         pos = {'positivists': 

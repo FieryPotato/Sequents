@@ -2,6 +2,7 @@ import json
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from multiprocessing import Pool
 from typing import Any
 
 from sequent import Sequent
@@ -36,13 +37,14 @@ class Tree:
         Return branches expanded from sequents in seq_list.
         (For non-invertible rules only.)
         """
-        return [
-            {
+        result = []
+        for universe in seq_list:
+            p = {
                 parent: self.grow_branch(parent)
                 for parent in universe
             }
-            for universe in seq_list
-        ]
+            result.append(p)
+        return result
 
     def grow_dict_branch(self, seq_dict: dict[Sequent, None]) \
             -> dict[Sequent, Sequent | None]:

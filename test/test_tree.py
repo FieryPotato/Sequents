@@ -539,9 +539,6 @@ class TestTree(unittest.TestCase):
         }
         tree = Tree.from_dict(test)
         self.assertEqual(tree.branches, test)
-        t2 = Tree(Sequent((self.n, self.cj), (self.cd, self.n)))
-        t2.grow()
-        self.assertEqual(t2, tree)
 
     def test_to_dict_atomic(self) -> None:
         test = {
