@@ -1,6 +1,7 @@
 import json
 import os
 
+from collections.abc import MutableMapping
 from pathlib import Path
 from typing import Any
 
@@ -8,31 +9,37 @@ from typing import Any
 sequent_package_dir = Path(__file__).parents[0]
 
 
-class _Settings(dict):
+class _Settings(MutableMapping):
     file = os.path.join(sequent_package_dir, 'config.json')
 
     def __init__(self) -> None:
         super().__init__()
+        self._dict = {}
         with open(self.file, 'r') as cfg:
             self.update(json.load(cfg))
 
-    def __repr__(self) -> str:
-        return f'{self.__name__}({dict.__repr__(self)})'
-
     def __setitem__(self, key, val) -> None:
-        dict.__setitem__(self, key, val)
+        self._dict[key] = val
         self.save()
 
     def __getitem__(self, key) -> Any:
-        return dict.__getitem__(self, key)
+        return self._dict[key]
+
+    def __delitem__(self, key) -> None:
+        del self._dict[key]
+
+    def __iter__(self):
+        yield from self._dict.__iter__()
+
+    def __len__(self) -> int:
+        return len(self._dict)
 
     def update(self, *args, **kwargs) -> None:
         """
         Overwrites dict.update to ensure we save to config.json after 
         changes.
         """
-        for k, v in dict(*args, **kwargs).items():
-            self[k] = v
+        self._dict.update(*args, **kwargs)
         self.save()
 
     def get_rule(self, connective: str, side: str) -> str:
@@ -47,7 +54,7 @@ class _Settings(dict):
     def save(self) -> None:
         """Save contents of self to config.json."""
         with open(self.file, 'w') as f:
-            json.dump(self, f, indent=4)
+            json.dump(self._dict, f, indent=4)
 
     def print_rules(self) -> None:
         """Print connective rules to console."""

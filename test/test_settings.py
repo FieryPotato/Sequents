@@ -28,6 +28,7 @@ test_config = {
     }
 }
 
+
 @patch('settings._Settings.file', test_config_path)
 class TestSettings(unittest.TestCase): 
     def setUp(self) -> None:
@@ -38,7 +39,7 @@ class TestSettings(unittest.TestCase):
             json.dump(test_config, f, indent=4)
 
     def test_load_settings(self) -> None:
-        self.assertEqual(test_config, self.s)
+            self.assertEqual(test_config, self.s._dict)
 
     def test_update(self) -> None:
         pos = {'positivists': 
