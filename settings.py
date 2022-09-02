@@ -58,15 +58,11 @@ class _Settings(MutableMapping):
 
     def print_rules(self) -> None:
         """Print connective rules to console."""
-        string = 'Rules:\n' \
-                 f'&:  ant={self.get_rule("&", "ant")}\n' \
-                 f'    con={self.get_rule("&", "con")}\n' \
-                 f'v:  ant={self.get_rule("v", "ant")}\n' \
-                 f'    con={self.get_rule("v", "con")}\n' \
-                 f'->: ant={self.get_rule("->", "ant")}\n' \
-                 f'    con={self.get_rule("->", "con")}\n' \
-                 f'~:  ant={self.get_rule("~", "ant")}\n' \
-                 f'    con={self.get_rule("~", "con")}\n'
+        string = 'Rules:\n' 
+        for connective in '&', 'v', '->', '~':
+            string += (f'{connective}:\n')
+            for side in 'ant', 'con':
+                string += (f'    {side}: {self.get_rule(connective, side)}\n')
         print(string)
 
 

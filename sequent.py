@@ -76,8 +76,7 @@ class Sequent:
             for i, prop in enumerate(getattr(self, side)):
                 if prop.complexity >= 1:
                     return prop, side, i
-        else:
-            return None, None, None
+        return None, None, None
         
 
     @property

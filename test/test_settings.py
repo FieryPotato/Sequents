@@ -30,12 +30,13 @@ test_config = {
 
 class TestSettings(unittest.TestCase): 
     def setUp(self) -> None:
-        with patch('settings._Settings.file', test_config_path):
-            self.s = _Settings()
+        self.s = _Settings()
+        with open(self.s.file, 'r') as f:
+            self.cached_file = json.load(f)
 
     def tearDown(self) -> None:
-        with open(test_config_path, 'w') as f:
-            json.dump(test_config, f, indent=4)
+        with open(self.s.file, 'w') as f:
+            json.dump(self.cached_file, f, indent=4)
 
     def test_load_settings(self) -> None:
         self.assertEqual(test_config, self.s._dict)

@@ -22,6 +22,9 @@ connective_help = '\'->\', \'implies\', \'if\',\'conditional\' '\
                   'or \'&\', \'and\', \'conjunction\' '\
                   'or \'~\', \'not\', \'negation\''
 
+rule_help = 'display current rule settings'
+
+
 def solve(infile, outfile, filetype) -> None:
     # Create path for outfile if outfile is not specified
     if outfile is None:
@@ -56,8 +59,7 @@ def apply_filetype(outfile: str, filetype: str) -> str:
     o_f = Path(outfile)
     if o_f.suffix == filetype:
         return outfile
-    else:
-        return str(o_f.with_suffix(filetype))
+    return str(o_f.with_suffix(filetype))
 
 
 def normalize_rule_args(args) -> tuple[str, str, str]:
@@ -136,38 +138,32 @@ def main():
     set.add_argument('value', help=add_mul_help)
 
     # Create subparser for viewing rules
-    view_rules = subparsers.add_parser('view_rules', help='view current rule settings')
+    rules = subparsers.add_parser('rules', help=rule_help)
 
     # Parse arguments
     args = parser.parse_args()
     
-    # Run command
-    if args.subcommand == 'solve':
-        # Get file type option
-        filetype = None
-        if args.json:
-            filetype = '.json'
-        elif args.html:
-            raise NotImplementedError('.html is not yet supported')
-            # filetype = '.html'
-        
-        # Run solver
-        solve(args.infile, args.outfile, filetype)
+    match args.subcommand:
+        case 'solve':
+            # Get file type option
+            filetype = None
+            if args.json:
+                filetype = '.json'
+            elif args.html:
+                raise NotImplementedError('.html is not yet supported')
+                # filetype = '.html'
 
-    elif args.subcommand == 'set':
-        
-        # Set rules in config.json 
-        connective, side, value = normalize_rule_args(args)
-        Settings().set_rule(connective, side, value)
+            # Run solver
+            solve(args.infile, args.outfile, filetype)
 
-    elif args.subcommand == 'view_rules':
-        # Display currently selected rules
-        Settings().print_rules()
+        case 'set':
+            # Set rules in config.json 
+            connective, side, value = normalize_rule_args(args)
+            Settings().set_rule(connective, side, value)
 
-    else:
-        # Argparse prevents this from ever executing, 
-        # but I put it here for completeness.
-        print('Unknown command.')
+        case 'rules':
+            # Display currently selected rules
+            Settings().print_rules()
 
 if __name__ == '__main__':
     main()

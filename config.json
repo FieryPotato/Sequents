@@ -16,11 +16,5 @@
             "ant": "mul",
             "con": "mul"
         }
-    },
-    "positivists": [
-        "Carnap",
-        "Hahn",
-        "Neurath",
-        "Schlick"
-    ]
+    }
 }

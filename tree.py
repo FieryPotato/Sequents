@@ -56,15 +56,13 @@ class Tree:
         Return the body of the tree whose root is sequent.
         """
         decomposer = get_decomposer(sequent)
-        parents: dict[Sequent, None] | list[dict[Sequent, None]] | None
+
         if (parents := decomposer.get_parents()) is None:
             return None
-        else:
-            if isinstance(parents, dict):
-                results = self.grow_dict_branch(parents)
-            elif isinstance(parents, list):
-                results = self.grow_list_branch(parents)
-        return results
+        elif isinstance(parents, dict):
+            return self.grow_dict_branch(parents)
+        elif isinstance(parents, list):
+            return self.grow_list_branch(parents)
 
     @classmethod
     def from_dict(cls, dictionary: dict, is_grown: bool = True) -> 'Tree':
@@ -81,16 +79,13 @@ class Tree:
             """Recursively make elements of data json-serializable."""
             result = None
             if isinstance(data, dict):
-                result = {}
-                for key, element in data.items():
-                    result[str(key)] = convert(element)
+                result = {str(key): convert(element) 
+                          for key, element in data.items()}
             elif isinstance(data, list):
-                result = []
-                for element in data:
-                    result.append(convert(element))
+                result = [convert(element) for element in data]
             return result
 
-        return {str(self.root): convert(self.branches[self.root])}
+        return convert(self.branches)
 
 
     class TreeIsGrownError(Exception):

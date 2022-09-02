@@ -25,21 +25,25 @@ def deparenthesize(string: str) -> str:
         return ''
 
     # While string is bookended by parentheses.
-    while string[0] == '(' and string[-1] == ')':
+    while string.startswith('(') and string.endswith(')'):
+
+        # Ensure outer parentheses are connected
         nestedness = 0
         for i, char in enumerate(string):
 
-            # nestedness += 1 for each '('
-            # nestedness -= 1 for each ')'
-            # no change for any other character
+            # Increase nestedness with each '('
+            # Decrease nestedness with each ')'
+            # No change otherwise.
             nestedness += NEST_MAP[char] if char in NEST_MAP else 0
 
             # If the first and last parentheses are not connected
             # eg. (A v B) -> (C & D)
             if nestedness <= 0 and ((i + 1) < len(string)):
                 return string
-        else:
-            string = string[1:-1]
+
+        # If they are connected, remove them and check again.
+        string = string[1:-1]
+
     return string
 
 
@@ -69,15 +73,17 @@ def string_to_proposition(string) -> Proposition:
 
 def find_connective(string: str) -> list[str]:
     """
-    Return a list of strings separating the connective from 
+    Return a list of strings separating the main connective from 
     surrounding propositional material. Deparenthesizes sub-
     propositions.
 
-    >>> Proposition.find_connective('A & B')
+    >>> find_connective('A & B')
     ['A', '&', 'B']
-    >>> Proposition.find_connective('not C')
+    >>> find_connective('(A -> B) v (B -> A)')
+    ['(A -> B)', 'v', '(B -> A)']
+    >>> find_connective('not C')
     ['not', 'C']
-    >>> Proposition.find_connective('anything')
+    >>> find_connective('anything')
     ['anything']
     """
     # Return early if the string is empty.
@@ -98,8 +104,12 @@ def find_connective(string: str) -> list[str]:
     # Check for binary connectives as main connective.
     nestedness = 0
     for i, word in enumerate(word_list):
-        if word[0] == '(': nestedness += 1
-        if word[-1] == ')': nestedness -= 1
+
+        # Increase nestedness with each '('
+        # Decrease nestedness with each ')'
+        # No change for other characters.
+        nestedness += 1 if word.startswith('(') else 0
+        nestedness -= 1 if word.endswith(')') else 0
 
         if (connective := word) in binaries and nestedness == 0:
             l = deparenthesize(' '.join(word_list[:i]))
