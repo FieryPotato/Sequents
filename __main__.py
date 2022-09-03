@@ -132,10 +132,10 @@ def main():
             nargs='?', help='destination for results file')
 
     # Create subparser for setting rules
-    set = subparsers.add_parser('set', help='edit rule settings')
-    set.add_argument('side', help=side_help)
-    set.add_argument('connective', help=connective_help)
-    set.add_argument('value', help=add_mul_help)
+    set_rule = subparsers.add_parser('set', help='edit rule settings')
+    set_rule.add_argument('side', help=side_help)
+    set_rule.add_argument('connective', help=connective_help)
+    set_rule.add_argument('value', help=add_mul_help)
 
     # Create subparser for viewing rules
     rules = subparsers.add_parser('rules', help=rule_help)
