@@ -9,9 +9,6 @@ class Importer(Protocol):
     """
     Protocol for importers.
     """ 
-    def __init__(self, path) -> None:
-        self.path = path
-
     def import_(self) -> list[str]:
         """Import input file as lines for prover use."""
         ...

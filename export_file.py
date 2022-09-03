@@ -10,11 +10,8 @@ from prover import Prover
     
 class Exporter(Protocol):
     """Abstract class for exporters."""
-    def __init__(self, file) -> None:
-        self.file = file
 
     def export(self, data) -> None:
-        """Process data and save to self.file."""
         ...
 
 

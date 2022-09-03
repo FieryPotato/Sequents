@@ -64,15 +64,6 @@ class Tree:
         elif isinstance(parents, list):
             return self.grow_list_branch(parents)
 
-    @classmethod
-    def from_dict(cls, dictionary: dict, is_grown: bool = True) -> 'Tree':
-        """Initialize a Tree object from input dictionary."""
-        first_key = next(iter(dictionary.keys()))
-        tree = cls(first_key, is_grown=is_grown)
-        tree.branches = dictionary
-        return tree
-
-
     def to_dict(self) -> dict:
         """Return self as a dict."""
         def convert(data):
@@ -87,10 +78,24 @@ class Tree:
 
         return convert(self.branches)
 
-
     class TreeIsGrownError(Exception):
         """Trees should only be able to be grown once."""
         def __init__(self, tree) -> None:
             m = f'The tree beginning in {tree.root} has already been decomposed.'
             super().__init__(m)
+
+
+def tree_from_sequent(sequent) -> Tree:
+    """Return Tree object grown from sequent."""
+    tree = Tree(sequent)
+    tree.grow()
+    return tree
+
+
+def tree_from_dict(dictionary: dict, is_grown: bool = True) -> Tree:
+    """Initialize a Tree object from input dictionary."""
+    first_key = next(iter(dictionary.keys()))
+    tree = Tree(first_key, is_grown=is_grown)
+    tree.branches = dictionary
+    return tree
 

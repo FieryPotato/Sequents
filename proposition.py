@@ -11,14 +11,17 @@ class Proposition(ABC):
     """
     arity = None  # How many propositions this object contains.
     symb = None  # The logical symbol this object assumes.
+    left = None
+    right = None
 
     def __post_init__(self) -> None:
         self.validate_content()
 
     def __getitem__(self, index) -> 'Proposition':
         """
-        Allows slicing into self, eg.:
-        >>> cj = Conjunction(p, q)  # NB: p and q are Atom objects
+        Allows slicing into self, e.g.:
+        >>> p, q = Atom('proposition'), Atom('another_prop')
+        >>> cj = Conjunction(p, q)
         >>> cj[0] == p == cj.left
         True
         >>> cj[1] == q == cj.right
@@ -70,9 +73,9 @@ class Atom(Proposition):
     """
     Proposition class with no logical content.
     """
+    prop: str
     symb = ''
     arity = 1
-    prop: str
 
     def __str__(self) -> str:
         return f'{self[0]}'
@@ -137,4 +140,3 @@ class Disjunction(BinaryProposition):
     Binary proposition signifying logical '... or ...'
     """
     symb = 'v'
-

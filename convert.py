@@ -1,7 +1,7 @@
-from abc import ABC, abstractmethod
+from typing import Protocol
 
-from proposition import Proposition, Atom,  Conjunction, Conditional,\
-        Disjunction, Negation
+from proposition import Proposition, Atom, Negation, Conjunction,\
+    Disjunction, Conditional
 from sequent import Sequent
 
 NEST_MAP = {'(': 1, ')': -1}
@@ -57,18 +57,18 @@ def string_to_proposition(string) -> Proposition:
     fac: PropositionFactory
     match split_string:
         case [left, '&' | 'and', right]:
-            fac = ConjunctionFactory()
+            fac = ConjunctionFactory
         case [left, '->' | 'implies', right]:
-            fac = ConditionalFactory()
+            fac = ConditionalFactory
         case [left, 'v' | 'or', right]:
-            fac = DisjunctionFactory()
+            fac = DisjunctionFactory
         case ['~' | 'not', negatum]:
-            fac = NegationFactory()
+            fac = NegationFactory
         case '':
             raise ValueError('Cannot convert empty string to proposition.')
         case _:
-            fac = AtomFactory()
-    return fac.get_prop(*split_string)
+            fac = AtomFactory
+    return fac().get_prop(*split_string)
 
 
 def find_connective(string: str) -> list[str]:
@@ -149,16 +149,13 @@ def string_to_sequent(string: str) -> Sequent:
         tuple(consequents)
     )
 
+class PropositionFactory(Protocol):
+    """Protocol for proposition factories."""
 
-class PropositionFactory(ABC):
-    """Abstract Class for proposition factories."""
-
-    @abstractmethod
     def get_prop(self, *content) -> Proposition:
-        """Return an instance of the correct proposition."""
+        ...
 
-
-class AtomFactory(PropositionFactory):
+class AtomFactory:
     """Factory for Atoms."""
 
     def get_prop(self, content) -> Atom:
@@ -166,7 +163,7 @@ class AtomFactory(PropositionFactory):
         return Atom(content)
 
 
-class NegationFactory(PropositionFactory):
+class NegationFactory:
     """Factory for Negations."""
 
     def get_prop(self, _, prop) -> Negation:
@@ -174,7 +171,7 @@ class NegationFactory(PropositionFactory):
         return Negation(string_to_proposition(prop))
 
 
-class ConjunctionFactory(PropositionFactory):
+class ConjunctionFactory:
     """Factory for Conjunctions."""
 
     def get_prop(self, left, _, right) -> Conjunction:
@@ -185,7 +182,7 @@ class ConjunctionFactory(PropositionFactory):
         )
 
 
-class DisjunctionFactory(PropositionFactory):
+class DisjunctionFactory:
     """Factory for Disjunctions."""
 
     def get_prop(self, left, _, right) -> Disjunction:
@@ -196,7 +193,7 @@ class DisjunctionFactory(PropositionFactory):
         )
 
 
-class ConditionalFactory(PropositionFactory):
+class ConditionalFactory:
     """Factory for Conditionals."""
 
     def get_prop(self, ant, _, con) -> Conditional:

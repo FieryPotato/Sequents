@@ -2,7 +2,7 @@ from multiprocessing import Pool
 
 from convert import string_to_sequent
 from sequent import Sequent
-from tree import Tree
+from tree import tree_from_sequent
 
 
 class Prover:
@@ -25,10 +25,4 @@ class Prover:
             trees = pool.imap_unordered(self.mk_tree, self.roots)
             for i, tree in enumerate(trees):
                 self.forest.append(tree)
-
-    def mk_tree(self, sequent) -> Tree:
-        """Return Tree object grown from sequent."""
-        tree = Tree(sequent)
-        tree.grow()
-        return tree
 

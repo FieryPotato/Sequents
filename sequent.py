@@ -63,7 +63,6 @@ class Sequent:
             new_con = new_con + arg.con
         return Sequent(new_ant, new_con)
 
-    @property
     def first_complex_prop(self) ->\
             tuple[Proposition, str, int] | tuple[None, None, None]:
         """
@@ -79,7 +78,6 @@ class Sequent:
         return None, None, None
         
 
-    @property
     def possible_mix_parents(self) -> list[tuple['Sequent']]:
         """
         Return a list of all possible parents this sequent may have had

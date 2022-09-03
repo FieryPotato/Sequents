@@ -65,18 +65,18 @@ class TestSequent(unittest.TestCase):
     def test_first_complex_prop(self) -> None:
         s_0 = Sequent((self.p, self.q, self.n), (self.dj, self.cj))
         expected = self.n, 'ant', 2
-        actual = s_0.first_complex_prop
+        actual = s_0.first_complex_prop()
         self.assertEqual(expected, actual)
         
         s_1 = Sequent((self.p, self.q), (self.q, self.cj, self.dj))
         expected = self.cj, 'con', 1
-        actual = s_1.first_complex_prop
+        actual = s_1.first_complex_prop()
         self.assertEqual(expected, actual)
 
     def test_atomic_first_complex_prop(self) -> None:
         s = Sequent((self.p,), (self.q,))
         expected = None, None, None
-        actual = s.first_complex_prop
+        actual = s.first_complex_prop()
         self.assertEqual(expected, actual)
 
     def test_possible_mix_parents(self) -> None:
@@ -87,7 +87,7 @@ class TestSequent(unittest.TestCase):
             (Sequent((), (self.q,)), Sequent((self.p,), ())),
             (Sequent((), ()), Sequent((self.p,), (self.q,)))
         ]
-        self.assertEqual(expected, s_0.possible_mix_parents)
+        self.assertEqual(expected, s_0.possible_mix_parents())
 
         s_1 = Sequent((self.p, self.q), (self.cj, self.cd))
         expected = [
@@ -108,7 +108,7 @@ class TestSequent(unittest.TestCase):
             (Sequent((), (self.cd,)), Sequent((self.p, self.q), (self.cj,))),
             (Sequent((), ()), Sequent((self.p, self.q), (self.cj, self.cd))),
         ]
-        self.assertEqual(expected, s_1.possible_mix_parents)
+        self.assertEqual(expected, s_1.possible_mix_parents())
 
 
     def test_is_atomic(self) -> None:
