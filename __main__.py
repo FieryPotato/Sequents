@@ -62,7 +62,7 @@ def apply_filetype(outfile: str, filetype: str) -> str:
     return str(o_f.with_suffix(filetype))
 
 
-def normalize_rule_args(args) -> tuple[str, str, str]:
+def normalize_rule_args(args) -> list[str, str, str]:
     """
     Return args namespace values converted to a format that this
     package expects. 
@@ -92,25 +92,24 @@ def normalize_rule_args(args) -> tuple[str, str, str]:
         'mul': mul
     }
 
-    connective: str
-    side: str
-    value: str
-
     def get_item(arg, d) -> str:
         for key, _set in d.items():
             if arg in _set:
                 return key
         raise KeyError
-   
-    try:
-        connective = get_item(args.connective, connectives)
-        side = get_item(args.side, sides)
-        value = get_item(args.value, values)
 
-    except KeyError:
-        raise ValueError('Unknown input in .')
+    arguments = args.connective, args.side, args.value
+    dicts = connectives, sides, values
+    arg_dict_pairs = zip(arguments, dicts)
 
-    return connective, side, value
+    result = []
+    for arg, dict_ in arg_dict_pairs:
+        try:
+            result.append(get_item(arg, dict_))
+        except KeyError:
+            raise ValueError(f'Unknown input {arg}.')
+
+    return result
 
 
 def main():
