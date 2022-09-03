@@ -86,6 +86,7 @@ def find_connective(string: str) -> list[str]:
     >>> find_connective('anything')
     ['anything']
     """
+    string = deparenthesize(string)
     # Return early if the string is empty.
     if not string: 
         return ''
@@ -105,11 +106,11 @@ def find_connective(string: str) -> list[str]:
     nestedness = 0
     for i, word in enumerate(word_list):
 
-        # Increase nestedness with each '('
-        # Decrease nestedness with each ')'
-        # No change for other characters.
-        nestedness += 1 if word.startswith('(') else 0
-        nestedness -= 1 if word.endswith(')') else 0
+        for char in word:
+            # Increase nestedness with each '('
+            # Decrease nestedness with each ')'
+            # No change for other characters.
+            nestedness += NEST_MAP[char] if char in NEST_MAP else 0
 
         if (connective := word) in binaries and nestedness == 0:
             l = deparenthesize(' '.join(word_list[:i]))

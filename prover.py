@@ -21,8 +21,8 @@ class Prover:
         the forest.
         """
         # Done with multiprocessing to speed up work with many trees.
-        with Pool() as pool:
-            trees = pool.imap_unordered(self.mk_tree, self.roots)
+        with Pool(processes=1) as pool:
+            trees = pool.imap_unordered(tree_from_sequent, self.roots)
             for i, tree in enumerate(trees):
                 self.forest.append(tree)
 

@@ -126,6 +126,12 @@ class TestFindConnective(unittest.TestCase):
             with self.subTest(i=c):
                 self.assertEqual(expected, find_connective(string))
 
+    def test_fc_multiple_open_parentheses(self) -> None:
+        string = '(((P -> Q) -> P) -> P)'
+        actual = find_connective(string)
+        expected = ['(P -> Q) -> P', '->', 'P']
+        self.assertEqual(expected, actual)
+
 
 class TestDeparenthesize(unittest.TestCase):
     def test_single_set(self) -> None:
