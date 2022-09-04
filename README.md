@@ -14,21 +14,24 @@ The Sequents API is vastly improved from the MaterialInference one,
 with main classes and functions easily accessible via sane import paths
 from the Sequents package. 
 
-As of this writing (2022-08-29) the package applies invertible rules
+As of this writing (2022-09-03) the program applies invertible rules
 (by default) to sequents in the input file and saves them as byte strings. 
-These can be loaded up with the built-in pickle package as follows:
+These can be loaded back up using pickle as follows.
 ```
 >>> import pickle
 >>> path = 'path\to\bytes\file'
 >>> with open(path, 'rb') as file:
-        results = pickle.load(file)
+        data = pickle.load(file)
 ```
-Current plans are to allow saving to json for a more transparent results file
-and as a html document, which will allow users to view the trees typeset in a 
-browser window.
+The pickle package allows for a more streamlined way to share these objects
+between people, uses, and projects, as it allows users to move objects 
+directly without the need to translate them to json first, although the 
+relevant packages still need to be imported.
 
+Saving to and loading from json is also supported. 
+ 
 
-## Useage
+## Command-Line Useage
 
 Additivity and multiplicativity of rules can be changed with 
 ```
@@ -40,10 +43,25 @@ Current rule settings can be viewed with
 $ python3 Sequents view_rules
 ```
 
-Run the solver (and generate a bytes file) with
+Run the solver and generate a bytes file with
 ```
 $ python3 Sequents solve (infile) [outfile]
 ```
 If outfile is not given, the results are saved to the same directory
 as infile.
+
+To save the output as a .json file, use the --json option as below:
+```
+$ python3 Sequents solve --json (infile) [outfile]
+```
+
+## Package Useage
+One of the main upsides of the redesign is that the new structure allows
+the import of classes using a commonsense syntax. 
+```
+>>> from Sequents.proposition import *
+>>> from Sequents.sequent import Sequent
+...
+```
+See the documentation in each package for more detailed information.
 

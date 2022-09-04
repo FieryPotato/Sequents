@@ -1,8 +1,7 @@
 from multiprocessing import Pool
 
-from convert import string_to_sequent
+from convert import string_to_sequent, sequent_to_tree
 from sequent import Sequent
-from tree import tree_from_sequent
 
 
 class Prover:

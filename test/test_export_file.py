@@ -2,11 +2,12 @@ import os
 import unittest
 import pickle
 
+from convert import sequent_to_tree, dict_to_tree
+from export_file import PickleExporter
 from proposition import Atom, Negation, Conditional, Conjunction,\
     Disjunction
 from sequent import Sequent
-from tree import Tree, tree_from_dict
-from export_file import PickleExporter
+from tree import Tree
 
 
 class TestExportFile(unittest.TestCase):
@@ -27,7 +28,7 @@ class TestExportFile(unittest.TestCase):
             Sequent((),(self.cd,)):
                 {Sequent((self.p,),(self.q,)): None}
         }
-        t_0 = tree_from_dict(d_0)
+        t_0 = dict_to_tree(d_0)
 
         d_1 = {
             Sequent((self.cd,),()):
@@ -36,7 +37,7 @@ class TestExportFile(unittest.TestCase):
                     Sequent((self.q,),()): None
                 }
         }
-        t_1 = tree_from_dict(d_1)
+        t_1 = dict_to_tree(d_1)
         tree_list = [t_0, t_1]
                         
         exporter = PickleExporter(self.file)

@@ -3,9 +3,10 @@ import unittest
 
 from unittest.mock import patch
 
+from convert import dict_to_tree 
 from proposition import Atom, Conjunction, Negation, Disjunction, Conditional
 from sequent import Sequent
-from tree import Tree, tree_from_dict
+from tree import Tree
 
 
 class TestTree(unittest.TestCase):
@@ -537,14 +538,14 @@ class TestTree(unittest.TestCase):
                 }
             }
         }
-        tree = tree_from_dict(test)
+        tree = dict_to_tree(test)
         self.assertEqual(tree.branches, test)
 
     def test_to_dict_atomic(self) -> None:
         test = {
             Sequent((self.p,), (self.q,)): None
         }
-        tree = tree_from_dict(test)
+        tree = dict_to_tree(test)
         expected = {
             'p; q': None
         }
@@ -557,7 +558,7 @@ class TestTree(unittest.TestCase):
                 Sequent((self.p,), (self.p,)): None
             }
         }
-        tree = tree_from_dict(test)
+        tree = dict_to_tree(test)
         expected = {
             'p, ~ p; ': {
                 'p; p': None
@@ -573,7 +574,7 @@ class TestTree(unittest.TestCase):
                 Sequent((self.q,), ()): None
             }
         }
-        tree = tree_from_dict(test)
+        tree = dict_to_tree(test)
         expected = {
             '(p -> q); ': {
                 '; p': None,
@@ -590,7 +591,7 @@ class TestTree(unittest.TestCase):
                 {Sequent((self.q,), ()): None}
             ]
         }
-        tree = tree_from_dict(test)
+        tree = dict_to_tree(test)
         expected = {
             '(p & q); ': [
                 {'p; ': None},
@@ -613,7 +614,7 @@ class TestTree(unittest.TestCase):
                 }
             ]
         }
-        tree = tree_from_dict(test)
+        tree = dict_to_tree(test)
         expected = {
             'p; (p v q)': [
                 {

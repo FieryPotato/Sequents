@@ -1,8 +1,13 @@
+"""
+Package for converting objects of one type to another.
+
+"""
 from typing import Protocol
 
 from proposition import Proposition, Atom, Negation, Conjunction,\
     Disjunction, Conditional
 from sequent import Sequent
+from tree import Tree
 
 NEST_MAP = {'(': 1, ')': -1}
 
@@ -69,6 +74,21 @@ def string_to_proposition(string) -> Proposition:
         case _:
             fac = AtomFactory
     return fac().get_prop(*split_string)
+
+
+def sequent_to_tree(sequent) -> Tree:
+    """Return Tree object grown from sequent."""
+    tree = Tree(sequent)
+    tree.grow()
+    return tree
+
+
+def dict_to_tree(dictionary: dict, is_grown: bool = True) -> Tree:
+    """Initialize a Tree object from input dictionary."""
+    first_key = next(iter(dictionary.keys()))
+    tree = Tree(first_key, is_grown=is_grown)
+    tree.branches = dictionary
+    return tree
 
 
 def find_connective(string: str) -> list[str]:
@@ -203,4 +223,5 @@ class ConditionalFactory:
             string_to_proposition(ant),
             string_to_proposition(con)
         )
+
 

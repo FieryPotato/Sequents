@@ -3,8 +3,10 @@ import os
 import unittest
 
 from import_file import TextImporter, JSONImporter, ByteImporter, get_importer
+from proposition import Atom, Negation, Conjunction, Disjunction, Conditional
 
 text_content = 'a bird in hand is worth two in the bush; a bird in hand is worth two in the bush'
+
 json_roots_only = {
     'A v B; A, B': None,
     'A, B; A v B': None,
@@ -14,6 +16,7 @@ json_roots_only = {
     'D; C -> D, C': None,
     'E; E': None,
 }
+
 json_tree = {
     'A v B; A, B': {
         'A; A, B': None,
@@ -39,12 +42,14 @@ json_tree = {
     },
     'E; E': None,
 }
+
 json_universes = {
     'P & Q; R': [
         {'P; R': None},
         {'Q; R': None}
     ]
 }
+
 
 class TestImportText(unittest.TestCase):
     file_path = 'test/io_testing/test_file.txt'
@@ -77,10 +82,6 @@ class TestImportText(unittest.TestCase):
 class TestImportJson(unittest.TestCase):
     file_path = 'test/io_testing/test_file.json'
 
-    def setUp(self) -> None:
-        with open(self.file_path, 'w') as f:
-            json.dump(json_roots_only, f, indent=4)
-    
     def tearDown(self) -> None:
         if os.path.exists(self.file_path):
             os.remove(self.file_path)
@@ -92,9 +93,23 @@ class TestImportJson(unittest.TestCase):
         self.assertEqual(expected.path, importer.path)
 
     def test_import_json_roots(self) -> None:
+        # setUp
+        with open(self.file_path, 'w') as f:
+            json.dump(json_roots_only, f)
+        # Test
         importer = JSONImporter(self.file_path)
         actual = importer.import_()
         expected = json_roots_only
+        self.assertEqual(expected, actual)
+
+    def test_import_whole_json(self) -> None:
+        # setUp
+        with open(self.file_path, 'w') as f:
+            json.dump(json_tree, f)
+        # Test
+        importer = JSONImporter(self.file_path)
+        actual = importer.import_()
+        expected = json_tree
         self.assertEqual(expected, actual)
 
 

@@ -84,18 +84,3 @@ class Tree:
             m = f'The tree beginning in {tree.root} has already been decomposed.'
             super().__init__(m)
 
-
-def tree_from_sequent(sequent) -> Tree:
-    """Return Tree object grown from sequent."""
-    tree = Tree(sequent)
-    tree.grow()
-    return tree
-
-
-def tree_from_dict(dictionary: dict, is_grown: bool = True) -> Tree:
-    """Initialize a Tree object from input dictionary."""
-    first_key = next(iter(dictionary.keys()))
-    tree = Tree(first_key, is_grown=is_grown)
-    tree.branches = dictionary
-    return tree
-
