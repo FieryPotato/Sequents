@@ -6,6 +6,7 @@ from unittest.mock import patch
 from settings import _Settings
 
 test_config_path = 'test/io_testing/test_config.json'
+mock_path = lambda: test_config_path
 
 test_config = {
     "connective_type": {
@@ -29,14 +30,16 @@ test_config = {
 }
 
 class TestSettings(unittest.TestCase): 
+    @patch('settings.config_path', test_config_path)
     def setUp(self) -> None:
         self.s = _Settings()
-        with open(self.s.file, 'r') as f:
-            self.cached_file = json.load(f)
 
     def tearDown(self) -> None:
-        with open(self.s.file, 'w') as f:
-            json.dump(self.cached_file, f, indent=4)
+        with open(test_config_path, 'w') as f:
+            json.dump(test_config, f, indent=4)
+
+    def test_settings_path(self) -> None:
+        self.assertEqual(test_config_path, self.s.path)
 
     def test_load_settings(self) -> None:
         self.assertEqual(test_config, self.s._dict)
@@ -46,7 +49,7 @@ class TestSettings(unittest.TestCase):
             ['Carnap', 'Hahn', 'Neurath', 'Schlick']
         }
         self.s.update(pos)
-        with open(self.s.file, 'r') as f:
+        with open(self.s.path, 'r') as f:
             actual = json.load(f)
         pos.update(test_config)
         self.assertEqual(pos, actual)
@@ -75,7 +78,7 @@ class TestSettings(unittest.TestCase):
                 with self.subTest(i=(connective, side)):
                     value = anti_ketonen[connective][side]
                     self.s.set_rule(connective, side, value)
-                    with open(self.s.file, 'r') as f:
+                    with open(self.s.path, 'r') as f:
                         s_dict = json.load(f)
                     actual = s_dict['connective_type'][connective][side]
                     self.assertEqual(value, actual)

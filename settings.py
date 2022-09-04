@@ -7,15 +7,19 @@ from typing import Any
 
 # Absolute path to the Sequents package.
 sequent_package_dir = Path(__file__).parents[0]
-
+config_path = os.path.join(sequent_package_dir, 'config.json')
 
 class _Settings(MutableMapping):
-    file = os.path.join(sequent_package_dir, 'config.json')
+    """
+    Object for storing and maintaining config.json. It's a singleton to
+    prevent the possibility of inconsistent Settings objects.
+    """
 
     def __init__(self) -> None:
         super().__init__()
+        self.path = config_path
         self._dict = {}
-        with open(self.file, 'r') as cfg:
+        with open(self.path, 'r') as cfg:
             self.update(json.load(cfg))
 
     def __setitem__(self, key, val) -> None:
@@ -53,7 +57,7 @@ class _Settings(MutableMapping):
 
     def save(self) -> None:
         """Save contents of self to config.json."""
-        with open(self.file, 'w') as f:
+        with open(self.path, 'w') as f:
             json.dump(self._dict, f, indent=4)
 
     def print_rules(self) -> None:
