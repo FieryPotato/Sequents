@@ -3,7 +3,7 @@ import unittest
 
 from unittest.mock import patch
 
-from convert import dict_to_tree 
+from convert import dict_to_tree, tree_to_dict
 from proposition import Atom, Conjunction, Negation, Disjunction, Conditional
 from sequent import Sequent
 from tree import Tree
@@ -549,7 +549,7 @@ class TestTree(unittest.TestCase):
         expected = {
             'p; q': None
         }
-        actual = tree.to_dict()
+        actual = tree_to_dict(tree)
         self.assertEqual(expected, actual)
 
     def test_to_dict_c_1_opi(self) -> None:
@@ -564,7 +564,7 @@ class TestTree(unittest.TestCase):
                 'p; p': None
             }
         }
-        actual = tree.to_dict()
+        actual = tree_to_dict(tree)
         self.assertEqual(expected, actual)
 
     def test_to_json_c_1_tpi(self) -> None:
@@ -581,7 +581,7 @@ class TestTree(unittest.TestCase):
                 'q; ': None
             }
         }
-        actual = tree.to_dict()
+        actual = tree_to_dict(tree)
         self.assertEqual(expected, actual)
 
     def test_to_json_c_1_opni(self) -> None:
@@ -598,7 +598,7 @@ class TestTree(unittest.TestCase):
                 {'q; ': None}
             ]
         }
-        actual = tree.to_dict()
+        actual = tree_to_dict(tree)
         self.assertEqual(expected, actual)
 
     def test_to_json_c_1_tpni(self) -> None:
@@ -627,7 +627,7 @@ class TestTree(unittest.TestCase):
                 }
             ]
         }
-        actual = tree.to_dict()
+        actual = tree_to_dict(tree)
         self.assertEqual(expected, actual)
 
 

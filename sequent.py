@@ -1,8 +1,44 @@
+"""
+Module containing the Sequent class.
+
+Sequents are immutable hashable objects containing two tuples of
+Propositions and which have the following properties:
+    - is_atomic: True if all the sequent's propositions are atomic 
+    (i.e. are atoms) and False otherwise.
+    - complexity: The total complexity of each proposition in thes 
+    sequent.
+    
+Sequents can be mixed, which is to say two or more sequents can be 
+combined into a new sequent whose antecedent is all their combined 
+antecedents and likewise for consequents.
+>>> s_0 = Sequent((Atom('ant_0'),), (Atom('con_0'),))
+>>> s_1 = Sequent((Atom('ant_1'),), (Atom('con_1'),))
+>>> Sequent.mix(s_0, s_1)
+Sequent((Atom('ant_0'), Atom('ant_1')), (Atom('con_0'), Atom('con_1)))
+
+Sequents know the location of their first complex prop. The following 
+returns the proposition, which side it's on, and its index in that 
+side. Returns a tuple of three Nones if the sequent is atomic.
+>>> s = Sequent((Atom('ant'),), (Conditional(Atom('p'), Atom('q')),))
+>>> s.first_complex_prop()
+Conditional(Atom('p'), Atom('q')), 'con', 0
+
+Finally, sequents can imperfectly reverse the mixing process. 
+Sequent.possible_mix_parents() returns a list containing each pair
+of sequents that could have been mixed (or combined via two-parent 
+non-invertible rule) to achieve it.
+"""
+
+__all__ = ['Sequent']
+
 import itertools 
 
 from dataclasses import dataclass
+from typing import Protocol
 
-from proposition import Proposition
+
+class Proposition(Protocol):
+    complexity: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -85,12 +121,14 @@ class Sequent:
         """
         def two_parent_combinations(props):
             """Yield possible combinations for props into two groups."""
+            # Represent which parent had the proposition by allocating True
+            # to one and false to the other (in all combinations).
             combinations = itertools.product([True, False], repeat=len(props))
             for combination in combinations:
+                # Where x is the left parent and y is the right parent
                 x = [props[i] for i, v in enumerate(combination) if v]
                 y = [props[i] for i, v in enumerate(combination) if not v]
                 yield tuple(x), tuple(y)
-            return (), ()
 
         results = []
         for antecedents in two_parent_combinations(self.ant):

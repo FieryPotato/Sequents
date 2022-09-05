@@ -5,9 +5,11 @@ from collections.abc import MutableMapping
 from pathlib import Path
 from typing import Any
 
+
 # Absolute path to the Sequents package.
 sequent_package_dir = Path(__file__).parents[0]
 config_path = os.path.join(sequent_package_dir, 'config.json')
+
 
 class _Settings(MutableMapping):
     """
@@ -40,8 +42,7 @@ class _Settings(MutableMapping):
 
     def update(self, *args, **kwargs) -> None:
         """
-        Overwrites dict.update to ensure we save to config.json after 
-        changes.
+        Update self._dict and save the results to disk.
         """
         self._dict.update(*args, **kwargs)
         self.save()

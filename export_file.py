@@ -1,22 +1,29 @@
+"""
+This package contains classes for exporting data to a given file.
+
+The only function you really need is get_exporter, which takes a
+desired output path as input and returns an exporter ready to export
+to that file by calling it's .export(data) function. Note that in all
+cases, data should be an iterable container of Tree objects.
+
+"""
+__all__ = ['get_exporter']
+
 import json
 import pickle
 
 from pathlib import Path
 from typing import Any, Protocol
 
-from tree import Tree
-from prover import Prover
-
     
 class Exporter(Protocol):
-    """Abstract class for exporters."""
-
+    """Protocol for exporters."""
     def export(self, data) -> None:
         ...
 
 
 class PickleExporter:
-    """Class for exporting data as a pickled bytestring."""
+    """Class for exporting data using pickle.""" 
     def __init__(self, file) -> None:
         self.file = file
 
@@ -39,7 +46,13 @@ class JSONExporter:
 
 
 class HTMLExporter:
-    """Class for exporting data to an .html file for viewing."""
+    """
+    Class for exporting data to an .html file for viewing.
+    The plan is to eventually be able to typeset trees as an html
+    file that can be opened in any web browser. This will not be 
+    implemented until I get a handle on html and any relevant 
+    javascript.
+    """
     def __init__(self, file) -> None:
         self.file = file
 
@@ -48,7 +61,7 @@ class HTMLExporter:
 
 
 def get_exporter(dst: str) -> Exporter:
-    """Return the desired exporter object based on dst suffix."""
+    """Return the exporter object matching dst's suffix."""
     exporters = {
         '': PickleExporter,
         '.json': JSONExporter,

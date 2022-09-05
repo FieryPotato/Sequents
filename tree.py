@@ -1,12 +1,35 @@
-import json 
+"""
+Module containing the Tree class.
 
-from abc import ABC, abstractmethod
+Trees represent proof trees in this package. Each tree starts with
+a root (a sequent) and grows outward by applying rules first to that 
+root and then successively to each result until each node is atomic 
+(all leaves terminate in None). Each leaf node is represented by a 
+dictionary whose keys are sequents and whose values are their parent
+sequents. (To analogize, we can imagine the parent of an atom is None,
+which we might consider an Axiom or as part of the material base.)
+
+Trees are grown using the .grow() method and will throw an error if 
+they are told to grow more than once.
+
+Invertible rules are always represented as dictionaries, either with 
+one or with two key-value pairs. Non-invertible rules are instead
+represented as lists of dictionaries, where each dictionary is one 
+possible way the parents might be (we are, after all, performing root-
+first proof searches, so we don't necessarily know how a sequent came
+about).
+"""
+
+__all__ = ['Tree']
+
 from dataclasses import dataclass, field
-from multiprocessing import Pool
-from typing import Any
+from typing import Any, Protocol
 
-from sequent import Sequent
 from rules import get_decomposer
+
+
+class Sequent(Protocol):
+    ...    
 
 
 @dataclass(slots=True)
@@ -31,11 +54,22 @@ class Tree:
         self.branches[self.root] = self.grow_branch(self.root)
         self.is_grown = True
 
+    def grow_branch(self, sequent) -> dict | list | None:
+        """
+        Return the body of the tree whose root is sequent.
+        """
+        decomposer = get_decomposer(sequent)
+        if (parents := decomposer.get_parents()) is None:
+            return None
+        elif isinstance(parents, dict):
+            return self.grow_dict_branch(parents)
+        elif isinstance(parents, list):
+            return self.grow_list_branch(parents)
+
     def grow_list_branch(self, seq_dict_list: list[dict[Sequent, None]]) \
             -> list[dict[Sequent, Sequent | None]]:
         """
         Return branches expanded from sequents in seq_dict_list.
-        (For non-invertible rules only.)
         """
         return [
             self.grow_dict_branch(sequent) for sequent in seq_dict_list
@@ -45,38 +79,10 @@ class Tree:
             -> dict[Sequent, Sequent | None]:
         """
         Return branches expanded from sequents in seq_dict.
-        (For invertible rules only.)
         """
         return {
             sequent: self.grow_branch(sequent) for sequent in seq_dict.keys()
         }
-
-    def grow_branch(self, sequent) -> dict | list | None:
-        """
-        Return the body of the tree whose root is sequent.
-        """
-        decomposer = get_decomposer(sequent)
-
-        if (parents := decomposer.get_parents()) is None:
-            return None
-        elif isinstance(parents, dict):
-            return self.grow_dict_branch(parents)
-        elif isinstance(parents, list):
-            return self.grow_list_branch(parents)
-
-    def to_dict(self) -> dict:
-        """Return self as a dict."""
-        def convert(data):
-            """Recursively make elements of data json-serializable."""
-            result = None
-            if isinstance(data, dict):
-                result = {str(key): convert(element) 
-                          for key, element in data.items()}
-            elif isinstance(data, list):
-                result = [convert(element) for element in data]
-            return result
-
-        return convert(self.branches)
 
     class TreeIsGrownError(Exception):
         """Trees should only be able to be grown once."""

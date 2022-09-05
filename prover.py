@@ -1,7 +1,22 @@
+"""
+Module containing the Prover class. 
+
+The Prover is initialized with a list of strings, which are converted 
+and saved into the instance as a list of sequents. The run method can 
+then be called to solve each of those sequents and save the results to
+the instance's .forest attribute. 
+"""
+
+__all__ = ['Prover']
+
 from multiprocessing import Pool
+from typing import Protocol
 
 from convert import string_to_sequent, sequent_to_tree
-from sequent import Sequent
+
+
+class Sequent(Protocol):
+    ...
 
 
 class Prover:
