@@ -40,7 +40,7 @@ $ python3 Sequents set_rule (side) (connective) (value)
 
 Current rule settings can be viewed with
 ```
-$ python3 Sequents view_rules
+$ python3 Sequents rules
 ```
 
 Run the solver and generate a bytes file with
