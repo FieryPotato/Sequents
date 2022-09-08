@@ -18,12 +18,12 @@ At least one predicate in the proposition must have the quantifier's
 variable as one or more of its names.
 
 ### Universal
-- symbol: ∀ (U+2200)
+- symbol: ∀ (U+2200, html: &forall;)
 - string: forall
 - eg: `∀x LovesRaymond<x>`, `∀x ∀y (H<x, y> -> M<x, y>)`
 
 ### Existential
-- symbol: ∃ (U+2203)
+- symbol: ∃ (U+2203, html: &exist;)
 - string: exists
 - eg: ∃x (Tasty<x> & Liquorice<x>)
 
