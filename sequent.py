@@ -27,6 +27,10 @@ Finally, sequents can imperfectly reverse the mixing process.
 Sequent.possible_mix_parents() returns a list containing each pair
 of sequents that could have been mixed (or combined via two-parent 
 non-invertible rule) to achieve it.
+
+Note that for most purposes, you should prefer to create sequents 
+using the string_to_sequent function in the convert module, rather than
+importing this module and creating them from scratch.
 """
 
 __all__ = ['Sequent']

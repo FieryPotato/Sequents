@@ -18,11 +18,14 @@ subproposition, with Atoms having complexity 0.
 to the subproposition on that side of their main connective. Negations
 meanwhile have the 'negatum' property and Atoms, 'prop'. These can be 
 accessed class-agnostically by accessing the object's .content property.
+
 Notably, Atoms have strings as their propositional content, while all
 other propositions have Propositions (atoms or otherwise) as their 
 content.
 
-
+Note that for most uses, you should prefer creating the classes in this 
+module by using the functions in the convert module (e.g., 
+string_to_proposition) over creating these classes directly.
 """
 
 __all__ = ['Atom', 'Negation', 'Conjunction', 'Conditional', 'Disjunction']
@@ -67,7 +70,7 @@ class Proposition(ABC):
 
     @abstractmethod
     def validate_content(self) -> None:
-        """Raise error if content has incorrect type."""
+        """Raise ValueError if content has incorrect type."""
 
 
 @dataclass(slots=True, frozen=True)
