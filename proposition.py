@@ -127,8 +127,11 @@ class Atom(Proposition):
             )
             
     def names(self) -> tuple[str]:
-        name_string = regex.search(names_re, self.content[0]).group(1)
-        return tuple(name_string.split(', '))
+        names = regex.search(names_re, self.content[0]).group(1)
+        return tuple(n for n in names.split(', ') if len(n) > 1)
+
+    def unbound_variables(self) -> tuple[str]:
+        pass
 
 
 @dataclass(slots=True, frozen=True)

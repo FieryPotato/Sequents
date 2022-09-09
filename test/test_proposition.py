@@ -56,16 +56,28 @@ class TestAtom(unittest.TestCase):
         tests = [
             Atom('Predicate<alice>'),
             Atom('TwoPlace<beth, carol>'),
-            Atom('L<de, fg, hi>')
+            Atom('L<daisy, e, florence>')
         ]
         expected = [
             ('alice',),
             ('beth', 'carol'),
-            ('de', 'fg', 'hi')
+            ('daisy', 'florence')
         ]
         for t, e in zip(tests, expected):
             with self.subTest(i=t):
                 self.assertEqual(e, t.names())
+
+    @unittest.skip('')
+    def test_quantified_atom_has_variables(self) -> None:
+        tests = [
+            Atom('Predicate<a>'),
+        ]
+        expected = [
+            ('a')
+        ]
+        for t, e in zip(tests, expected):
+            with self.subTest(i=t):
+                self.assertEqual(e, t.unbound_variables())
 
 
 class TestNegation(unittest.TestCase):
