@@ -52,6 +52,12 @@ class TestAtom(unittest.TestCase):
         with self.assertRaises(Exception):
             self.a1.prop = 'hello'
 
+    def test_quantified_atom_has_names(self) -> None:
+        a = Atom('Predicate<alice>')
+        expected = 'alice',
+        self.assertEqual(expected, a.names())
+        
+
 
 class TestNegation(unittest.TestCase):
     def setUp(self) -> None:
@@ -213,11 +219,6 @@ class TestBinary(unittest.TestCase):
             with self.subTest(i=a):
                 self.assertEqual(e, str(a))
 
-
-# class TestNestedStrings(unittest.TestCase):
-#     def test_negation_inside_conjunction(self) -> None:
-#         expected = '
-# 
 
 if __name__ == '__main__':
     unittest.main()

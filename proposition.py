@@ -30,11 +30,13 @@ string_to_proposition) over creating these classes directly.
 
 __all__ = ['Atom', 'Negation', 'Conjunction', 'Conditional', 'Disjunction']
 
+import regex
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 SIDES: set[str] = {'ant', 'con'}
-
+names_re = regex.compile(r'\<(.*)\>')
 
 @dataclass(frozen=True, slots=True)
 class Proposition(ABC):
@@ -123,6 +125,10 @@ class Atom(Proposition):
             raise TypeError(
                 f'{self.__class__} content requires string, not {type(self.prop)}.'
             )
+            
+    def names(self) -> tuple[str]:
+        name_string = regex.search(names_re, self.content[0]).group(1)
+        return tuple(name_string.split(', '))
 
 
 @dataclass(slots=True, frozen=True)
