@@ -53,10 +53,19 @@ class TestAtom(unittest.TestCase):
             self.a1.prop = 'hello'
 
     def test_quantified_atom_has_names(self) -> None:
-        a = Atom('Predicate<alice>')
-        expected = 'alice',
-        self.assertEqual(expected, a.names())
-        
+        tests = [
+            Atom('Predicate<alice>'),
+            Atom('TwoPlace<beth, carol>'),
+            Atom('L<de, fg, hi>')
+        ]
+        expected = [
+            ('alice',),
+            ('beth', 'carol'),
+            ('de', 'fg', 'hi')
+        ]
+        for t, e in zip(tests, expected):
+            with self.subTest(i=t):
+                self.assertEqual(e, t.names())
 
 
 class TestNegation(unittest.TestCase):
