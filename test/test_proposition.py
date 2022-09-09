@@ -85,15 +85,23 @@ class TestAtom(unittest.TestCase):
     def test_instantiate_atom(self) -> None:
         tests = [
             Atom('Predicate<a>'),
+            Atom('Property<b, c>'),
+            Atom('Relation<diana, e, frieda>')
         ]
         variables = [
-            'a'
+            'a',
+            'c',
+            'e'
         ]
         names = [
-            'alice'
+            'adrian',
+            'clemence',
+            'emma'
         ]
         expected = [
-            Atom('Predicate<alice>'),
+            Atom('Predicate<adrian>'),
+            Atom('Property<b, clemence>'),
+            Atom('Relation<diana, emma, frieda>')
         ]
         for t, v, n, e in zip(tests, variables, names, expected):
             with self.subTest(i=t):

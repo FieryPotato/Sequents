@@ -36,8 +36,10 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 SIDES: set[str] = {'ant', 'con'}
+
 # Match anything between angle brackets ('<' and '>')
 objects_re = regex.compile(r'\<(.*)\>')
+
 # Match anything before an opening angle bracket ('<')
 predicate_re = regex.compile(r'(.+)\<')
 
