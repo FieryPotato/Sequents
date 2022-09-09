@@ -17,7 +17,9 @@ letters and be entirely lowercase, separated by commas. E.g.
 Quantifiers are declared right before their propositional content.
 At least one predicate in the proposition must have the quantifier's
 variable as one or more of its names. Variables are single lowercase
-letters.
+letters. `P<s>`, `EatsWith<x, y>`. Note that variables are always
+bound by some quantifier. `P<s>` is malformed if it is not a sub-
+proposition of a Quantifier whose variable is 's'.
 
 ### Universal
 - symbol: ∀ (U+2200, html: &forall;)
@@ -27,7 +29,7 @@ letters.
 ### Existential
 - symbol: ∃ (U+2203, html: &exist;)
 - string: exists
-- eg: existsx (Tasty<x> & Liquorice<x>), `∃y ~ ∃x ~ D<x, y>`
+- eg: existsx (Tasty\<x\> & Liquorice\<x\>), `∃y ~ ∃x ~ D<x, y>`
 
 ## Proposition
 
@@ -35,7 +37,7 @@ letters.
 All propositions will gain the following properties:
 - names: tuple[str] = a collection of all names in the proposition, 
 which is to say anything inside angle brackets
-- unbound_variables: tuple[str] = a collection of variables which are
+- unbound\_variables: tuple[str] = a collection of variables which are
 not bound by a quantifier. A proposition in this state which is not
 the subproposition of another quantified proposition that binds those
 variables is maformed.
@@ -48,3 +50,4 @@ all instances of a given variable with an input name. This should raise
 an error if that variable is bound. Note that for quantifiers, this 
 will overlap the behaviour of the decomposition algorithm as it should
 in those cases return the proposition's content without the quantifier.
+

@@ -36,7 +36,10 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 SIDES: set[str] = {'ant', 'con'}
-names_re = regex.compile(r'\<(.*)\>')
+# Match anything between angle brackets ('<' and '>')
+objects_re = regex.compile(r'\<(.*)\>')
+# Match anything before an opening angle bracket ('<')
+predicate_re = regex.compile(r'(.+)\<')
 
 @dataclass(frozen=True, slots=True)
 class Proposition(ABC):
@@ -125,13 +128,53 @@ class Atom(Proposition):
             raise TypeError(
                 f'{self.__class__} content requires string, not {type(self.prop)}.'
             )
+    
+    @property
+    def objects(self) -> list[str]:
+        """
+        Return the objects (i.e. names and variables) in self.content.
+        """
+        result = regex.search(objects_re, self.content[0])
+        string = result.group(1)
+        return string.split(', ')
+
+    @property
+    def predicates(self) -> list[str]:
+        """Return self.content's predicate."""
+        result = regex.search(predicate_re, self.content[0])
+        string = result.group(1)
+        return [string]
             
     def names(self) -> tuple[str]:
-        names = regex.search(names_re, self.content[0]).group(1)
-        return tuple(n for n in names.split(', ') if len(n) > 1)
+        """Return a tuple of names in self.content."""
+        objects: list[str] = self.objects
+        return tuple(o for o in objects if len(o) > 1)
 
     def unbound_variables(self) -> tuple[str]:
-        pass
+        """Return a tuple of unbound variables in self.content."""
+        objects: list[str] = self.objects
+        return tuple(o for o in objects if len(o) == 1)
+
+    def instantiate(self, variable: str, name: str) -> 'Atom':
+        """
+        Return an atom whose instances of variable are replaced with
+        name.
+        """
+        objects: list[str] = self.objects
+
+        # Replace variable instances with name
+        new_objects = []
+        for o in objects:
+            if o == variable:
+                o = name
+            new_objects.append(o)
+
+        # Put new objects into a new string for Atom creation
+        new_content = f"{self.predicates[0]}<{', '.join(new_objects)}>"
+
+        return Atom(new_content)
+        
+
 
 
 @dataclass(slots=True, frozen=True)
