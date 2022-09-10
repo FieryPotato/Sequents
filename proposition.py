@@ -75,9 +75,13 @@ class Proposition(ABC):
         """Return this object's logical complexity."""
         return 1 + max(p.complexity for p in self.content)
 
-    @abstractmethod
     def validate_content(self) -> None:
         """Raise ValueError if content has incorrect type."""
+        for prop in self.content:
+            if not isinstance(prop, Proposition):
+                raise TypeError(
+                    f'{self.__class__} content requires propositions, not {type(prop)}.'
+                )
 
     @property
     def names(self) -> tuple[str]:
@@ -105,6 +109,41 @@ class Proposition(ABC):
 
 
 @dataclass(slots=True, frozen=True)
+class UnaryProposition(Proposition):
+    """
+    Super class for unary propositions.
+    """
+    prop: Proposition = None
+    arity = 1
+    symb = None
+    variable = ''
+
+    def __str__(self) -> str:
+        return f'{self.symb} {self.prop}'
+
+    @property
+    def content(self) -> tuple[Proposition | str]:
+        return (self.prop,)
+
+@dataclass(slots=True, frozen=True)
+class Quantifier(Proposition):
+    """
+    Super class for quantifiers.
+    """
+    variable: str
+    prop: Proposition
+    arity = 1
+    symb = None
+
+    def __str__(self) -> str:
+        return f'{self.symb}{self.variable} {self.prop}'
+
+    @property
+    def content(self) -> tuple[Proposition]:
+        return (self.prop,)
+
+
+@dataclass(slots=True, frozen=True)
 class BinaryProposition(Proposition):
     """
     Super class for binary propositions.
@@ -121,16 +160,10 @@ class BinaryProposition(Proposition):
     def content(self) -> tuple[Proposition, Proposition]:
         return self.left, self.right
 
-    def validate_content(self) -> None:
-        for prop in self.content:
-            if not isinstance(prop, Proposition):
-                raise TypeError(
-                    f'{self.__class__} content requires propositions, not {type(prop)}.'
-                )
 
 
 @dataclass(slots=True, frozen=True)
-class Atom(Proposition):
+class Atom(UnaryProposition):
     """
     Proposition class with no logical content.
     """
@@ -144,10 +177,6 @@ class Atom(Proposition):
     @property
     def complexity(self) -> int:
         return 0
-
-    @property
-    def content(self) -> tuple[str]:
-        return self.prop,
 
     def validate_content(self) -> None:
         if not isinstance(self.prop, str):
@@ -205,16 +234,23 @@ class Atom(Proposition):
 
 
 @dataclass(slots=True, frozen=True)
-class Universal(Proposition):
+class Universal(Quantifier):
     """
     Unary proposition signifying logical 'for all ...'.
     """
+    variable: str
+    prop: Proposition
     arity = 1
     symb = '∀'
 
 
+    @property
+    def content(self) -> tuple[Proposition]:
+        return self.prop,
+
+
 @dataclass(slots=True, frozen=True)
-class Negation(Proposition):
+class Negation(UnaryProposition):
     """
     Unary proposition signifying logical 'not ...'.
     """
@@ -222,19 +258,9 @@ class Negation(Proposition):
     symb = '~'
     arity = 1
 
-    def __str__(self) -> str:
-        return f'~ {str(self[0])}'
-
     @property
     def content(self) -> tuple[Proposition]:
         return self.prop,
-
-    def validate_content(self) -> None:
-        if not isinstance(self.prop, Proposition):
-            raise TypeError(
-                f'{self.__class__} content requires Proposition, not {type(self.prop)}.'
-            )
-
 
 
 @dataclass(slots=True, frozen=True)

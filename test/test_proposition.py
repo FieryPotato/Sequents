@@ -212,8 +212,25 @@ class TestUniversal(unittest.TestCase):
         var = 'x'
         prop = Atom('P<x>')
         u1 = Universal('x', prop)
-        self.assertEqual(var, u1.var)
+        self.assertEqual(var, u1.variable)
         self.assertEqual(prop, u1.prop)
+        
+    def test_universal_string(self) -> None:
+        test = [
+            Universal('a', Atom('P<a>')),
+            Universal('b', Atom('P<alice, b>')),
+            Universal('a', Universal('b', Atom('P<a, b>'))),
+            Universal('x', Conditional(Atom('P<x>'), Atom('Q<x>')))
+        ]
+        expected = [
+            '∀a P<a>',
+            '∀b P<alice, b>',
+            '∀a ∀b P<a, b>',
+            '∀x (P<x> -> Q<x>)'
+        ]
+        for t, e in zip(test, expected):
+            with self.subTest(i=t):
+                self.assertEqual(e, str(t))
 
 
 class TestBinary(unittest.TestCase):
