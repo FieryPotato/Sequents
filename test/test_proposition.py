@@ -146,9 +146,40 @@ class TestNegation(unittest.TestCase):
             self.n1.negatum = Atom('test')
 
     def test_negation_has_names(self) -> None:
-        a = Negation(Atom('A<alice>'))
-        expected = ('alice',)
-        self.assertEqual(expected, a.names)
+        tests = [
+            Negation(Atom('A<alice>')),
+            Negation(Atom('B<betty, charlie>')),
+            Negation(Negation(Atom('D<edgar, falcon, gerry>')))
+        ]
+        expected = [
+            ('alice',),
+            ('betty', 'charlie'),
+            ('edgar', 'falcon', 'gerry')
+        ]
+        for t, e in zip(tests, expected):
+            with self.subTest(i=t):
+               self.assertEqual(e, t.names)
+
+    def test_instantiate_negation(self) -> None:
+        tests = [
+            Negation(Atom('A<a>')),
+            Negation(Atom('B<betty, c>'))
+        ]
+        variables = [
+            'a',
+            'c',
+        ]
+        names = [
+            'alice',
+            'charlie'
+        ]
+        expected = [
+            Negation(Atom('A<alice>')),
+            Negation(Atom('B<betty, charlie>'))
+        ]
+        for t, v, n, e in zip(tests, variables, names, expected):
+            with self.subTest(i=t):
+                self.assertEqual(e, t.instantiate(v, n))
 
 
 class TestBinary(unittest.TestCase):

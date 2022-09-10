@@ -210,6 +210,9 @@ class Negation(Proposition):
             for name in prop.names:
                 names.append(name)
         return tuple(names)
+        
+    def instantiate(self, variable, name) -> 'Negation':
+        return Negation(self.negatum.instantiate(variable, name))
 
 
 @dataclass(slots=True, frozen=True)
