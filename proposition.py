@@ -147,11 +147,13 @@ class Atom(Proposition):
         string = result.group(1)
         return [string]
             
+    @property
     def names(self) -> tuple[str]:
         """Return a tuple of names in self.content."""
         objects: list[str] = self.objects
         return tuple(o for o in objects if len(o) > 1)
 
+    @property
     def unbound_variables(self) -> tuple[str]:
         """Return a tuple of unbound variables in self.content."""
         objects: list[str] = self.objects
@@ -200,6 +202,14 @@ class Negation(Proposition):
             raise TypeError(
                 f'{self.__class__} content requires Proposition, not {type(self.negatum)}.'
             )
+
+    @property
+    def names(self) -> tuple[str]:
+        names = []
+        for prop in self.content:
+            for name in prop.names:
+                names.append(name)
+        return tuple(names)
 
 
 @dataclass(slots=True, frozen=True)

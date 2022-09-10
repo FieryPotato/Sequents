@@ -65,7 +65,7 @@ class TestAtom(unittest.TestCase):
         ]
         for t, e in zip(tests, expected):
             with self.subTest(i=t):
-                self.assertEqual(e, t.names())
+                self.assertEqual(e, t.names)
 
     def test_quantified_atom_has_variables(self) -> None:
         tests = [
@@ -80,7 +80,7 @@ class TestAtom(unittest.TestCase):
         ]
         for t, e in zip(tests, expected):
             with self.subTest(i=t):
-                self.assertEqual(e, t.unbound_variables())
+                self.assertEqual(e, t.unbound_variables)
 
     def test_instantiate_atom(self) -> None:
         tests = [
@@ -144,6 +144,11 @@ class TestNegation(unittest.TestCase):
     def test_negation_is_immutable(self) -> None:
         with self.assertRaises(Exception):
             self.n1.negatum = Atom('test')
+
+    def test_negation_has_names(self) -> None:
+        a = Negation(Atom('A<alice>'))
+        expected = ('alice',)
+        self.assertEqual(expected, a.names)
 
 
 class TestBinary(unittest.TestCase):
