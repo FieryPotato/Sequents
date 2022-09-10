@@ -323,6 +323,21 @@ class TestBinary(unittest.TestCase):
             with self.subTest(i=a):
                 self.assertEqual(e, str(a))
 
+    def test_binary_names(self) -> None:
+        classes = Conditional, Conjunction, Disjunction
+        for cls in classes:
+            tests = [
+                cls(Atom('P<alice>'), Atom('Q<betty>')),
+                cls(Negation(Atom('R<carol, destiny>')), Atom('S<eleanor, fancy>')),
+            ]
+            expected = [
+                ('alice', 'betty'),
+                ('carol', 'destiny', 'eleanor', 'fancy')
+            ]
+            for t, e in zip(tests, expected):
+                with self.subTest(i=cls):
+                    self.assertEqual(e, t.names)
+
 
 if __name__ == '__main__':
     unittest.main()

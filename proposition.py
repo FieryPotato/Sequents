@@ -104,6 +104,12 @@ class BinaryProposition(Proposition):
                     f'{self.__class__} content requires propositions, not {type(prop)}.'
                 )
 
+    @property
+    def names(self) -> tuple[str]:
+        names = []
+        for prop in self.content:
+            names.extend([n for n in prop.names])
+        return tuple(names)
 
 @dataclass(slots=True, frozen=True)
 class Atom(Proposition):
