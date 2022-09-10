@@ -79,6 +79,14 @@ class Proposition(ABC):
     def validate_content(self) -> None:
         """Raise ValueError if content has incorrect type."""
 
+    @property
+    def names(self) -> tuple[str]:
+        """Return all names in self.content."""
+        names = []
+        for prop in self.content:
+            names.extend([n for n in prop.names])
+        return tuple(names)
+
 
 @dataclass(slots=True, frozen=True)
 class BinaryProposition(Proposition):
@@ -103,13 +111,6 @@ class BinaryProposition(Proposition):
                 raise TypeError(
                     f'{self.__class__} content requires propositions, not {type(prop)}.'
                 )
-
-    @property
-    def names(self) -> tuple[str]:
-        names = []
-        for prop in self.content:
-            names.extend([n for n in prop.names])
-        return tuple(names)
 
     @property
     def unbound_variables(self) -> tuple[str]:
@@ -220,14 +221,6 @@ class Negation(Proposition):
             raise TypeError(
                 f'{self.__class__} content requires Proposition, not {type(self.negatum)}.'
             )
-
-    @property
-    def names(self) -> tuple[str]:
-        names = []
-        for prop in self.content:
-            for name in prop.names:
-                names.append(name)
-        return tuple(names)
 
     @property
     def unbound_variables(self) -> tuple[str]:
