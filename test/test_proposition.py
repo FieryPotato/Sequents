@@ -143,7 +143,7 @@ class TestNegation(unittest.TestCase):
 
     def test_negation_is_immutable(self) -> None:
         with self.assertRaises(Exception):
-            self.n1.negatum = Atom('test')
+            self.n1.prop = Atom('test')
 
     def test_negation_has_names(self) -> None:
         tests = [

@@ -210,7 +210,7 @@ class Negation(Proposition):
     """
     Unary proposition signifying logical 'not ...'.
     """
-    negatum: Proposition
+    prop: Proposition
     symb = '~'
     arity = 1
 
@@ -219,12 +219,12 @@ class Negation(Proposition):
 
     @property
     def content(self) -> tuple[Proposition]:
-        return self.negatum,
+        return self.prop,
 
     def validate_content(self) -> None:
-        if not isinstance(self.negatum, Proposition):
+        if not isinstance(self.prop, Proposition):
             raise TypeError(
-                f'{self.__class__} content requires Proposition, not {type(self.negatum)}.'
+                f'{self.__class__} content requires Proposition, not {type(self.prop)}.'
             )
 
 @dataclass(slots=True, frozen=True)
