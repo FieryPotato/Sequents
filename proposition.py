@@ -81,11 +81,19 @@ class Proposition(ABC):
 
     @property
     def names(self) -> tuple[str]:
-        """Return all names in self.content."""
+        """Return a tuple of names in self.content."""
         names = []
         for prop in self.content:
             names.extend([n for n in prop.names])
         return tuple(names)
+
+    @property
+    def unbound_variables(self) -> tuple[str]:
+        """Return a tuple of unbound variables in self.content."""
+        variables = []
+        for prop in self.content:
+            variables.extend([v for v in prop.unbound_variables])
+        return tuple(variables)
 
 
 @dataclass(slots=True, frozen=True)
@@ -112,12 +120,12 @@ class BinaryProposition(Proposition):
                     f'{self.__class__} content requires propositions, not {type(prop)}.'
                 )
 
-    @property
-    def unbound_variables(self) -> tuple[str]:
-        variables = []
-        for prop in self.content:
-            variables.extend([v for v in prop.unbound_variables])
-        return tuple(variables)
+#    @property
+#    def unbound_variables(self) -> tuple[str]:
+#        variables = []
+#        for prop in self.content:
+#            variables.extend([v for v in prop.unbound_variables])
+#        return tuple(variables)
 
     def instantiate(self, variable, name) -> 'cls':
         left = self.left.instantiate(variable, name)
@@ -222,13 +230,13 @@ class Negation(Proposition):
                 f'{self.__class__} content requires Proposition, not {type(self.negatum)}.'
             )
 
-    @property
-    def unbound_variables(self) -> tuple[str]:
-        variables = []
-        for prop in self.content:
-            for var in prop.unbound_variables:
-                variables.append(var)
-        return tuple(variables)
+#    @property
+#    def unbound_variables(self) -> tuple[str]:
+#        variables = []
+#        for prop in self.content:
+#            for var in prop.unbound_variables:
+#                variables.append(var)
+#        return tuple(variables)
         
     def instantiate(self, variable, name) -> 'Negation':
         return Negation(self.negatum.instantiate(variable, name))
