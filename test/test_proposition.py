@@ -1,7 +1,7 @@
 import unittest
 
 from proposition import Atom, Negation, Conjunction, \
-    Conditional, Disjunction
+    Conditional, Disjunction, Universal
 
 
 class TestProposition(unittest.TestCase):
@@ -199,6 +199,21 @@ class TestNegation(unittest.TestCase):
         for t, v, n, e in zip(tests, variables, names, expected):
             with self.subTest(i=t):
                 self.assertEqual(e, t.instantiate(v, n))
+
+
+class TestUniversal(unittest.TestCase):
+    def test_arity_is_1(self) -> None:
+        self.assertEqual(1, Universal.arity)
+        
+    def test_symb(self) -> None: 
+        self.assertEqual('∀', Universal.symb)
+
+    def test_var_and_prop(self) -> None:
+        var = 'x'
+        prop = Atom('P<x>')
+        u1 = Universal('x', prop)
+        self.assertEqual(var, u1.var)
+        self.assertEqual(prop, u1.prop)
 
 
 class TestBinary(unittest.TestCase):

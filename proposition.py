@@ -28,7 +28,7 @@ module by using the functions in the convert module (e.g.,
 string_to_proposition) over creating these classes directly.
 """
 
-__all__ = ['Atom', 'Negation', 'Conjunction', 'Conditional', 'Disjunction']
+__all__ = ['Atom', 'Negation', 'Conjunction', 'Conditional', 'Disjunction', 'Universal']
 
 import re
 
@@ -204,6 +204,14 @@ class Atom(Proposition):
         
 
 
+@dataclass(slots=True, frozen=True)
+class Universal(Proposition):
+    """
+    Unary proposition signifying logical 'for all ...'.
+    """
+    arity = 1
+    symb = '∀'
+
 
 @dataclass(slots=True, frozen=True)
 class Negation(Proposition):
@@ -226,6 +234,8 @@ class Negation(Proposition):
             raise TypeError(
                 f'{self.__class__} content requires Proposition, not {type(self.prop)}.'
             )
+
+
 
 @dataclass(slots=True, frozen=True)
 class Conjunction(BinaryProposition):
