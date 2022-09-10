@@ -111,6 +111,18 @@ class BinaryProposition(Proposition):
             names.extend([n for n in prop.names])
         return tuple(names)
 
+    @property
+    def unbound_variables(self) -> tuple[str]:
+        variables = []
+        for prop in self.content:
+            variables.extend([v for v in prop.unbound_variables])
+        return tuple(variables)
+
+    def instantiate(self, variable, name) -> 'cls':
+        left = self.left.instantiate(variable, name)
+        right = self.right.instantiate(variable, name)
+        return self.__class__(left, right)
+
 @dataclass(slots=True, frozen=True)
 class Atom(Proposition):
     """

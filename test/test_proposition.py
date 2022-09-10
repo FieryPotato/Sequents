@@ -338,6 +338,57 @@ class TestBinary(unittest.TestCase):
                 with self.subTest(i=cls):
                     self.assertEqual(e, t.names)
 
+    def test_binary_variables(self) -> None:
+        classes = Conditional, Conjunction, Disjunction
+        for cls in classes:
+            tests = [
+                cls(Atom('P<a>'), Atom('Q<b>')),
+                cls(Negation(Atom('R<c, destiny>')), Atom('S<e, fancy>'))
+            ]
+            expected = [
+                ('a', 'b'),
+                ('c', 'e')
+            ]
+            for t, e in zip(tests, expected):
+                with self.subTest(i=cls):
+                    self.assertEqual(e, t.unbound_variables)
+
+    def test_instantiate_binary(self) -> None:
+        classes = Conditional, Conjunction, Disjunction
+        for cls in classes:
+            tests = [
+                cls(Atom('P<a>'), Atom('Q<betty>')),
+                cls(Atom('P<alice>'), Atom('Q<b>')),
+                cls(Atom('P<a>'), Atom('Q<a>')),
+                cls(Atom('P<alice>'), Atom('Q<a>')),
+                cls(Negation(Atom('R<c, destiny>')), Atom('S<eleanor, c>'))
+            ]
+            variables = [
+                'a',
+                'b', 
+                'a',
+                'a',
+                'c'
+            ]
+            names = [
+                'alice',
+                'betty',
+                'alice', 
+                'alice',
+                'carol'
+            ]
+            expected = [
+                cls(Atom('P<alice>'), Atom('Q<betty>')),
+                cls(Atom('P<alice>'), Atom('Q<betty>')),
+                cls(Atom('P<alice>'), Atom('Q<alice>')),
+                cls(Atom('P<alice>'), Atom('Q<alice>')),
+                cls(Negation(Atom('R<carol, destiny>')), Atom('S<eleanor, carol>'))
+            ]
+            for t, v, n, e in zip(tests, variables, names, expected):
+                with self.subTest(i=t):
+                    self.assertEqual(e, t.instantiate(v, n))
+                
+
 
 if __name__ == '__main__':
     unittest.main()
