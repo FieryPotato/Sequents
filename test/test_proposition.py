@@ -160,6 +160,21 @@ class TestNegation(unittest.TestCase):
             with self.subTest(i=t):
                self.assertEqual(e, t.names)
 
+    def test_negation_has_variables(self) -> None:
+        tests = [
+            Negation(Atom('A<alice>')),
+            Negation(Atom('A<a>')),
+            Negation(Negation(Atom('B<b, charlie, d>')))
+        ]
+        expected = [
+            (),
+            ('a',),
+            ('b', 'd'),
+        ]
+        for t, e in zip(tests, expected):
+            with self.subTest(i=t):
+                self.assertEqual(e, t.unbound_variables)
+
     def test_instantiate_negation(self) -> None:
         tests = [
             Negation(Atom('A<a>')),

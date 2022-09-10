@@ -210,6 +210,14 @@ class Negation(Proposition):
             for name in prop.names:
                 names.append(name)
         return tuple(names)
+
+    @property
+    def unbound_variables(self) -> tuple[str]:
+        variables = []
+        for prop in self.content:
+            for var in prop.unbound_variables:
+                variables.append(var)
+        return tuple(variables)
         
     def instantiate(self, variable, name) -> 'Negation':
         return Negation(self.negatum.instantiate(variable, name))
