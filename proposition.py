@@ -30,7 +30,7 @@ string_to_proposition) over creating these classes directly.
 
 __all__ = ['Atom', 'Negation', 'Conjunction', 'Conditional', 'Disjunction']
 
-import regex
+import re
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -38,10 +38,10 @@ from dataclasses import dataclass
 SIDES: set[str] = {'ant', 'con'}
 
 # Match anything between angle brackets ('<' and '>')
-objects_re = regex.compile(r'\<(.*)\>')
+objects_re = re.compile(r'\<(.*)\>')
 
 # Match anything before an opening angle bracket ('<')
-predicate_re = regex.compile(r'(.+)\<')
+predicate_re = re.compile(r'(.+)\<')
 
 @dataclass(frozen=True, slots=True)
 class Proposition(ABC):
@@ -136,14 +136,14 @@ class Atom(Proposition):
         """
         Return the objects (i.e. names and variables) in self.content.
         """
-        result = regex.search(objects_re, self.content[0])
+        result = re.search(objects_re, self.content[0])
         string = result.group(1)
         return string.split(', ')
 
     @property
     def predicates(self) -> list[str]:
         """Return self.content's predicate."""
-        result = regex.search(predicate_re, self.content[0])
+        result = re.search(predicate_re, self.content[0])
         string = result.group(1)
         return [string]
             
