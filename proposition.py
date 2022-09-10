@@ -95,6 +95,14 @@ class Proposition(ABC):
             variables.extend([v for v in prop.unbound_variables])
         return tuple(variables)
 
+    def instantiate(self, variable, name) -> 'cls':
+        """
+        Return an instance of this class whose instances of variable
+        are replaced with name.
+        """
+        props = [prop.instantiate(variable, name) for prop in self.content]
+        return self.__class__(*props)
+
 
 @dataclass(slots=True, frozen=True)
 class BinaryProposition(Proposition):
@@ -120,17 +128,6 @@ class BinaryProposition(Proposition):
                     f'{self.__class__} content requires propositions, not {type(prop)}.'
                 )
 
-#    @property
-#    def unbound_variables(self) -> tuple[str]:
-#        variables = []
-#        for prop in self.content:
-#            variables.extend([v for v in prop.unbound_variables])
-#        return tuple(variables)
-
-    def instantiate(self, variable, name) -> 'cls':
-        left = self.left.instantiate(variable, name)
-        right = self.right.instantiate(variable, name)
-        return self.__class__(left, right)
 
 @dataclass(slots=True, frozen=True)
 class Atom(Proposition):
@@ -229,18 +226,6 @@ class Negation(Proposition):
             raise TypeError(
                 f'{self.__class__} content requires Proposition, not {type(self.negatum)}.'
             )
-
-#    @property
-#    def unbound_variables(self) -> tuple[str]:
-#        variables = []
-#        for prop in self.content:
-#            for var in prop.unbound_variables:
-#                variables.append(var)
-#        return tuple(variables)
-        
-    def instantiate(self, variable, name) -> 'Negation':
-        return Negation(self.negatum.instantiate(variable, name))
-
 
 @dataclass(slots=True, frozen=True)
 class Conjunction(BinaryProposition):
