@@ -163,19 +163,23 @@ class TestNegation(unittest.TestCase):
     def test_instantiate_negation(self) -> None:
         tests = [
             Negation(Atom('A<a>')),
-            Negation(Atom('B<betty, c>'))
+            Negation(Atom('B<betty, c>')),
+            Negation(Negation(Atom('D<edward, f, georg>')))
         ]
         variables = [
             'a',
             'c',
+            'f'
         ]
         names = [
             'alice',
-            'charlie'
+            'charlie',
+            'francis'
         ]
         expected = [
             Negation(Atom('A<alice>')),
-            Negation(Atom('B<betty, charlie>'))
+            Negation(Atom('B<betty, charlie>')),
+            Negation(Negation(Atom('D<edward, francis, georg>')))
         ]
         for t, v, n, e in zip(tests, variables, names, expected):
             with self.subTest(i=t):
