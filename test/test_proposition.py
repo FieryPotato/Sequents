@@ -285,15 +285,23 @@ class TestQuantifiers(unittest.TestCase):
         for cls in self.classes:
             tests = [
                 ('x', Atom('P<x>')),
+                ('a', Atom('P<x, a>')),
+                ('b', Conditional(Atom('P<x, b>'), Atom('Q<b, ali>')))
             ]
             variables = [
                 'x',
+                'a',
+                'b'
             ]
             names = [
                 'alice',
+                'amy',
+                'beth'
             ]
             expected = [
-                (Atom('P<alice>')),
+                Atom('P<alice>'),
+                Atom('P<x, amy>'),
+                Conditional(Atom('P<x, beth>'), Atom('Q<beth, ali>'))
             ]
             for t, v, n, e in zip(tests, variables, names, expected):
                 a = cls(*t)
