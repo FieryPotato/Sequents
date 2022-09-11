@@ -206,32 +206,31 @@ class TestNegation(unittest.TestCase):
 
 
 class TestQuantifiers(unittest.TestCase):
+    classes = Universal, Existential
+
     def test_arity_is_1(self) -> None:
-        for cls in Universal, Existential:
+        for cls in self.classes:
             with self.subTest(i=cls):
                 self.assertEqual(1, cls.arity)
         
     def test_symb(self) -> None: 
-        classes = Universal, Existential
         symbs = '∀', '∃'
-        for c, s in zip(classes, symbs):
+        for c, s in zip(self.classes, symbs):
             with self.subTest(i=c):
                 self.assertEqual(s, c.symb)
 
     def test_var_and_prop(self) -> None:
         var = 'x'
         prop = Atom('P<x>')
-        classes = Universal, Existential
-        for cls in classes:
+        for cls in self.classes:
             q = cls(var, prop)
             with self.subTest(i=cls):
                 self.assertEqual(var, q.variable)
                 self.assertEqual(prop, q.prop)
         
     def test_string(self) -> None:
-        classes = Universal, Existential
         symbs = '∀', '∃'
-        for cls, symb in zip(classes, symbs):
+        for cls, symb in zip(self.classes, symbs):
             test = [
                 cls('a', Atom('P<a>')),
                 cls('b', Atom('P<alice, b>')),
@@ -249,7 +248,6 @@ class TestQuantifiers(unittest.TestCase):
                     self.assertEqual(e, str(t))
 
     def test_names(self) -> None:
-        classes = Universal, Existential
         tests = [
             ('x', Atom('P<x>')),
             ('x', Atom('P<x, david>')),
@@ -262,13 +260,12 @@ class TestQuantifiers(unittest.TestCase):
             ('nancy', 'eve'),
             ('naomi',)
         ]
-        for cls, t, e in zip(classes, tests, expected):
+        for cls, t, e in zip(self.classes, tests, expected):
             a = cls(*t)
-            with self.subTest(i=(cls, t)):
+            with self.subTest(i=(cls, a)):
                 self.assertEqual(e, a.names)
 
     def test_unbound_variables(self) -> None:
-        classes = Universal, Existential
         tests = [
             ('x', Atom('P<x>')),
             ('x', Atom('P<x, y>')),
@@ -279,10 +276,29 @@ class TestQuantifiers(unittest.TestCase):
             ('y',),
             ('a',)
         ]
-        for cls, t, e in zip(classes, tests, expected):
+        for cls, t, e in zip(self.classes, tests, expected):
             a = cls(*t)
-            with self.subTest(i=(cls, t)):
+            with self.subTest(i=(a)):
                 self.assertEqual(e, a.unbound_variables)
+
+    def test_instantiate(self) -> None:
+        for cls in self.classes:
+            tests = [
+                ('x', Atom('P<x>')),
+            ]
+            variables = [
+                'x',
+            ]
+            names = [
+                'alice',
+            ]
+            expected = [
+                (Atom('P<alice>')),
+            ]
+            for t, v, n, e in zip(tests, variables, names, expected):
+                a = cls(*t)
+                with self.subTest(i=a):
+                    self.assertEqual(e, a.instantiate(v, n))        
 
 
 class TestBinary(unittest.TestCase):

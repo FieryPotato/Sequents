@@ -96,18 +96,19 @@ class Proposition(ABC):
     @property
     def names(self) -> tuple[str]:
         """Return a tuple of names in self.content."""
-        names = []
+        # breakpoint()
+        names = set()
         for prop in self.content:
-            names.extend([n for n in prop.names])
-        return tuple(names)
+            names.update({n for n in prop.names})
+        return tuple(sorted(names))
 
     @property
     def unbound_variables(self) -> tuple[str]:
         """Return a tuple of unbound variables in self.content."""
         variables = set()
         for prop in self.content:
-            variables.union({v for v in prop.unbound_variables})
-        return tuple(variables)
+            variables.update({v for v in prop.unbound_variables})
+        return tuple(sorted(variables))
 
     def instantiate(self, variable, name) -> 'cls':
         """
@@ -156,8 +157,18 @@ class Quantifier(Proposition):
     def unbound_variables(self) -> tuple[str]:
         variables = set()
         for prop in self.content:
-            variables.union({v for v in prop.unbound_variables})
-        return tuple([v for v in variables if v != self.variable])
+            variables.update({v for v in prop.unbound_variables})
+        unbound = [v for v in variables if v != self.variable]
+        return tuple(sorted(unbound))
+
+    def instantiate(self, variable, name) -> Proposition:
+        if variable == self.variable:
+            return self.instantiate_with(name)
+        sub_prop = self.prop.instantiate(variable, name)
+        return self.__class__(self.variable, sub_prop)
+
+    def instantiate_with(self, name) -> 'Quantifier':
+        return self.prop.instantiate(self.variable, name)
 
 
 @dataclass(slots=True, frozen=True)
@@ -221,13 +232,15 @@ class Atom(UnaryProposition):
     def names(self) -> tuple[str]:
         """Return a tuple of names in self.content."""
         objects: list[str] = self.objects
-        return tuple(o for o in objects if len(o) > 1)
+        names = {o for o in objects if len(o) > 1}
+        return tuple(sorted(names))
 
     @property
     def unbound_variables(self) -> tuple[str]:
         """Return a tuple of unbound variables in self.content."""
         objects: list[str] = list(set(self.objects))
-        return tuple(o for o in objects if len(o) == 1)
+        variables = [o for o in objects if len(o) == 1]
+        return tuple(sorted(variables))
 
     def instantiate(self, variable: str, name: str) -> 'Atom':
         """
@@ -261,11 +274,6 @@ class Universal(Quantifier):
     symb = '∀'
 
 
-    @property
-    def content(self) -> tuple[Proposition]:
-        return self.prop,
-
-
 @dataclass(slots=True, frozen=True)
 class Existential(Quantifier):
     """
@@ -285,10 +293,6 @@ class Negation(UnaryProposition):
     prop: Proposition
     symb = '~'
     arity = 1
-
-    @property
-    def content(self) -> tuple[Proposition]:
-        return self.prop,
 
 
 @dataclass(slots=True, frozen=True)
