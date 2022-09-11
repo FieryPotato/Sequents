@@ -29,6 +29,11 @@ subpropositions. Names are always two or more lowercase letters.
 in the proposition. Unbound variables are single lowercase letters not 
 bound by a quantifier.
 
+- instantiate: return this proposition with all instances of a variable
+replaced with a name. If the proposition is a quantifier and the 
+variable, is the variable it binds, instead return the subproposition 
+(i.e. remove the quantifier).
+
 Notably, Atoms have strings as their propositional content, while all
 other propositions have Propositions (atoms or otherwise) as their 
 content.
@@ -162,12 +167,18 @@ class Quantifier(Proposition):
         return tuple(sorted(unbound))
 
     def instantiate(self, variable, name) -> Proposition:
+        """
+        Return self with instances of variable replaced with name.
+        If variable is self.variable, instead return instantiated 
+        subproposition.
+        """
         if variable == self.variable:
             return self.instantiate_with(name)
         sub_prop = self.prop.instantiate(variable, name)
         return self.__class__(self.variable, sub_prop)
 
     def instantiate_with(self, name) -> 'Quantifier':
+        """Return self.prop instantiated with self.variable."""
         return self.prop.instantiate(self.variable, name)
 
 
