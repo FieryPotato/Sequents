@@ -244,6 +244,23 @@ class TestQuantifiers(unittest.TestCase):
                 with self.subTest(i=(cls, t)):
                     self.assertEqual(e, str(t))
 
+    def test_names(self) -> None:
+        classes = Universal, Existential
+        tests = [
+            ('x', Atom('P<x>')),
+            ('x', Atom('P<x, david>')),
+            ('x', Conjunction(Atom('Q<nancy>'), Atom('R<eve, x>')))
+        ]
+        expected = [
+            (),
+            ('david',),
+            ('nancy', 'eve'),
+        ]
+        for cls, t, e in zip(classes, tests, expected):
+            a = cls(*t)
+            with self.subTest(i=(cls, t)):
+                self.assertEqual(e, a.names)
+
 
 class TestBinary(unittest.TestCase):
     def setUp(self) -> None:
