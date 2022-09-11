@@ -7,17 +7,27 @@ properties:
 - 'arity': a measure of how many subpropositions the proposition 
 contains.  Atoms and negations are unary (arity=1), while conjunctions, 
 disjunctions, and conditionals are binary (arity=2).
+
 - 'symb': the string symbolizing the logical content of the proposition.
 The following correspond to propositions in the expected way: &, v, ~, 
 ->. (Atoms have no logical content and are therefore associated with the 
 empty string ('').)
+
 - 'complexity': a measure of how deeply nested the most-nested 
 subproposition is. This is measured recursively for each proposition and
 subproposition, with Atoms having complexity 0.
+
 - Binary propositions have a 'left' and 'right' property, corresponding 
 to the subproposition on that side of their main connective. Negations
 meanwhile have the 'negatum' property and Atoms, 'prop'. These can be 
 accessed class-agnostically by accessing the object's .content property.
+
+- names: a tuple of strings containing each name in the proposition and
+subpropositions. Names are always two or more lowercase letters.
+
+- unbound_variables: a tuple of strings containing each unbound variable
+in the proposition. Unbound variables are single lowercase letters not 
+bound by a quantifier.
 
 Notably, Atoms have strings as their propositional content, while all
 other propositions have Propositions (atoms or otherwise) as their 

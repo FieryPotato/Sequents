@@ -201,67 +201,48 @@ class TestNegation(unittest.TestCase):
                 self.assertEqual(e, t.instantiate(v, n))
 
 
-class TestUniversal(unittest.TestCase):
+class TestQuantifiers(unittest.TestCase):
     def test_arity_is_1(self) -> None:
-        self.assertEqual(1, Universal.arity)
+        for cls in Universal, Existential:
+            with self.subTest(i=cls):
+                self.assertEqual(1, cls.arity)
         
     def test_symb(self) -> None: 
-        self.assertEqual('∀', Universal.symb)
+        classes = Universal, Existential
+        symbs = '∀', '∃'
+        for c, s in zip(classes, symbs):
+            with self.subTest(i=c):
+                self.assertEqual(s, c.symb)
 
     def test_var_and_prop(self) -> None:
         var = 'x'
         prop = Atom('P<x>')
-        u1 = Universal('x', prop)
-        self.assertEqual(var, u1.variable)
-        self.assertEqual(prop, u1.prop)
+        classes = Universal, Existential
+        for cls in classes:
+            q = cls(var, prop)
+            with self.subTest(i=cls):
+                self.assertEqual(var, q.variable)
+                self.assertEqual(prop, q.prop)
         
-    def test_universal_string(self) -> None:
-        test = [
-            Universal('a', Atom('P<a>')),
-            Universal('b', Atom('P<alice, b>')),
-            Universal('a', Universal('b', Atom('P<a, b>'))),
-            Universal('x', Conditional(Atom('P<x>'), Atom('Q<x>')))
-        ]
-        expected = [
-            '∀a P<a>',
-            '∀b P<alice, b>',
-            '∀a ∀b P<a, b>',
-            '∀x (P<x> -> Q<x>)'
-        ]
-        for t, e in zip(test, expected):
-            with self.subTest(i=t):
-                self.assertEqual(e, str(t))
-
-class TestExistential(unittest.TestCase):
-    def test_arity_is_1(self) -> None:
-        self.assertEqual(1, Existential.arity)
-
-    def test_symb(self) -> None:
-        self.assertEqual('∃', Existential.symb)
-
-    def test_var_and_prop(self) -> None:
-        var = 'x'
-        prop = Atom('P<x>')
-        e1 = Existential('x', prop)
-        self.assertEqual(var, e1.variable)
-        self.assertEqual(prop, e1.prop)
-
-    def test_existential_string(self) -> None:
-        test = [
-            Existential('a', Atom('P<a>')),
-            Existential('b', Atom('P<alice, b>')),
-            Existential('a', Existential('b', Atom('P<a, b>'))),
-            Existential('x', Conditional(Atom('P<x>'), Atom('Q<x>')))
-        ]
-        expected = [
-            '∃a P<a>',
-            '∃b P<alice, b>',
-            '∃a ∃b P<a, b>',
-            '∃x (P<x> -> Q<x>)'
-        ]
-        for t, e in zip(test, expected):
-            with self.subTest(i=t):
-                self.assertEqual(e, str(t))
+    def test_string(self) -> None:
+        classes = Universal, Existential
+        symbs = '∀', '∃'
+        for cls, symb in zip(classes, symbs):
+            test = [
+                cls('a', Atom('P<a>')),
+                cls('b', Atom('P<alice, b>')),
+                cls('a', cls('b', Atom('P<a, b>'))),
+                cls('x', Conditional(Atom('P<x>'), Atom('Q<x>')))
+            ]
+            expected = [
+                f'{symb}a P<a>',
+                f'{symb}b P<alice, b>',
+                f'{symb}a {symb}b P<a, b>',
+                f'{symb}x (P<x> -> Q<x>)'
+            ]
+            for t, e in zip(test, expected):
+                with self.subTest(i=(cls, t)):
+                    self.assertEqual(e, str(t))
 
 
 class TestBinary(unittest.TestCase):
