@@ -1,7 +1,7 @@
 import unittest
 
 from proposition import Atom, Negation, Conjunction, \
-    Conditional, Disjunction, Universal
+    Conditional, Disjunction, Universal, Existential
 
 
 class TestProposition(unittest.TestCase):
@@ -227,6 +227,37 @@ class TestUniversal(unittest.TestCase):
             '∀b P<alice, b>',
             '∀a ∀b P<a, b>',
             '∀x (P<x> -> Q<x>)'
+        ]
+        for t, e in zip(test, expected):
+            with self.subTest(i=t):
+                self.assertEqual(e, str(t))
+
+class TestExistential(unittest.TestCase):
+    def test_arity_is_1(self) -> None:
+        self.assertEqual(1, Existential.arity)
+
+    def test_symb(self) -> None:
+        self.assertEqual('∃', Existential.symb)
+
+    def test_var_and_prop(self) -> None:
+        var = 'x'
+        prop = Atom('P<x>')
+        e1 = Existential('x', prop)
+        self.assertEqual(var, e1.variable)
+        self.assertEqual(prop, e1.prop)
+
+    def test_existential_string(self) -> None:
+        test = [
+            Existential('a', Atom('P<a>')),
+            Existential('b', Atom('P<alice, b>')),
+            Existential('a', Existential('b', Atom('P<a, b>'))),
+            Existential('x', Conditional(Atom('P<x>'), Atom('Q<x>')))
+        ]
+        expected = [
+            '∃a P<a>',
+            '∃b P<alice, b>',
+            '∃a ∃b P<a, b>',
+            '∃x (P<x> -> Q<x>)'
         ]
         for t, e in zip(test, expected):
             with self.subTest(i=t):

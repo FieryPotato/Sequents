@@ -250,6 +250,17 @@ class Universal(Quantifier):
 
 
 @dataclass(slots=True, frozen=True)
+class Existential(Quantifier):
+    """
+    Unary proposition signifying logical 'there is at least one ...'.
+    """
+    variable: str
+    prop: Proposition
+    arity = 1
+    symb = '∃'
+
+
+@dataclass(slots=True, frozen=True)
 class Negation(UnaryProposition):
     """
     Unary proposition signifying logical 'not ...'.
