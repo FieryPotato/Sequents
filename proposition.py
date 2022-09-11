@@ -104,9 +104,9 @@ class Proposition(ABC):
     @property
     def unbound_variables(self) -> tuple[str]:
         """Return a tuple of unbound variables in self.content."""
-        variables = []
+        variables = set()
         for prop in self.content:
-            variables.extend([v for v in prop.unbound_variables])
+            variables.union({v for v in prop.unbound_variables})
         return tuple(variables)
 
     def instantiate(self, variable, name) -> 'cls':
@@ -151,6 +151,13 @@ class Quantifier(Proposition):
     @property
     def content(self) -> tuple[Proposition]:
         return (self.prop,)
+
+    @property
+    def unbound_variables(self) -> tuple[str]:
+        variables = set()
+        for prop in self.content:
+            variables.union({v for v in prop.unbound_variables})
+        return tuple([v for v in variables if v != self.variable])
 
 
 @dataclass(slots=True, frozen=True)
@@ -219,7 +226,7 @@ class Atom(UnaryProposition):
     @property
     def unbound_variables(self) -> tuple[str]:
         """Return a tuple of unbound variables in self.content."""
-        objects: list[str] = self.objects
+        objects: list[str] = list(set(self.objects))
         return tuple(o for o in objects if len(o) == 1)
 
     def instantiate(self, variable: str, name: str) -> 'Atom':

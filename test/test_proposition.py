@@ -56,12 +56,14 @@ class TestAtom(unittest.TestCase):
         tests = [
             Atom('Predicate<alice>'),
             Atom('TwoPlace<beth, carol>'),
-            Atom('L<daisy, e, florence>')
+            Atom('L<daisy, e, florence>'),
+            Atom('M<lucie, lucie>')
         ]
         expected = [
             ('alice',),
             ('beth', 'carol'),
-            ('daisy', 'florence')
+            ('daisy', 'florence'),
+            ('lucie',)
         ]
         for t, e in zip(tests, expected):
             with self.subTest(i=t):
@@ -149,12 +151,14 @@ class TestNegation(unittest.TestCase):
         tests = [
             Negation(Atom('A<alice>')),
             Negation(Atom('B<betty, charlie>')),
-            Negation(Negation(Atom('D<edgar, falcon, gerry>')))
+            Negation(Negation(Atom('D<edgar, falcon, gerry>'))),
+            Negation(Atom('H<iris, iris>'))
         ]
         expected = [
             ('alice',),
             ('betty', 'charlie'),
-            ('edgar', 'falcon', 'gerry')
+            ('edgar', 'falcon', 'gerry'),
+            ('iris',)
         ]
         for t, e in zip(tests, expected):
             with self.subTest(i=t):
@@ -249,17 +253,36 @@ class TestQuantifiers(unittest.TestCase):
         tests = [
             ('x', Atom('P<x>')),
             ('x', Atom('P<x, david>')),
-            ('x', Conjunction(Atom('Q<nancy>'), Atom('R<eve, x>')))
+            ('x', Conjunction(Atom('Q<nancy>'), Atom('R<eve, x>'))),
+            ('x', Atom('Q<naomi, naomi>'))
         ]
         expected = [
             (),
             ('david',),
             ('nancy', 'eve'),
+            ('naomi',)
         ]
         for cls, t, e in zip(classes, tests, expected):
             a = cls(*t)
             with self.subTest(i=(cls, t)):
                 self.assertEqual(e, a.names)
+
+    def test_unbound_variables(self) -> None:
+        classes = Universal, Existential
+        tests = [
+            ('x', Atom('P<x>')),
+            ('x', Atom('P<x, y>')),
+            ('x', Conjunction(Atom('Q<a>'), Atom('R<eve, x>')))
+        ]
+        expected = [
+            (),
+            ('y',),
+            ('a',)
+        ]
+        for cls, t, e in zip(classes, tests, expected):
+            a = cls(*t)
+            with self.subTest(i=(cls, t)):
+                self.assertEqual(e, a.unbound_variables)
 
 
 class TestBinary(unittest.TestCase):
@@ -390,10 +413,12 @@ class TestBinary(unittest.TestCase):
             tests = [
                 cls(Atom('P<alice>'), Atom('Q<betty>')),
                 cls(Negation(Atom('R<carol, destiny>')), Atom('S<eleanor, fancy>')),
+                cls(Atom('T<ogilvy>'), Atom('U<ogilvy>'))
             ]
             expected = [
                 ('alice', 'betty'),
-                ('carol', 'destiny', 'eleanor', 'fancy')
+                ('carol', 'destiny', 'eleanor', 'fancy'),
+                ('ogilvy',)
             ]
             for t, e in zip(tests, expected):
                 with self.subTest(i=cls):
