@@ -379,12 +379,15 @@ class LUni:
         
     def apply(self) -> tuple[Sequent, ...]:
         """Apply left universal rule to self.sequent"""
-        result = []
-        for name in self.names:
-            var = self.proposition.variable
-            new_prop = self.proposition.instantiate(var, name)
-            result.append(new_prop)
-        return tuple(Sequent((r,), ()) for r in result)
+        instantiated = [self.instantiate(name) for name in self.names]
+        return tuple(Sequent((prop,), ()) for prop in instantiated)
+        
+    def instantiate(self, name) -> Proposition:
+        """
+        Return self.proposition with bound variables replaced with name
+        """
+        var = self.proposition.variable
+        return self.proposition.instantiate(var, name) 
 
 
 class RUni:
@@ -397,12 +400,15 @@ class RUni:
         
     def apply(self) -> tuple[Sequent, ...]:
         """Apply right universal rule to self.sequent"""
-        result = []
-        for name in self.names:
-            var = self.proposition.variable
-            new_prop = self.proposition.instantiate(var, name)
-            result.append(new_prop)
-        return tuple(Sequent((), (r,)) for r in result)
+        instantiated = [self.instantiate(name) for name in self.names]
+        return tuple(Sequent((), (prop,)) for prop in instantiated)
+        
+    def instantiate(self, name) -> Proposition:
+        """
+        Return self.proposition with bound variables replaced with name
+        """
+        var = self.proposition.variable
+        return self.proposition.instantiate(var, name) 
 
 
 class LExi:
@@ -415,12 +421,15 @@ class LExi:
         
     def apply(self) -> tuple[Sequent, ...]:
         """Apply left existential rule to self.sequent"""
-        result = []
-        for name in self.names:
-            var = self.proposition.variable
-            new_prop = self.proposition.instantiate(var, name)
-            result.append(new_prop)
-        return tuple(Sequent((r,), ()) for r in result)
+        instantiated = [self.instantiate(name) for name in self.names]
+        return tuple(Sequent((prop,), ()) for prop in instantiated)
+        
+    def instantiate(self, name) -> Proposition:
+        """
+        Return self.proposition with bound variables replaced with name
+        """
+        var = self.proposition.variable
+        return self.proposition.instantiate(var, name) 
 
 
 class RExi:
@@ -433,12 +442,15 @@ class RExi:
         
     def apply(self) -> tuple[Sequent, ...]:
         """Apply right existential rule to self.sequent"""
-        result = []
-        for name in self.names:
-            var = self.proposition.variable
-            new_prop = self.proposition.instantiate(var, name)
-            result.append(new_prop)
-        return tuple(Sequent((), (r,)) for r in result)
+        instantiated = [self.instantiate(name) for name in self.names]
+        return tuple(Sequent((), (prop,)) for prop in instantiated)
+        
+    def instantiate(self, name) -> Proposition:
+        """
+        Return self.proposition with bound variables replaced with name
+        """
+        var = self.proposition.variable
+        return self.proposition.instantiate(var, name) 
 
 
 # Dictionary mapping connectives, sides, and types to their rule class.
