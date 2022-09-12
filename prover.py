@@ -36,7 +36,7 @@ class Prover:
         """
         # Done with multiprocessing to speed up work with many trees.
         with Pool(processes=1) as pool:
-            trees = pool.imap_unordered(tree_from_sequent, self.roots)
+            trees = pool.imap_unordered(sequent_to_tree, self.roots)
             for i, tree in enumerate(trees):
                 self.forest.append(tree)
 
