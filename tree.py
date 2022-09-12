@@ -62,8 +62,8 @@ class Tree:
         """
         Return the body of the tree whose root is sequent.
         """
-        decomposer = get_decomposer(sequent)
-        if (parents := decomposer.get_parents(names=self.names)) is None:
+        decomposer = get_decomposer(sequent, names=self.names)
+        if (parents := decomposer.get_parents()) is None:
             return None
         elif isinstance(parents, dict):
             return self.grow_dict_branch(parents)

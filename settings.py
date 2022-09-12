@@ -21,7 +21,7 @@ class _Settings(MutableMapping):
         super().__init__()
         self.path = config_path
         self._dict = {}
-        with open(self.path, 'r') as cfg:
+        with open(self.path, 'r', encoding='utf-8') as cfg:
             self.update(json.load(cfg))
 
     def __setitem__(self, key, val) -> None:

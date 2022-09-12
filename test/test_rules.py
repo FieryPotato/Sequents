@@ -140,19 +140,25 @@ class TestRules(unittest.TestCase):
                     self.assertEqual(e, actual)
 
     def test_quantifier_decomposition(self) -> None:
-        sequents = [  # LUNI
-            Sequent((self.un),()),
+        sequents = [  
+            Sequent((self.un,),()),  # LUni
+            Sequent((), (self.un,)),  # RUni
         ]
         expected = [
             [
-                Sequent((Atom('P<alpha>')), ()),
-                Sequent((Atom('P<beta>')), ()),
-                Sequent((Atom('P<gamma>')), ()),
+                Sequent((Atom('P<alpha>'),), ()),
+                Sequent((Atom('P<beta>'),), ()),
+                Sequent((Atom('P<gamma>'),), ()),
+            ],
+            [
+                Sequent((), (Atom('P<alpha>'),)),
+                Sequent((), (Atom('P<beta>'),)),
+                Sequent((), (Atom('P<gamma>'),)),
             ],
         ]
         for s, e in zip(sequents, expected):
             with self.subTest(i=s):
-                decomposer = get_decomposer(s)
+                decomposer = get_decomposer(s, names=self.names)
                 actual = decomposer.decompose()
                 self.assertEqual(e, actual)
 

@@ -15,6 +15,14 @@
         "~": {
             "ant": "add",
             "con": "add"
+        },
+        "\u2200": {
+            "ant": "add",
+            "con": "add"
+        },
+        "\u2203": {
+            "ant": "add",
+            "con": "add"
         }
     }
 }
