@@ -29,7 +29,7 @@ proposition of a Quantifier whose variable is 's'.
 ### Existential
 - symbol: ∃ (U+2203, html: &exist;)
 - string: exists
-- eg: existsx (Tasty\<x\> & Liquorice\<x\>), `∃y ~ ∃x ~ D<x, y>`
+- eg: `existsx (Tasty\<x\> & Liquorice\<x\>)`, `∃y ~ ∃x ~ D<x, y>`
 
 ## Proposition
 
@@ -51,3 +51,11 @@ quantifiers, this will overlap the behaviour of the decomposition
 algorithm as it should in those cases return the proposition's content 
 without the quantifier.
 
+### Decomposition
+Decomposed existential and universal quantifiers will have to be 
+handled with a little care, since, at least for existentials, we don't
+know ahead of time whether a given name has a certain property. Until
+I figure out the best way to manage this, I will decompose universals
+and existentials identically; I'm very open to feedback on how I should
+differentiate them. My current design is to have the prover accept a 
+list of names.
