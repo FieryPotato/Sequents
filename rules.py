@@ -39,7 +39,7 @@ class Decomposer(Protocol):
     num_parents: int
     is_invertible: bool
 
-    def get_parents(self) -> dict | list | None:
+    def get_parents(self, names=[]) -> dict | list | None:
         ...
 
 class AtomDecomposer:
@@ -51,7 +51,7 @@ class AtomDecomposer:
         self.sequent = sequent
         self.rule = Axiom()
 
-    def get_parents(self) -> None:
+    def get_parents(self, names=[]) -> None:
         return None
 
 
@@ -72,7 +72,7 @@ class InvertibleOneParentDecomposer:
             return Sequent.mix(self.removed_main_prop, rule_result)
         return None
 
-    def get_parents(self) -> dict:
+    def get_parents(self, names=[]) -> dict:
         parent = self.decompose()
         return {parent: None}
 
@@ -95,7 +95,7 @@ class InvertibleTwoParentDecomposer:
             Sequent.mix(self.removed_main_prop, rule_result[1])
         )
 
-    def get_parents(self) -> dict:
+    def get_parents(self, names=[]) -> dict:
         left, right = self.decompose()
         return {
             left: None,
@@ -121,7 +121,7 @@ class NonInvertibleOneParentDecomposer:
             Sequent.mix(self.removed_main_prop, rule_result[1])
         ]
 
-    def get_parents(self) -> list:
+    def get_parents(self, names=[]) -> list:
         a, b = self.decompose()
         return [
             {a: None},
@@ -150,7 +150,7 @@ class NonInvertibleTwoParentDecomposer:
             decomp_results.append((l_result, r_result))
         return decomp_results
 
-    def get_parents(self) -> list:
+    def get_parents(self, names=[]) -> list:
         decomp_results = self.decompose()
         parents = []
         for left, right in decomp_results:

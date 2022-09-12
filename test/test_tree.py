@@ -630,6 +630,11 @@ class TestTree(unittest.TestCase):
         actual = tree_to_dict(tree)
         self.assertEqual(expected, actual)
 
+    def test_tree_can_have_names(self) -> None:
+        names = ['alpha', 'beta', 'gamma']
+        tree = Tree(Sequent((), ()), names=names)
+        self.assertEqual(names, tree.names)
+
 
 if __name__ == '__main__':
     unittest.main()

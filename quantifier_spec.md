@@ -46,8 +46,8 @@ In addition to the content property, quantified propositions have a
 variable property which stores the character it was initialized with.
 
 All propositions will gain the 'instantiate' method, which replaces 
-all instances of a given variable with an input name. This should raise
-an error if that variable is bound. Note that for quantifiers, this 
-will overlap the behaviour of the decomposition algorithm as it should
-in those cases return the proposition's content without the quantifier.
+all instances of a given variable with an input name. Note that for 
+quantifiers, this will overlap the behaviour of the decomposition 
+algorithm as it should in those cases return the proposition's content 
+without the quantifier.
 

@@ -2,18 +2,22 @@ import unittest
 from unittest.mock import patch
 
 from proposition import Atom, Negation, Conditional, Conjunction, \
-    Disjunction
+    Disjunction, Universal, Existential
 from rules import get_decomposer
 from sequent import Sequent
 
 
 class TestRules(unittest.TestCase):
-    p = Atom("P")
-    q = Atom("Q")
+    names = ['alpha', 'beta', 'gamma']
+    p = Atom('P')
+    q = Atom('Q')
+    x = Atom('P<x>')
     n = Negation(p)
     cj = Conjunction(p, q)
     dj = Disjunction(p, q)
     cd = Conditional(p, q)
+    un = Universal('x', x)
+    ex = Existential('x', x)
 
     def test_invertible_additive_decomposition(self) -> None:
         with patch('rules.get_rule_setting', return_value='add'):
@@ -134,6 +138,24 @@ class TestRules(unittest.TestCase):
                     decomposer = get_decomposer(s)
                     actual = decomposer.decompose()
                     self.assertEqual(e, actual)
+
+    def test_quantifier_decomposition(self) -> None:
+        sequents = [  # LUNI
+            Sequent((self.un),()),
+        ]
+        expected = [
+            [
+                Sequent((Atom('P<alpha>')), ()),
+                Sequent((Atom('P<beta>')), ()),
+                Sequent((Atom('P<gamma>')), ()),
+            ],
+        ]
+        for s, e in zip(sequents, expected):
+            with self.subTest(i=s):
+                decomposer = get_decomposer(s)
+                actual = decomposer.decompose()
+                self.assertEqual(e, actual)
+
 
 
 if __name__ == '__main__':

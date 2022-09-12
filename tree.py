@@ -18,6 +18,9 @@ represented as lists of dictionaries, where each dictionary is one
 possible way the parents might be (we are, after all, performing root-
 first proof searches, so we don't necessarily know how a sequent came
 about).
+
+Trees initialization signature is:
+Tree(root: str, is_grown: bool = False, names: list[str] = [])
 """
 
 __all__ = ['Tree']
@@ -42,6 +45,7 @@ class Tree:
     """
     root: Sequent
     is_grown: bool = field(default=False)
+    names: list[str] = field(default_factory=list)
     branches: dict = field(default_factory=dict, init=False)
 
     def __post_init__(self) -> None:
@@ -59,7 +63,7 @@ class Tree:
         Return the body of the tree whose root is sequent.
         """
         decomposer = get_decomposer(sequent)
-        if (parents := decomposer.get_parents()) is None:
+        if (parents := decomposer.get_parents(names=self.names)) is None:
             return None
         elif isinstance(parents, dict):
             return self.grow_dict_branch(parents)
