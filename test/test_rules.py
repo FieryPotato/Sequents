@@ -141,8 +141,10 @@ class TestRules(unittest.TestCase):
 
     def test_quantifier_decomposition(self) -> None:
         sequents = [  
-            Sequent((self.un,),()),  # LUni
+            Sequent((self.un,), ()),  # LUni
             Sequent((), (self.un,)),  # RUni
+            Sequent((self.ex,), ()),  # LExi
+            Sequent((), (self.ex,)),  # RExi
         ]
         expected = [
             [
@@ -155,7 +157,7 @@ class TestRules(unittest.TestCase):
                 Sequent((), (Atom('P<beta>'),)),
                 Sequent((), (Atom('P<gamma>'),)),
             ],
-        ]
+        ] * 2
         for s, e in zip(sequents, expected):
             with self.subTest(i=s):
                 decomposer = get_decomposer(s, names=self.names)
