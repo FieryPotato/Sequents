@@ -112,6 +112,14 @@ class TestConvertProposition(unittest.TestCase):
             with self.subTest(i=connective):
                 self.assertEqual(e, actual)
 
+    def test_quantifier_simple_parens_creation(self) -> None:
+        expected = [self.universal, self.existential] * 2
+        for e, connective in zip(expected, self.quantified_connectives):
+            string = f'({connective}x {self.quan_test_x})'
+            actual = string_to_proposition(string)
+            with self.subTest(i=connective):
+                self.assertEqual(e, actual)
+
 
 class TestFindConnective(unittest.TestCase):
     unary_connectives = ['~', 'not']
