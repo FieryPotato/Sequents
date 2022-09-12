@@ -3,27 +3,40 @@ import unittest
 from convert import deparenthesize, string_to_proposition, \
     string_to_sequent, find_connective
 from proposition import Atom, Conditional, Conjunction, \
-    Disjunction, Negation
+    Disjunction, Negation, Universal, Existential
 from sequent import Sequent
 
 
 class TestConvertProposition(unittest.TestCase):
+    unary_connectives = ['~', 'not']
     binary_connectives = ['and', 'or', 'implies', '&', 'v', '->']
+    quantified_connectives = ['forall', 'exists', '∀', '∃']
     bin_test = ['the grass is green', 'the birds are singing']
     un_test = 'The cat is on the mat'
+    quan_test_x = 'isABug<x>'
+    quan_test_xy = 'isABug<x, y>'
+    quan_test_l = 'isABug<lady>'
     atom = Atom(un_test)
     bin_atom_0 = Atom(bin_test[0])
     bin_atom_1 = Atom(bin_test[1])
+    quan_atom_x = Atom(quan_test_x)
+    quan_atom_xy = Atom(quan_test_xy)
+    quan_atom_l = Atom(quan_test_l)
     negation = Negation(atom)
     conjunction = Conjunction(bin_atom_0, bin_atom_1)
     conditional = Conditional(bin_atom_0, bin_atom_1)
     disjunction = Disjunction(bin_atom_0, bin_atom_1)
+    universal = Universal('x', quan_atom_x)
+    existential = Existential('x', quan_atom_x)
     comp_conj = Conjunction(conjunction, conjunction)
     comp_cond = Conditional(conditional, conditional)
     comp_disj = Disjunction(disjunction, disjunction)
     comp_neg = Negation(negation)
+    comp_uni = Universal('y', Universal('x', quan_atom_xy))
+    comp_exi = Existential('y', Existential('x', quan_atom_xy))
+    
 
-    def complex(self, connective: str) -> str:
+    def __complex(self, connective: str) -> str:
         """
         Helper function to generate complex propositions.
         """
@@ -62,51 +75,60 @@ class TestConvertProposition(unittest.TestCase):
         props = [self.comp_conj, self.comp_disj, self.comp_cond] * 2
         tests = zip(self.binary_connectives, props)
         for connective, expected in tests:
-            string = self.complex(connective)
+            string = self.__complex(connective)
             actual = string_to_proposition(string)
             with self.subTest(i=connective):
                 self.assertEqual(expected, actual)
 
     def test_negation_simple_no_parens_creation(self) -> None:
-        for connective in ('not ', '~ '):
-            string = connective + self.un_test
+        for connective in self.unary_connectives:
+            string = connective + ' ' + self.un_test
             expected = self.negation
             actual = string_to_proposition(string)
             with self.subTest(i=connective):
                 self.assertEqual(expected, actual)
 
     def test_negation_simple_parens_creation(self) -> None:
-        for connective in ('not ', '~ '):
-            string = '(' + connective + self.un_test + ')'
+        for connective in self.unary_connectives:
+            string = '(' + connective + ' ' + self.un_test + ')'
             expected = self.negation
             actual = string_to_proposition(string)
             with self.subTest(i=connective):
                 self.assertEqual(expected, actual)
 
     def test_negation_complex_creation(self) -> None:
-        for connective in ('not', '~'):
+        for connective in self.unary_connectives:
             string = f'{connective} ({connective} {self.un_test})'
             expected = self.comp_neg
             actual = string_to_proposition(string)
             with self.subTest(i=connective):
                 self.assertEqual(expected, actual)
+    
+    def test_quantifier_simple_no_parens_creation(self) -> None:
+        expected = [self.universal, self.existential] * 2
+        for e, connective in zip(expected, self.quantified_connectives):
+            string = f'{connective}x {self.quan_test_x}'
+            actual = string_to_proposition(string)
+            with self.subTest(i=connective):
+                self.assertEqual(e, actual)
 
 
 class TestFindConnective(unittest.TestCase):
+    unary_connectives = ['~', 'not']
     def test_fc_returns_list_if_no_connective(self) -> None:
         string = 'anything'
         expected = ['anything']
         self.assertEqual(expected, find_connective(string))
 
     def test_fc_negation_atomic(self) -> None:
-        for c in ('not', '~'):
+        for c in self.unary_connectives:
             string = f'{c} the bird is in the bush'
             expected = [c, 'the bird is in the bush']
             with self.subTest(i=c):
                 self.assertEqual(expected, find_connective(string))
 
     def test_fc_negation_nested(self) -> None:
-        for c in ('not', '~'):
+        for c in self.unary_connectives:
             string = f'{c} ({c} the bird is in the bush)'
             expected = [c, f'{c} the bird is in the bush']
             with self.subTest(i=c):

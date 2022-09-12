@@ -10,7 +10,7 @@ __all__ = [
 from typing import Protocol
 
 from proposition import Atom, Negation, Conjunction,\
-    Disjunction, Conditional
+    Disjunction, Conditional, Universal, Existential
 from sequent import Sequent
 from tree import Tree
 
@@ -83,6 +83,10 @@ def string_to_proposition(string) -> Proposition:
             fac = DisjunctionFactory
         case ['~' | 'not', negatum]:
             fac = NegationFactory
+        case ['∀' | 'forall', var, prop]:
+            fac = UniversalFactory
+        case ['∃' | 'exists', var, prop]:
+            fac = ExistentialFactory
         case '':
             raise ValueError('Cannot convert empty string to proposition.')
         case _:
@@ -152,13 +156,20 @@ def find_connective(string: str) -> list[str]:
     # connective keywords
     negations = {'~', 'not'}
     binaries = {'&', 'v', 'and', 'or', '->', 'implies'}
-
+    quantifiers = {'∃', '∀', 'exists', 'forall'}
+    
     word_list = string.split(' ')
 
     # Check for negation as main connective.
-    if word_list[0] in negations:
+    if (connective := word_list[0]) in negations:
         negatum = ' '.join(word_list[1:])
-        return [word_list[0], deparenthesize(negatum)]
+        return [connective, deparenthesize(negatum)]
+
+    # Check for quantifiers as main connective.
+    if (connective := word_list[0][:-1]) in quantifiers:
+        variable = word_list[0][-1]
+        prop = ' '.join(word_list[1:])
+        return [connective, variable, deparenthesize(prop)]
 
     # Check for binary connectives as main connective.
     nestedness = 0
@@ -246,6 +257,21 @@ class NegationFactory:
     def get_prop(self, _, prop) -> Negation:
         """Return a Negation instance."""
         return Negation(string_to_proposition(prop))
+
+
+class UniversalFactory:
+    """Factory for Universals."""
+    
+    def get_prop(self, _, var, prop) -> Universal:
+        return Universal(var, string_to_proposition(prop))
+
+
+class ExistentialFactory:
+    """Factory for Existentials."""
+    
+    def get_prop(self, _, var, prop) -> Existential:
+        return Existential(var, string_to_proposition(prop))
+
 
 
 class ConjunctionFactory:
