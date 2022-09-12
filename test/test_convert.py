@@ -120,6 +120,14 @@ class TestConvertProposition(unittest.TestCase):
             with self.subTest(i=connective):
                 self.assertEqual(e, actual)
 
+    def test_quntifier_complex_creation(self) -> None:
+        expected = [self.comp_uni, self.comp_exi] *2
+        for e, connective in zip(expected, self.quantified_connectives):
+            string = f'{connective}y {connective}x isABug<x, y>'
+            actual = string_to_proposition(string)
+            with self.subTest(i=connective):
+                self.assertEqual(e, actual)
+
 
 class TestFindConnective(unittest.TestCase):
     unary_connectives = ['~', 'not']
