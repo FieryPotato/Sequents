@@ -108,8 +108,7 @@ class Sequent:
         """
         Return the leftmost complex proposition in the sequent, the
         side of the sequent it's on, and its index on that side. If
-        self.is_atomic, return None, None, None. Results are stored
-        in self.fcp.
+        self.is_atomic, return None, None, None.
         """
         for side in ('ant', 'con'):
             for i, prop in enumerate(getattr(self, side)):
