@@ -5,6 +5,11 @@ The Prover is initialized with a list of strings, which are converted
 and saved into the instance as a list of sequents. The run method can 
 then be called to solve each of those sequents and save the results to
 the instance's .forest attribute. 
+
+If any first-order propositions appear in the solver's input data, but
+none of them have names and no names are passed in to the initializer,
+then all quantified propositions will be instantiated with the 'NONE'
+non-name.
 """
 
 __all__ = ['Prover']
