@@ -43,7 +43,8 @@ class TextImporter:
             lines = [line.strip('\n') for line in file.readlines()]
         return {
             'names': set(),
-            'sequents': lines
+            'sequents': lines,
+            'forest': []
         }
 
 

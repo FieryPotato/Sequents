@@ -8,39 +8,42 @@ from proposition import Atom, Negation, Conjunction, Disjunction, Conditional
 text_content = 'a bird in hand is worth two in the bush; a bird in hand is worth two in the bush'
 
 json_roots_only = {
-    'A v B; A, B': None,
-    'A, B; A v B': None,
-    'B & C; B, C': None,
-    'B, C; B & C': None,
-    'C, C -> D; D': None,
-    'D; C -> D, C': None,
-    'E; E': None,
+    'sequents': [
+        'A v B; A, B',
+        'A, B; A v B',
+        'B & C; B, C',
+        'B, C; B & C',
+        'C, C -> D; D',
+        'D; C -> D, C',
+        'E; E'
+    ]
 }
 
 json_tree = {
-    'A v B; A, B': {
-        'A; A, B': None,
-        'B; A, B': None
-    },
-    'A, B; A v B': {
-        'A, B; A, B': None
-    },
-    'B & C; B, C': {
-        'B, C; B, C': None
-    },
-    'B, C; B & C': {
-        'B, C; B': None,
-        'B, C; C': None
-
-    },
-    'C, C -> D; D': {
-        'C; C': None,
-        'D; D': None
-    },
-    'D; C -> D, C': {
-        'C, D; D, C': None
-    },
-    'E; E': None,
+    'forest': [
+        {'A v B; A, B': {
+            'A; A, B': None,
+            'B; A, B': None
+        },},
+        {'A, B; A v B': {
+            'A, B; A, B': None
+        },},
+        {'B & C; B, C': {
+            'B, C; B, C': None
+        },},
+        {'B, C; B & C': {
+            'B, C; B': None,
+            'B, C; C': None
+        },},
+        {'C, C -> D; D': {
+            'C; C': None,
+            'D; D': None
+        },},
+        {'D; C -> D, C': {
+            'C, D; D, C': None
+        },},
+        {'E; E': None,}
+    ]
 }
 
 json_universes = {
@@ -103,7 +106,8 @@ class TestImportJson(unittest.TestCase):
         # Test
         importer = JSONImporter(self.file_path)
         actual = importer.import_()
-        expected = json_roots_only
+        expected = json_roots_only.copy()
+        expected.update({'names': set(), 'forest': []})
         self.assertEqual(expected, actual)
 
     def test_import_whole_json(self) -> None:
@@ -113,7 +117,8 @@ class TestImportJson(unittest.TestCase):
         # Test
         importer = JSONImporter(self.file_path)
         actual = importer.import_()
-        expected = json_tree
+        expected = json_tree.copy()
+        expected.update({'names': set(), 'sequents': []})
         self.assertEqual(expected, actual)
 
 
