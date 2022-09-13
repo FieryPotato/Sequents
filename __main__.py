@@ -43,15 +43,16 @@ def solve(infile, outfile, filetype) -> None:
 
     # Import file
     importer = get_importer(infile)
-    sequents = importer.import_()
+    data = importer.import_()
 
     # Solve sequents in file
-    prover = Prover(sequents)
+    prover = Prover(sequents=data[sequents], names=data[names])
     prover.run()
+    result: dict = prover.export()
 
     # Export data
     exporter = get_exporter(outfile)
-    exporter.export(prover.forest)
+    exporter.export(result)
 
 
 def apply_filetype(outfile: str, filetype: str) -> str:

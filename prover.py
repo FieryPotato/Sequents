@@ -25,12 +25,12 @@ class Prover:
     sequent objects and then turning those objects into trees.
     """
 
-    def __init__(self, data: list[str], names: list[str] = None) -> None:
+    def __init__(self, sequents: list[str], names: set = None) -> None:
         if names is None:
-            names = list({name for sequent in data in for name in sequent.names})
+            names = {name for sequent in sequents in for name in sequent.names}
         else: 
-            self.names: list[str] = names
-        self.roots: list[Sequent] = [string_to_sequent(s) for s in data]
+            self.names = names
+        self.roots: list[Sequent] = [string_to_sequent(s) for s in sequents]
         self.forest = []
 
     def run(self) -> None:
@@ -38,8 +38,13 @@ class Prover:
         Turn each sequent in self.roots into a full tree and add it to 
         the forest.
         """
-        
         self.forest = [
 sequent_to_tree(root, names=self.names) for root in self.roots]
+
+    def export(self) -> dict:
+        return {
+            'names': self.names,
+            'forest': self.forest
+        }
 
 

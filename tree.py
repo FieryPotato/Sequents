@@ -45,7 +45,7 @@ class Tree:
     """
     root: Sequent
     is_grown: bool = field(default=False)
-    names: list[str] = field(default_factory=list)
+    names: set[str] = field(default_factory=set)
     branches: dict = field(default_factory=dict, init=False)
 
     def __post_init__(self) -> None:

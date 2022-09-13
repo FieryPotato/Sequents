@@ -25,7 +25,7 @@ class Importer(Protocol):
     """
     Protocol for importers.
     """ 
-    def import_(self) -> list[str]:
+    def import_(self) -> dict:
         """Import input file as lines for prover use."""
         ...
 
@@ -37,11 +37,14 @@ class TextImporter:
     def __init__(self, path) -> None:
         self.path = path
 
-    def import_(self) -> list[str]:
+    def import_(self) -> dict:
         """Return a list of self.path's lines."""
         with open(self.path, 'r') as file:
             lines = [line.strip('\n') for line in file.readlines()]
-        return lines
+        return {
+            'names': set(),
+            'sequents': lines
+        }
 
 
 class JSONImporter:
@@ -51,17 +54,23 @@ class JSONImporter:
     def __init__(self, path) -> None:
         self.path = path
 
-    def import_(self) -> dict[str, None]:
+    def import_(self) -> dict:
         """Return a dictionary represented by the JSON in self.path."""
         with open(self.path, 'r') as file:
             data = json.load(file)
+        if 'names' not in data:
+            data['names'] = set()
+        if 'sequents' not in data:
+            data['sequents'] = []
+        if 'forest' not in data: 
+            data['forest'] = []
         return data
 
 class ByteImporter:
     """
     Class for importing bytes-like objects.
     """
-    def __init__(self, path) -> None:
+    def __init__(self, path) -> dict:
         self.path = path
 
     def import_(self) -> Any:
