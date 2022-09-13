@@ -24,10 +24,9 @@ class Prover:
     Class for converting a list of strings representing sequents into
     sequent objects and then turning those objects into trees.
     """
-
     def __init__(self, sequents: list[str], names: set = None) -> None:
         if names is None:
-            names = {name for sequent in sequents in for name in sequent.names}
+            names = {name for sequent in sequents for name in sequent.names}
         else: 
             self.names = names
         self.roots: list[Sequent] = [string_to_sequent(s) for s in sequents]
@@ -38,13 +37,16 @@ class Prover:
         Turn each sequent in self.roots into a full tree and add it to 
         the forest.
         """
-        self.forest = [
-sequent_to_tree(root, names=self.names) for root in self.roots]
+        for root in self.roots:
+            self.forest.append(root)
 
     def export(self) -> dict:
+        """
+        Return a dictionary of the prover's names, roots, and solved trees.
+        """
         return {
             'names': self.names,
+            'sequents': self.roots,
             'forest': self.forest
         }
-
 
