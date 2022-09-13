@@ -40,13 +40,13 @@ class JSONExporter:
     
     def export(self, data) -> None:
         """Process data and save to self.file."""
+        names = data['names']
+        forest = [tree.to_dict() for tree in data['forest']]
+        result = {
+            'names': names,
+            'forest': forest
+        }
         with open(self.file, 'w') as f:
-            names = data['names']
-            forest = [tree.to_dict() for tree in data['forest']]
-            result = {
-                'names': names,
-                'forest': forest
-            }
             json.dump(result, f, indent=4)
 
 
