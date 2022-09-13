@@ -71,7 +71,11 @@ class TestImportText(unittest.TestCase):
     def test_import_lines(self) -> None:
         importer = TextImporter(self.file_path)
         actual = importer.import_()
-        expected = text_content.split('\n')
+        expected = {
+            'names': set(),
+            'sequents': text_content.split('\n'),
+            'forest': []
+        }
         self.assertEqual(expected, actual)
 
     def test_importing_incorrect_file_extension_causes_exception(self) -> None:

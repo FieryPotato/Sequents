@@ -94,7 +94,7 @@ def string_to_proposition(string) -> Proposition:
     return fac().get_prop(*split_string)
 
 
-def sequent_to_tree(sequent: Sequent, names: set = None -> Tree:
+def sequent_to_tree(sequent: Sequent, names: set = None) -> Tree:
     """
     Return a solved tree whose root is the input sequent. 
     """
