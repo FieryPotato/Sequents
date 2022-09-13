@@ -131,7 +131,6 @@ def tree_to_dict(tree) -> dict:
         elif isinstance(data, list):
             result = [serialize(element) for element in data]
         return result
-
     return serialize(tree.branches)
 
 

@@ -46,7 +46,7 @@ def solve(infile, outfile, filetype) -> None:
     data = importer.import_()
 
     # Solve sequents in file
-    prover = Prover(sequents=data[sequents], names=data[names])
+    prover = Prover(sequents=data['sequents'], names=data['names'])
     prover.run()
     result: dict = prover.export()
 

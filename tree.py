@@ -26,6 +26,7 @@ Tree(root: str, is_grown: bool = False, names: list[str] = [])
 __all__ = ['Tree']
 
 from dataclasses import dataclass, field
+from multiprocessing import Pool
 from typing import Any, Protocol
 
 from rules import get_decomposer

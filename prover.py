@@ -38,7 +38,8 @@ class Prover:
         the forest.
         """
         for root in self.roots:
-            self.forest.append(root)
+            tree = sequent_to_tree(root)
+            self.forest.append(tree)
 
     def export(self) -> dict:
         """

@@ -15,6 +15,8 @@ import pickle
 from pathlib import Path
 from typing import Any, Protocol
 
+from convert import tree_to_dict
+
     
 class Exporter(Protocol):
     """Protocol for exporters."""
@@ -40,11 +42,10 @@ class JSONExporter:
     
     def export(self, data) -> None:
         """Process data and save to self.file."""
-        names = data['names']
-        forest = [tree.to_dict() for tree in data['forest']]
+        
         result = {
-            'names': names,
-            'forest': forest
+            'names': list(data['names']),
+            'forest': [tree_to_dict(tree) for tree in data['forest']]
         }
         with open(self.file, 'w') as f:
             json.dump(result, f, indent=4)

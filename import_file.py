@@ -58,13 +58,25 @@ class JSONImporter:
     def import_(self) -> dict:
         """Return a dictionary represented by the JSON in self.path."""
         with open(self.path, 'r') as file:
-            data = json.load(file)
-        if 'names' not in data:
+            data = self.validate(json.load(file))
+        return data
+        
+    def validate(self, data: dict) -> dict:
+        """
+        Ensure names, sequents, and forest keys are present in data.
+        """
+        # names comes in as a list, but we want it as a set.
+        if 'names' in data:
+            data['names'] = set(names)
+        else:
             data['names'] = set()
+
         if 'sequents' not in data:
             data['sequents'] = []
+
         if 'forest' not in data: 
             data['forest'] = []
+
         return data
 
 class ByteImporter:
