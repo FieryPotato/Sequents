@@ -62,6 +62,22 @@ To save the output as a .json file, use the --json option as below:
 $ python3 Sequents solve --json (infile) [outfile]
 ```
 
+When loading from a .txt file, the prover expects sequents as a pair
+of comma-separated lists of proposions, separated from each other
+by a semicolon.
+
+When loading from a .json file, the prover expects three key: value 
+pairs:
+
+        - 'names': list containing names for use in the prover
+        - 'sequents': list containing sequents to be decomposed
+        - 'forest': list containing solved sequents
+        
+Any missing value is replaced by an empty placeholder.
+
+When loading from a bytes file, the prover expects an iterable 
+containing sequents.
+
 ## Package Useage
 One of the main upsides of the redesign is that the new structure allows
 the import of classes using a commonsense syntax. 
