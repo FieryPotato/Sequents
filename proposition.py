@@ -101,11 +101,8 @@ class Proposition(ABC):
     @property
     def names(self) -> tuple[str]:
         """Return a tuple of names in self.content."""
-        # breakpoint()
-        names = set()
-        for prop in self.content:
-            names.update({n for n in prop.names})
-        return tuple(sorted(names))
+        return {name for prop in self.content for name in prop.names}
+        
 
     @property
     def unbound_variables(self) -> tuple[str]:
@@ -243,8 +240,7 @@ class Atom(UnaryProposition):
     def names(self) -> tuple[str]:
         """Return a tuple of names in self.content."""
         objects: list[str] = self.objects
-        names = {o for o in objects if len(o) > 1}
-        return tuple(sorted(names))
+        return {o for o in objects if len(o) > 1}
 
     @property
     def unbound_variables(self) -> tuple[str]:

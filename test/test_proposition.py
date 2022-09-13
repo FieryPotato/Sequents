@@ -60,10 +60,10 @@ class TestAtom(unittest.TestCase):
             Atom('M<lucie, lucie>')
         ]
         expected = [
-            ('alice',),
-            ('beth', 'carol'),
-            ('daisy', 'florence'),
-            ('lucie',)
+            {'alice',},
+            {'beth', 'carol'},
+            {'daisy', 'florence'},
+            {'lucie',}
         ]
         for t, e in zip(tests, expected):
             with self.subTest(i=t):
@@ -155,10 +155,10 @@ class TestNegation(unittest.TestCase):
             Negation(Atom('H<iris, iris>'))
         ]
         expected = [
-            ('alice',),
-            ('betty', 'charlie'),
-            ('edgar', 'falcon', 'gerry'),
-            ('iris',)
+            {'alice',},
+            {'betty', 'charlie'},
+            {'edgar', 'falcon', 'gerry'},
+            {'iris',}
         ]
         for t, e in zip(tests, expected):
             with self.subTest(i=t):
@@ -255,10 +255,10 @@ class TestQuantifiers(unittest.TestCase):
             ('x', Atom('Q<naomi, naomi>'))
         ]
         expected = [
-            (),
-            ('david',),
-            ('nancy', 'eve'),
-            ('naomi',)
+            set(),
+            {'david',},
+            {'nancy', 'eve'},
+            {'naomi',}
         ]
         for cls, t, e in zip(self.classes, tests, expected):
             a = cls(*t)
@@ -440,9 +440,9 @@ class TestBinary(unittest.TestCase):
                 cls(Atom('T<ogilvy>'), Atom('U<ogilvy>'))
             ]
             expected = [
-                ('alice', 'betty'),
-                ('carol', 'destiny', 'eleanor', 'fancy'),
-                ('ogilvy',)
+                {'alice', 'betty'},
+                {'carol', 'destiny', 'eleanor', 'fancy'},
+                {'ogilvy',}
             ]
             for t, e in zip(tests, expected):
                 with self.subTest(i=cls):
