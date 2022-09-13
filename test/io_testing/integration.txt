@@ -3,3 +3,5 @@ Socrates is human, all humans are mortal; Socrates is mortal
 ; (((P -> Q) -> P) -> P)
 (P & (~ P));
 ~ (P v (~ P)); (((Dionysus eats bagels or Elephants like to crash Funerals) & (~ Dionysus eats bagels)) -> Elephants like to crash Funerals)
+forallx (human<x> -> mortal<x>), human<socrates>; mortal<socrates>
+existsa (unicorn<a> & green<a>); forallb (unicorn<b> v green<b>)

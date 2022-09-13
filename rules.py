@@ -47,7 +47,7 @@ class AtomDecomposer:
     num_parents: 0
     is_invertible: True
 
-    def __init__(self, sequent: Sequent, names=[]) -> None:
+    def __init__(self, sequent: Sequent, names=None) -> None:
         self.sequent = sequent
         self.rule = Axiom()
 
@@ -60,11 +60,13 @@ class InvertibleOneParentDecomposer:
     num_parents = 1
     is_invertible = True
 
-    def __init__(self, sequent: Sequent, names=[]) -> None:
+    def __init__(self, sequent: Sequent, names=None) -> None:
+        if names is None:
+            names = set()
         self.sequent = sequent
         prop, side, index = sequent.first_complex_prop()
         self.removed_main_prop = sequent.remove(side, index)
-        self.rule = get_rule(prop, side)
+        self.rule = get_rule(prop, side, names=names)
 
     def decompose(self) -> Sequent | None:
         rule_result = self.rule.apply()
@@ -82,11 +84,13 @@ class InvertibleTwoParentDecomposer:
     num_parents = 2
     is_invertible = True
 
-    def __init__(self, sequent: Sequent, names=[]) -> None:
+    def __init__(self, sequent: Sequent, names=None) -> None:
+        if names is None:
+            names = set()
         self.sequent = sequent
         prop, side, index = sequent.first_complex_prop()
         self.removed_main_prop = sequent.remove(side, index)
-        self.rule = get_rule(prop, side)
+        self.rule = get_rule(prop, side, names=names)
 
     def decompose(self) -> tuple[Sequent, Sequent]:
         rule_result = self.rule.apply()
@@ -108,7 +112,9 @@ class NonInvertibleOneParentDecomposer:
     num_parents = 1
     is_invertible = False
 
-    def __init__(self, sequent: Sequent, names=[]) -> None:
+    def __init__(self, sequent: Sequent, names=None) -> None:
+        if names is None:
+            names = set()
         self.sequent = sequent
         prop, side, index = sequent.first_complex_prop()
         self.removed_main_prop = sequent.remove(side, index)
@@ -122,10 +128,8 @@ class NonInvertibleOneParentDecomposer:
         ]
 
     def get_parents(self) -> list:
-        a, b = self.decompose()
         return [
-            {a: None},
-            {b: None}
+            {sequent: None} for sequent in self.decompose()
         ]
 
 
@@ -134,11 +138,13 @@ class NonInvertibleTwoParentDecomposer:
     num_parents = 2
     is_invertible = False
 
-    def __init__(self, sequent: Sequent, names=[]) -> None:
+    def __init__(self, sequent: Sequent, names=None) -> None:
+        if names is None:
+            names = set()
         self.sequent = sequent
         prop, side, index = sequent.first_complex_prop()
         self.removed_main_prop = sequent.remove(side, index)
-        self.rule = get_rule(prop, side)
+        self.rule = get_rule(prop, side, names=names)
 
     def decompose(self) -> list[tuple[Sequent, Sequent]]:
         rule_result = self.rule.apply()
@@ -169,7 +175,7 @@ class Rule(Protocol):
 
 class Axiom:
     """Rule for terminating tree branches."""
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
     def apply(self) -> None:
@@ -180,7 +186,7 @@ class LNeg:
     is_invertible = True
     num_parents = 1
 
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
     def apply(self) -> Sequent:
@@ -192,7 +198,7 @@ class RNeg:
     is_invertible = True
     num_parents = 1
 
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
     def apply(self) -> Sequent:
@@ -204,7 +210,7 @@ class MultLAnd:
     is_invertible = True
     num_parents = 1
 
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
     def apply(self) -> Sequent:
@@ -216,7 +222,7 @@ class AddLAnd:
     is_invertible = False
     num_parents = 1
 
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
     def apply(self) -> tuple[Sequent, Sequent]:
@@ -229,7 +235,7 @@ class MultRAnd:
     is_invertible = False
     num_parents = 2
 
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
     def apply(self) -> tuple[Sequent, Sequent]:
@@ -244,7 +250,7 @@ class AddRAnd:
     is_invertible = True
     num_parents = 2
 
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
     def apply(self) -> tuple[Sequent, Sequent]:
@@ -259,7 +265,7 @@ class MultLOr:
     is_invertible = False
     num_parents = 2
 
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
     def apply(self) -> tuple[Sequent, Sequent]:
@@ -274,7 +280,7 @@ class AddLOr:
     is_invertible = True
     num_parents = 2
 
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
     def apply(self) -> tuple[Sequent, Sequent]:
@@ -289,7 +295,7 @@ class MultROr:
     is_invertible = True
     num_parents = 1
 
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
     def apply(self) -> Sequent:
@@ -301,7 +307,7 @@ class AddROr:
     is_invertible = False
     num_parents = 1
 
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
     def apply(self) -> tuple[Sequent, Sequent]:
@@ -316,7 +322,7 @@ class MultLIf:
     is_invertible = False
     num_parents = 2
 
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
     def apply(self) -> tuple[Sequent, Sequent]:
@@ -331,7 +337,7 @@ class AddLIf:
     is_invertible = True
     num_parents = 2
 
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
     def apply(self) -> tuple[Sequent, Sequent]:
@@ -346,7 +352,7 @@ class MultRIf:
     is_invertible = True
     num_parents = 1
 
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
     def apply(self) -> Sequent:
@@ -358,7 +364,7 @@ class AddRIf:
     is_invertible = False
     num_parents = 1
 
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
     def apply(self) -> tuple[Sequent, Sequent]:
@@ -373,7 +379,9 @@ class LUni:
     is_invertible = False
     num_parents = 1
 
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
+        if names is None:
+            names = set()
         self.proposition = proposition
         self.names = names
         
@@ -394,7 +402,9 @@ class RUni:
     is_invertible = False
     num_parents = 1
     
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
+        if names is None:
+            names = set()
         self.proposition = proposition
         self.names = names
         
@@ -415,7 +425,9 @@ class LExi:
     is_invertible = False
     num_parents = 1
     
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
+        if names is None:
+            names = set()
         self.proposition = proposition
         self.names = names
         
@@ -436,7 +448,9 @@ class RExi:
     is_invertible = False
     num_parents = 1
     
-    def __init__(self, proposition: Proposition = None, names=[]) -> None:
+    def __init__(self, proposition: Proposition = None, names=None) -> None:
+        if names is None:
+            names = set()
         self.proposition = proposition
         self.names = names
         
@@ -565,8 +579,10 @@ def get_rule(proposition: Proposition, side: str, names=[]) -> Rule:
     return rule(proposition, names=names)
 
 
-def get_decomposer(sequent: Sequent, names=[]) -> Decomposer:
+def get_decomposer(sequent: Sequent, names=None) -> Decomposer:
     """Return the appropriate decomposer for a given sequent."""
+    if names is None:
+        names = {} 
     if sequent.is_atomic:
         return AtomDecomposer(sequent)
     prop, side, index = sequent.first_complex_prop() 

@@ -226,8 +226,10 @@ class Atom(UnaryProposition):
         Return the objects (i.e. names and variables) in self.content.
         """
         result = re.search(objects_re, self.content[0])
-        string = result.group(1)
-        return string.split(', ')
+        if result:
+            string = result.group(1)
+            return string.split(', ')
+        return []
 
     @property
     def predicates(self) -> list[str]:

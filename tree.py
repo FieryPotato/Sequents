@@ -26,7 +26,6 @@ Tree(root: str, is_grown: bool = False, names: list[str] = [])
 __all__ = ['Tree']
 
 from dataclasses import dataclass, field
-from multiprocessing import Pool
 from typing import Any, Protocol
 
 from rules import get_decomposer
@@ -51,6 +50,7 @@ class Tree:
 
     def __post_init__(self) -> None:
         self.branches.update({self.root: None})
+        self.names.update({name for name in self.root.names})
 
     def grow(self):
         """Solve the root, then recursively solve each branch."""

@@ -26,10 +26,16 @@ class Prover:
     """
     def __init__(self, sequents: list[str], names: set = None) -> None:
         if names is None:
-            names = {name for sequent in sequents for name in sequent.names}
-        else: 
-            self.names = names
+            names = set()
+        self.names = names
+
         self.roots: list[Sequent] = [string_to_sequent(s) for s in sequents]
+
+        names_in_sequents = {name for sequent in self.roots for name in sequent.names}
+        self.names.update(names_in_sequents)
+        if not self.names:
+            self.names = {'NONE'}
+
         self.forest = []
 
     def run(self) -> None:
@@ -38,7 +44,7 @@ class Prover:
         the forest.
         """
         for root in self.roots:
-            tree = sequent_to_tree(root)
+            tree = sequent_to_tree(root, names=self.names)
             self.forest.append(tree)
 
     def export(self) -> dict:
