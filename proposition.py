@@ -34,6 +34,7 @@ replaced with a name. If the proposition is a quantifier and the
 variable, is the variable it binds, instead return the subproposition 
 (i.e. remove the quantifier).
 
+
 Notably, Atoms have strings as their propositional content, while all
 other propositions have Propositions (atoms or otherwise) as their 
 content.
