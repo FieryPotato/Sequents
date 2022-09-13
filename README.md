@@ -14,8 +14,8 @@ The Sequents API is vastly improved from the MaterialInference one,
 with main classes and functions easily accessible via sane import paths
 from the Sequents package. 
 
-As of this writing (2022-09-03) the program applies invertible rules
-(by default) to sequents in the input file and saves them as byte strings. 
+As of this writing (2022-09-13) the program applies invertible rules by
+default to sequents in the input file and saves them as byte strings. 
 These can be loaded back up using pickle as follows.
 ```
 >>> import pickle
@@ -29,7 +29,14 @@ directly without the need to translate them to json first, although the
 relevant packages still need to be imported.
 
 Saving to and loading from json is also supported. 
- 
+
+First-order propositions are now supported. When loading a text file, names
+discovered in the sequents and used by the prover. Loading a .json file 
+allows the user to specify names (in addition to names discovered in
+sequents). I am open to feedback on the precise behaviour of the 
+decomposition rules, including adding variants for additive vs 
+multiplicative universal and existential decomposition.
+
 
 ## Command-Line Useage
 
