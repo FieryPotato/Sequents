@@ -25,7 +25,11 @@ class Prover:
     sequent objects and then turning those objects into trees.
     """
 
-    def __init__(self, data: list[str]) -> None:
+    def __init__(self, data: list[str], names: list[str] = None) -> None:
+        if names is None:
+            names = list({name for sequent in data in for name in sequent.names})
+        else: 
+            self.names: list[str] = names
         self.roots: list[Sequent] = [string_to_sequent(s) for s in data]
         self.forest = []
 
@@ -34,9 +38,8 @@ class Prover:
         Turn each sequent in self.roots into a full tree and add it to 
         the forest.
         """
-        # Done with multiprocessing to speed up work with many trees.
-        with Pool(processes=1) as pool:
-            trees = pool.imap_unordered(sequent_to_tree, self.roots)
-            for i, tree in enumerate(trees):
-                self.forest.append(tree)
+        
+        self.forest = [
+sequent_to_tree(root, names=self.names) for root in self.roots]
+
 

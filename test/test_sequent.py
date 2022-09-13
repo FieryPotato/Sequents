@@ -119,6 +119,17 @@ class TestSequent(unittest.TestCase):
         self.assertFalse(c.is_atomic)
 
 
+    def test_sequent_has_names(self) -> None:
+        names = {'alice', 'betty', 'clarice'}
+        a = Atom('P<alice>')
+        b = Atom('Q<betty, clarice>')
+        s0 = Sequent((a,), (b,))
+        self.assertEqual(names, s0.names)
+        
+        s1 = Sequent((a, b), (a, b))
+        self.assertEqual(names, s1.names)
+
+
 if __name__ == '__main__':
     unittest.main()
 

@@ -68,6 +68,11 @@ class Sequent:
         return True
 
     @property
+    def names(self) -> set[str]:
+        names = {name for side in self for prop in side for name in prop.names}
+        return names
+
+    @property
     def complexity(self) -> int:
         """
         Return the total complexity of the sequent, i.e. the sum of
