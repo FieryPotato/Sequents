@@ -14,10 +14,10 @@ non-name.
 
 __all__ = ['Prover']
 
-from multiprocessing import Pool
+
 from typing import Protocol
 
-from convert import string_to_sequent, sequent_to_tree
+from convert import sequent_to_tree
 
 
 class Sequent(Protocol):
@@ -29,15 +29,15 @@ class Prover:
     Class for converting a list of strings representing sequents into
     sequent objects and then turning those objects into trees.
     """
-    def __init__(self, sequents: list[str], names: set = None) -> None:
+    def __init__(self, roots: list[Sequent], names: set = None) -> None:
         if names is None:
             names = set()
         self.names = names
 
-        self.roots: list[Sequent] = [string_to_sequent(s) for s in sequents]
+        self.roots: roots
 
-        names_in_sequents = {name for sequent in self.roots for name in sequent.names}
-        self.names.update(names_in_sequents)
+        names_in_roots = {name for sequent in roots for name in sequent.names}
+        self.names.update(names_in_roots)
         if not self.names:
             self.names = {'NONE'}
 

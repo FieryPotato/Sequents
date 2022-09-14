@@ -2,6 +2,7 @@ import argparse
 
 from pathlib import Path
 
+from convert import string_to_sequent
 from export_file import get_exporter
 from import_file import get_importer
 from prover import Prover
@@ -46,7 +47,8 @@ def solve(infile, outfile, filetype) -> None:
     data = importer.import_()
 
     # Solve sequents in file
-    prover = Prover(sequents=data['sequents'], names=data['names'])
+    roots = [string_to_sequent(s) for s in data['sequents']]
+    prover = Prover(roots=roots, names=data['names'])
     prover.run()
     result: dict = prover.export()
 
