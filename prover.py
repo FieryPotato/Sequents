@@ -15,12 +15,19 @@ non-name.
 __all__ = ['Prover']
 
 
+import itertools
+
 from typing import Protocol
+from multiprocessing import Pool
 
 from convert import sequent_to_tree
 
 
 class Sequent(Protocol):
+    ...
+
+
+class Tree(Protocol):
     ...
 
 
@@ -34,7 +41,7 @@ class Prover:
             names = set()
         self.names = names
 
-        self.roots: roots
+        self.roots = roots
 
         names_in_roots = {name for sequent in roots for name in sequent.names}
         self.names.update(names_in_roots)
@@ -46,11 +53,17 @@ class Prover:
     def run(self) -> None:
         """
         Turn each sequent in self.roots into a full tree and add it to 
-        the forest.
+        the forest. Uses parallel processing if there are sufficiently
+        many trees to prove.
         """
-        for root in self.roots:
-            tree = sequent_to_tree(root, names=self.names)
-            self.forest.append(tree)
+        results: list[Tree]
+        if len(self.roots) > 10:
+            with Pool() as pool:
+                results = pool.starmap(sequent_to_tree, [(root, self.names) for root in self.roots])
+        else:
+            results = itertools.starmap(sequent_to_tree, [(root, self.names) for root in self.roots])
+        self.forest.extend(results)
+
 
     def export(self) -> dict:
         """
