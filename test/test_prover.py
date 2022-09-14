@@ -38,6 +38,8 @@ class TestProverSolvesComplexity1(unittest.TestCase):
         tree.branches.update(branches)
         p = Prover([root], names=self.names)
         p.run()
+        
+        # return expected, actual
         return [tree], p.forest
 
     def test_land(self) -> None:
@@ -118,22 +120,56 @@ class TestProverSolvesComplexity1(unittest.TestCase):
     def test_lexi(self) -> None:
         branches = {
             self.lexi: [
-                {Sequent((self.pg,), ()): None}, 
-                {Sequent((self.p,), ()): None}
+                {Sequent((self.p,), ()): None},
+                {Sequent((self.pg,), ()): None}
+
             ]
         }        
-        expected, actual = self.do(self.lexi, branches)
+        _, p = self.do(self.lexi, branches)
+        s = lambda x: x.keys()
+        expected = sorted(branches[self.lexi], key=s)
+        actual = sorted(p[0].branches[self.lexi], key=s)
         self.assertEqual(expected, actual)
 
     def test_rexi(self) -> None:
         branches = {
             self.rexi: [
-                {Sequent((), (self.pg,)): None},
-                {Sequent((), (self.p,)): None}
+                {Sequent((), (self.p,)): None},
+                {Sequent((), (self.pg,)): None}
             ]
         }
-        expected, actual = self.do(self.rexi, branches)
+        _, p = self.do(self.rexi, branches)
+        s = lambda x: x.keys()
+        expected = sorted(branches[self.rexi], key=s)
+        actual = sorted(p[0].branches[self.rexi], key=s)
         self.assertEqual(expected, actual)
+
+    def test_luni(self) -> None:
+        branches = {
+            self.luni: [
+                {Sequent((self.p,), ()): None},
+                {Sequent((self.pg,), ()): None}
+            ]
+        }
+        _, p = self.do(self.luni, branches)
+        s = lambda x: x.keys()
+        expected = sorted(branches[self.luni], key=s)
+        actual = sorted(p[0].branches[self.luni], key=s)
+        self.assertEqual(expected, actual)
+
+    def test_runi(self) -> None:
+        branches = {
+            self.runi: [
+                {Sequent((), (self.p,)): None},
+                {Sequent((), (self.pg,)): None}
+            ]
+        }
+        _, p = self.do(self.runi, branches)
+        s = lambda x: x.keys()
+        expected = sorted(branches[self.runi], key=s)
+        actual = sorted(p[0].branches[self.runi], key=s)
+        self.assertEqual(expected, actual)
+
 
 
 if __name__ == '__main__':
