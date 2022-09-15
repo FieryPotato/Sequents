@@ -29,7 +29,7 @@ class TestProverSolvesComplexity1(unittest.TestCase):
     runi = Sequent((), (Universal('x', p_),))
 
     def do(self, root, branches) -> Prover:
-        """Helper function that does everything needed."""
+        """Helper function that runs theactual test logic."""
         tree = Tree(
             root=root,
             is_grown=True,
@@ -152,9 +152,8 @@ class TestProverSolvesComplexity1(unittest.TestCase):
             ]
         }
         _, p = self.do(self.luni, branches)
-        s = lambda x: x.keys()
-        expected = sorted(branches[self.luni], key=s)
-        actual = sorted(p[0].branches[self.luni], key=s)
+        expected = sorted(branches[self.luni], key=lambda x: x.keys())
+        actual = sorted(p[0].branches[self.luni], key=lambda x: x.keys())
         self.assertEqual(expected, actual)
 
     def test_runi(self) -> None:
@@ -165,9 +164,8 @@ class TestProverSolvesComplexity1(unittest.TestCase):
             ]
         }
         _, p = self.do(self.runi, branches)
-        s = lambda x: x.keys()
-        expected = sorted(branches[self.runi], key=s)
-        actual = sorted(p[0].branches[self.runi], key=s)
+        expected = sorted(branches[self.runi], key=lambda x: x.keys())
+        actual = sorted(p[0].branches[self.runi], key=lambda x: x.keys())
         self.assertEqual(expected, actual)
 
 
