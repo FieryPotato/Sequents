@@ -88,3 +88,35 @@ the import of classes using a commonsense syntax.
 ```
 See the documentation in each package for more detailed information.
 
+Note that the convert module is much better suited to the creation of
+sequent and proposition objects if you're starting with strings, as it
+takes all the pain out of creating more and more deeply nested objects.
+
+For example:
+```
+>>> Sequent(
+    (
+        Conditional(
+            Negation(
+                Atom('P<daniel>')
+            ),
+            Atom('Q<daniel>')
+        ),
+        Negation(
+            Existential(
+                'x', 
+                Atom('Q<x>')
+            )
+        )
+    ),
+    (
+        Atom('P<daniel>')
+    )
+)
+```
+produces the same result as the much more readable
+```
+>>> convert.string_to_sequent(
+    '(~ P<daniel> -> Q<daniel>), ~ existsx Q<x>; P<daniel>'
+)
+```
