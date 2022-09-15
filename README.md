@@ -120,6 +120,6 @@ For example:
 produces the same result as the much more readable
 ```
 >>> convert.string_to_sequent(
-    '(~ P<daniel> -> Q<daniel>), ~ existsx Q<x>; P<daniel>'
+    '((~ P<daniel>) -> Q<daniel>), ~ existsx Q<x>; P<daniel>'
 )
 ```
