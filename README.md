@@ -90,7 +90,10 @@ See the documentation in each package for more detailed information.
 
 Note that the convert module is much better suited to the creation of
 sequent and proposition objects if you're starting with strings, as it
-takes all the pain out of creating more and more deeply nested objects.
+takes all the pain out of creating more and more deeply nested objects
+and the mess of open and closing parentheses you need to write (not to
+mention the commas to force tuples for single-proposition antecedents 
+and consequents).
 
 For example:
 ```
@@ -110,7 +113,7 @@ For example:
         )
     ),
     (
-        Atom('P<daniel>')
+        Atom('P<daniel>'),
     )
 )
 ```
