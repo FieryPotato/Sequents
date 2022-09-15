@@ -8,43 +8,44 @@ from typing import Any
 
 # Absolute path to the Sequents package.
 sequent_package_dir = Path(__file__).parents[0]
+
 config_path = os.path.join(sequent_package_dir, 'config.json')
 
 
-class _Settings(MutableMapping):
+class __Settings(MutableMapping):
     """
     Object for storing and maintaining config.json. It's a singleton to
-    prevent the possibility of inconsistent Settings objects.
+    prevent the possibility of multiple inconsistent Settings objects.
+    To access this, the Settings function below should be used.
     """
-
     def __init__(self) -> None:
         super().__init__()
         self.path = config_path
-        self._dict = {}
+        self.__dict = {}
         with open(self.path, 'r', encoding='utf-8') as cfg:
             self.update(json.load(cfg))
 
     def __setitem__(self, key, val) -> None:
-        self._dict[key] = val
+        self.__dict[key] = val
         self.save()
 
     def __getitem__(self, key) -> Any:
-        return self._dict[key]
+        return self.__dict[key]
 
     def __delitem__(self, key) -> None:
-        del self._dict[key]
+        del self.__dict[key]
 
     def __iter__(self):
-        yield from self._dict.__iter__()
+        yield from self.__dict.__iter__()
 
     def __len__(self) -> int:
-        return len(self._dict)
+        return len(self.__dict)
 
     def update(self, *args, **kwargs) -> None:
         """
-        Update self._dict and save the results to disk.
+        Update self.__dict and save the results to disk.
         """
-        self._dict.update(*args, **kwargs)
+        self.__dict.update(*args, **kwargs)
         self.save()
 
     def get_rule(self, connective: str, side: str) -> str:
@@ -59,12 +60,12 @@ class _Settings(MutableMapping):
     def save(self) -> None:
         """Save contents of self to config.json."""
         with open(self.path, 'w') as f:
-            json.dump(self._dict, f, indent=4)
+            json.dump(self.__dict, f, indent=4)
 
     def print_rules(self) -> None:
         """Print connective rules to console."""
         string = 'Rules:\n' 
-        for connective in '&', 'v', '->', '~':
+        for connective in '&', 'v', '->', '~', '∀', '∃':
             string += (f'{connective}:\n')
             for side in 'ant', 'con':
                 string += (f'    {side}: {self.get_rule(connective, side)}\n')
@@ -79,5 +80,5 @@ def Settings() -> _Settings:
     """Getter for _Settings singleton."""
     global sentinel
     if sentinel is None:
-        sentinel = _Settings()
+        sentinel = __Settings()
     return sentinel

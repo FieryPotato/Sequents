@@ -43,7 +43,8 @@ module by using the functions in the convert module (e.g.,
 string_to_proposition) over creating these classes directly.
 """
 
-__all__ = ['Atom', 'Negation', 'Conjunction', 'Conditional', 'Disjunction', 'Universal']
+__all__ = ['Atom', 'Negation', 'Conjunction', 'Conditional', 'Disjunction', 
+    'Universal', 'Existential']
 
 import re
 
