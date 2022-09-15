@@ -76,8 +76,8 @@ class __Settings(MutableMapping):
 sentinel = None
 
 
-def Settings() -> _Settings:
-    """Getter for _Settings singleton."""
+def Settings() -> __Settings:
+    """Getter for __Settings singleton."""
     global sentinel
     if sentinel is None:
         sentinel = __Settings()
