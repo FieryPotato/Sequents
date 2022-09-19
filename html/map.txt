@@ -16,12 +16,12 @@ The HTML spec for sequents is as follows:
     the root
     (A -> B), A; B 
     yields the following classes:
-        .1A_implies_B25_A6_B-tree (the tree, i.e. grid container)
-        .1A_implies_B25_A6_B-root (the root, whose content is just 
+        ._1A_implies_B25_A6_B-tree (the tree, i.e. grid container)
+        ._1A_implies_B25_A6_B-root (the root, whose content is just 
         the sequent)
-        .1A_implies_B25_A6_B-L (the left parent, whose content is 
+        ._1A_implies_B25_A6_B-L (the left parent, whose content is 
         equivalent to A; A)
-        .1A_implies_B25_A6_B-R (the right parent, whose content is
+        ._1A_implies_B25_A6_B-R (the right parent, whose content is
         equivalent to B; B)
 
     To get around reserved characters in css classes, we make the 
@@ -33,6 +33,9 @@ The HTML spec for sequents is as follows:
         - ">" -> 4
         - "," -> 5
         - ";" -> 6
+    Moreover, because we cannot start with digits or hyphens followed 
+    by digits, all classes will begin with an underscore to allow 
+    sequens which would begin with parentheses.
     We reserve hyphens for the class identifier (so trees end in -tree)
     and to identify parent sequents uniquely, we follow their path from
     the root by going either left (L), right (R) or neither (M), so
