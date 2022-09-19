@@ -6,23 +6,37 @@
         ._1A_implies_B25_A6_B-tree {
             display: grid;
             grid-template-areas: 
-                'l r'
-                'root root';
+                "l r tagroot"
+                "root root tagroot";
             justify-content: center;
+            align-items: center;
+            margin: 10px;
+            padding: 10px;
+        }
+    
+        .cell {
+            border-top: 2px solid black;
+            padding: 0px 10px 0px 10px;
+            margin: 0px 10px 0px 10px;
+        }
+
+        .tag {
+            align-self: center;
         }
 
         ._1A_implies_B25_A6_B-root { grid-area: root; }
-
+        ._1A_implies_B25_A6_B-root-tag { grid-area: tagroot; }
         ._1A_implies_B25_A6_B-l { grid-area: l; }
-
         ._1A_implies_B25_A6_B-r { grid-area: r; }
+
     </style>
 </head>
 <body>
     <div class="_1A_implies_B25_A6_B-tree">
-        <div class="_1A_implies_B25_A6_B-l">A &vdash; A</div>
-        <div class="_1A_implies_B25_A6_B-r">B &vdash; B</div>
-        <div class="_1A_implies_B25_A6_B-root">(A &rarr; B), A &vdash; B</div>
+        <div class="cell _1A_implies_B25_A6_B-l">A &vdash; A</div>
+        <div class="cell _1A_implies_B25_A6_B-r">B &vdash; B</div>
+        <div class="cell _1A_implies_B25_A6_B-root">(A &rarr; B), A &vdash; B</div>
+        <div class="tag _1A_implies_B25_A6_B-tagroot">L-&rarr;</div>
     </div>
 </body>
 </html>
