@@ -1,0 +1,41 @@
+The HTML spec for sequents is as follows:
+    Each tree will be represented by a tree class which will act as a
+    grid container for the leaves (cells). The grid will be of height h
+    and width w where h = the height of the proof tree and w is its
+    width. 
+
+    Each tree will have its own class, defining grid-template-areas in
+    accordance with the size of the proof tree. Each leaf on that tree
+    will also have its own class, with a horizontal bar above it. The
+    text in each leaf (cell) will be centered.
+
+    Each tree will be identified by its root, with disallowed 
+    characters replaced by numbers (numbers in sequents may have to be
+    reserved for this, but we'll see).
+
+    the root
+    (A -> B), A; B 
+    yields the following classes:
+        .1A_implies_B25_A6_B-tree (the tree, i.e. grid container)
+        .1A_implies_B25_A6_B-root (the root, whose content is just 
+        the sequent)
+        .1A_implies_B25_A6_B-L (the left parent, whose content is 
+        equivalent to A; A)
+        .1A_implies_B25_A6_B-R (the right parent, whose content is
+        equivalent to B; B)
+
+    To get around reserved characters in css classes, we make the 
+    following substitutions:
+        - " " -> _
+        - "(" -> 1
+        - ")" -> 2
+        - "<" -> 3
+        - ">" -> 4
+        - "," -> 5
+        - ";" -> 6
+    We reserve hyphens for the class identifier (so trees end in -tree)
+    and to identify parent sequents uniquely, we follow their path from
+    the root by going either left (L), right (R) or neither (M), so
+    that sequents with two parents always have an L and R parent and 
+    single-parent sequents have only an M parent. These are placed in
+    the grid-template-areas property of the tree class.
