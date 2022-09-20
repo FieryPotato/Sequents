@@ -42,3 +42,12 @@ The HTML spec for sequents is as follows:
     that sequents with two parents always have an L and R parent and 
     single-parent sequents have only an M parent. These are placed in
     the grid-template-areas property of the tree class.
+
+    Possible directions:
+        - Using mathjax to typeset latex into html (allowing us to 
+        avoid basically requiring the user install latex, not that
+        anyone using this is likely not to have it installed)
+        - Using pylatex to typeset latex as pdfs directly using
+        a more pythonic api (which would require me to figure out
+        how to load bussproofs into this)
+
