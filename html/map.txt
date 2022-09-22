@@ -1,8 +1,8 @@
 The HTML spec for sequents is as follows:
     Each tree will be represented by a tree class which will act as a
-    grid container for the leaves (cells). The grid will be of height h
-    and width w where h = the height of the proof tree and w is its
-    width. 
+    grid container for the leaves (cells). The grid's height will be 
+    twice the height of the proof tree (i.e. the base sequent's 
+    complexity) plus one and its width will (TBD).
 
     Each tree will have its own class, defining grid-template-areas in
     accordance with the size of the proof tree. Each leaf on that tree
@@ -16,13 +16,17 @@ The HTML spec for sequents is as follows:
     the root
     (A -> B), A; B 
     yields the following classes:
-        ._1A_implies_B25_A6_B-tree (the tree, i.e. grid container)
-        ._1A_implies_B25_A6_B-root (the root, whose content is just 
-        the sequent)
-        ._1A_implies_B25_A6_B-L (the left parent, whose content is 
+        ._1A_implies_B25_A6_B (the tree, i.e. grid container)
+        ._1A_implies_B25_A6_B-f (the root, whose content is just 
+        the sequent, f stands for floor for now, this may change)
+        ._1A_implies_B25_A6_B-ft (the label for the root, t stands
+        for tag, since l (label) is taken)
+        ._1A_implies_B25_A6_B-l (the left parent, whose content is 
         equivalent to A; A)
-        ._1A_implies_B25_A6_B-R (the right parent, whose content is
+        ._1A_implies_B25_A6_B-lt (label for left parent)
+        ._1A_implies_B25_A6_B-r (the right parent, whose content is
         equivalent to B; B)
+        ._1A_implies_B25_A6_B-rt (label for right parent)
 
     To get around reserved characters in css classes, we make the 
     following substitutions:
@@ -36,18 +40,21 @@ The HTML spec for sequents is as follows:
     Moreover, because we cannot start with digits or hyphens followed 
     by digits, all classes will begin with an underscore to allow 
     sequens which would begin with parentheses.
-    We reserve hyphens for the class identifier (so trees end in -tree)
-    and to identify parent sequents uniquely, we follow their path from
-    the root by going either left (L), right (R) or neither (M), so
-    that sequents with two parents always have an L and R parent and 
-    single-parent sequents have only an M parent. These are placed in
-    the grid-template-areas property of the tree class.
+    We reserve hyphens for the class identifier. We follow sequents'
+    paths from the root by going either left (l), right (r) or neither 
+    (m), so that sequents with two parents always have an l and r 
+    parent and single-parent sequents have only an m parent. These are 
+    placed in the grid-template-areas property of the tree class.
 
-    Possible directions:
-        - Using mathjax to typeset latex into html (allowing us to 
-        avoid basically requiring the user install latex, not that
-        anyone using this is likely not to have it installed)
-        - Using pylatex to typeset latex as pdfs directly using
-        a more pythonic api (which would require me to figure out
-        how to load bussproofs into this)
+    To clean things up a bit, all trees have two classes, the general
+    tree class which defines general formatting for the grid, and the
+    sequent specific class which defines only grid-template-areas. 
+    Likewise, each cell is made of two classes, one for cell formatting
+    and one for the cell's location. Labels have only the class that 
+    defines their location in the parent grid.
+
+    Quantifiers are not fully implemented and having more than one name
+    instantiated in a tree will cause collisions. I will wait to 
+    implement these properly until I have a better handle on how 
+    quantifiers should be decomposed.
 
