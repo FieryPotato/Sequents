@@ -17,7 +17,7 @@
         }
         
         
-        ._1A_implies_B25_A6_B-tree {
+        ._1A_implies_B25_A6_B {
             grid-template-areas: 
                 ". lt . rt"
                 "l lt r rt"
@@ -32,7 +32,7 @@
         ._1A_implies_B25_A6_B-r { grid-area: r; }
         ._1A_implies_B25_A6_B-rt { grid-area: rt; }
 
-        ._1A_and_B26_1A_or_B2-tree {
+        ._1A_and_B26_1A_or_B2 {
             grid-template-areas:
                 ".   llt .   lrt .   .   rlt .   rrt ."
                 "ll  llt lr  lrt .   rl  rlt rr  rrt ."
@@ -42,11 +42,24 @@
                 "f   f   f   f   f   f   f   f   f   ft"
                 "f   f   f   f   f   f   f   f   f   ."
         }
-
+        ._1A_and_B26_1A_or_B2-f { grid-area: f; }
+        ._1A_and_B26_1A_or_B2-ft { grid-area: ft; }
+        ._1A_and_B26_1A_or_B2-l { grid-area: l; }
+        ._1A_and_B26_1A_or_B2-lt { grid-area: lt; }
+        ._1A_and_B26_1A_or_B2-r { grid-area: r; }
+        ._1A_and_B26_1A_or_B2-rt { grid-area: rt; }
+        ._1A_and_B26_1A_or_B2-ll { grid-area: ll; }
+        ._1A_and_B26_1A_or_B2-llt { grid-area: llt; }
+        ._1A_and_B26_1A_or_B2-lr { grid-area: lr; }
+        ._1A_and_B26_1A_or_B2-lrt { grid-area: lrt; }
+        ._1A_and_B26_1A_or_B2-rl { grid-area: rl; }
+        ._1A_and_B26_1A_or_B2-rlt { grid-area: rlt; }
+        ._1A_and_B26_1A_or_B2-rr { grid-area: rrt; }
+        ._1A_and_B26_1A_or_B2-rrt { grid-area: rrt; }
     </style>
 </head>
 <body>
-    <div class="_1A_implies_B25_A6_B-tree">
+    <div class="tree _1A_implies_B25_A6_B">
         <div class="cell _1A_implies_B25_A6_B-l">A &vdash; A</div>
         <div class="cell _1A_implies_B25_A6_B-r">B &vdash; B</div>
         <div class="_1A_implies_B25_A6_B-lt">Ax</div>
@@ -55,6 +68,21 @@
         <div class="_1A_implies_B25_A6_B-ft">L&rarr;</div>
     </div>
     
-    <div class=""></div>
+    <div class="tree _1A_and_B26_1A_or_B2">
+        <div class="cell _1A_and_B26_1A_or_B2-f">(A &or; B) &vdash; (A &and; B)</div>
+        <div class="_1A_and_B26_1A_or_B2-ft">L&or;</div>
+        <div class="cell _1A_and_B26_1A_or_B2-l">A &vdash (A &and; B)</div>
+        <div class="_1A_and_B26_1A_or_B2-lt">R&and;</div>
+        <div class="cell _1A_and_B26_1A_or_B2-r">B &vdash (A &and; B)</div>
+        <div class="_1A_and_B26_1A_or_B2-rt">R&and</div>
+        <div class="cell _1A_and_B26_1A_or_B2-ll">A &vdash; A</div>
+        <div class="_1A_and_B26_1A_or_B2-llt">Ax</div>
+        <div class="cell _1A_and_B26_1A_or_B2-lr">A &vdash; B</div>
+        <div class="_1A_and_B26_1A_or_B2-lrt">Ax</div>
+        <div class="cell _1A_and_B26_1A_or_B2-rl">B &vdash; A</div>
+        <div class="_1A_and_B26_1A_or_B2-rlt">Ax</div>
+        <div class="cell _1A_and_B26_1A_or_B2-rr">B &vdash; B</div>
+        <div class="_1A_and_B26_1A_or_B2-rrt">Ax</div>
+    </div>
 </body>
 </html>
