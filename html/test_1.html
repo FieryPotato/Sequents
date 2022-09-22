@@ -1,37 +1,60 @@
 <!doctype html>
 <html>
 <head>
-    <title>Complexity 1 Sequents</title>
+    <title>HTML Sequent Testing</title>
     <style>
-        ._1A_implies_B25_A6_B-tree {
+        .cell {
+            border-top: 2px solid black;
+            padding: 0px 0px 0px 10px;
+            margin: 0px 4px 0px 16px;
+        }
+        .tree {
             display: grid;
-            grid-template-areas: 
-                "l r"
-                "root root";
             justify-content: center;
             align-items: center;
             margin: 10px;
             padding: 10px;
         }
-    
-        .cell {
-            border-top: 2px solid black;
-            padding: 0px 10px 0px 10px;
-            margin: 0px 10px 0px 10px;
+        
+        
+        ._1A_implies_B25_A6_B-tree {
+            grid-template-areas: 
+                ". lt . rt"
+                "l lt r rt"
+                "l . r ft"
+                "f f f ft"
+                "f f f .";
         }
-
-        ._1A_implies_B25_A6_B-root { grid-area: root; }
+        ._1A_implies_B25_A6_B-f { grid-area: f; }
+        ._1A_implies_B25_A6_B-ft { grid-area: ft}
         ._1A_implies_B25_A6_B-l { grid-area: l; }
+        ._1A_implies_B25_A6_B-lt { grid-area: lt; }
         ._1A_implies_B25_A6_B-r { grid-area: r; }
+        ._1A_implies_B25_A6_B-rt { grid-area: rt; }
+
+        ._1A_and_B26_1A_or_B2-tree {
+            grid-template-areas:
+                ".   llt .   lrt .   .   rlt .   rrt ."
+                "ll  llt lr  lrt .   rl  rlt rr  rrt ."
+                "ll  .   lr  .   lt  rl  .   rr  .   rt"
+                "l   l   l   l   lt  r   r   r   r   rt"
+                "l   l   l   l   .   r   r   r   r   ft"
+                "f   f   f   f   f   f   f   f   f   ft"
+                "f   f   f   f   f   f   f   f   f   ."
+        }
 
     </style>
 </head>
 <body>
-    <h2>Note that rule tags are not supported with this setup</h2>
     <div class="_1A_implies_B25_A6_B-tree">
         <div class="cell _1A_implies_B25_A6_B-l">A &vdash; A</div>
         <div class="cell _1A_implies_B25_A6_B-r">B &vdash; B</div>
-        <div class="cell _1A_implies_B25_A6_B-root">(A &rarr; B), A &vdash; B</div>
+        <div class="_1A_implies_B25_A6_B-lt">Ax</div>
+        <div class="_1A_implies_B25_A6_B-rt">Ax</div>
+        <div class="cell _1A_implies_B25_A6_B-f">(A &rarr; B), A &vdash; B</div>
+        <div class="_1A_implies_B25_A6_B-ft">L&rarr;</div>
     </div>
+    
+    <div class=""></div>
 </body>
 </html>
