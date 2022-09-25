@@ -152,9 +152,13 @@ class TestProverSolvesComplexity1(unittest.TestCase):
             ]
         }
         _, p = self.do(self.luni, branches)
-        expected = sorted(branches[self.luni], key=lambda x: x.keys())
-        actual = sorted(p[0].branches[self.luni], key=lambda x: x.keys())
-        self.assertEqual(expected, actual)
+        e_branches = branches[self.luni]
+        a_branches = p[0].branches[self.luni]
+        self.assertEqual(e_branches[0].keys(), a_branches[0].keys())
+        sort_vals = lambda x: [sorted(v) for v in x[0].keys()]
+        e_vals = sort_vals(e_branches)
+        a_vals = sort_vals(a_branches)
+        self.assertEqual(e_vals, a_vals)
 
     def test_runi(self) -> None:
         branches = {
@@ -164,9 +168,14 @@ class TestProverSolvesComplexity1(unittest.TestCase):
             ]
         }
         _, p = self.do(self.runi, branches)
-        expected = sorted(branches[self.runi], key=lambda x: x.keys())
-        actual = sorted(p[0].branches[self.runi], key=lambda x: x.keys())
-        self.assertEqual(expected, actual)
+        e_branches = branches[self.runi]
+        a_branches = p[0].branches[self.runi]
+        self.assertEqual(e_branches[0].keys(), a_branches[0].keys())
+        sort_vals = lambda x: [sorted(v) for v in x[0].keys()]
+        e_vals = sort_vals(e_branches)
+        a_vals = sort_vals(a_branches)
+        self.assertEqual(e_vals, a_vals)
+
 
 
 

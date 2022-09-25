@@ -129,6 +129,11 @@ class TestSequent(unittest.TestCase):
         s1 = Sequent((a, b), (a, b))
         self.assertEqual(names, s1.names)
 
+    def test_sequent_is_sortable(self) -> None:
+        s1 = Sequent(self.p, self.q)
+        s2 = Sequent(self.q, self.p)
+        self.assertTrue(s1 > s2 or s1 < s2)
+
 
 if __name__ == '__main__':
     unittest.main()

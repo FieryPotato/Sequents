@@ -59,7 +59,7 @@ objects_re = re.compile(r'\<(.*)\>')
 # Match anything before an opening angle bracket ('<')
 predicate_re = re.compile(r'(.+)\<')
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, order=True)
 class Proposition(ABC):
     """
     Base class from which propositions should inherit.
@@ -122,7 +122,7 @@ class Proposition(ABC):
         return self.__class__(*props)
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, frozen=True, order=True)
 class UnaryProposition(Proposition):
     """
     Super class for unary propositions.
@@ -139,7 +139,7 @@ class UnaryProposition(Proposition):
     def content(self) -> tuple[Proposition | str]:
         return (self.prop,)
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, frozen=True, order=True)
 class Quantifier(Proposition):
     """
     Super class for quantifiers.
@@ -180,7 +180,7 @@ class Quantifier(Proposition):
         return self.prop.instantiate(self.variable, name)
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, frozen=True, order=True)
 class BinaryProposition(Proposition):
     """
     Super class for binary propositions.
@@ -199,7 +199,7 @@ class BinaryProposition(Proposition):
 
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, frozen=True, order=True)
 class Atom(UnaryProposition):
     """
     Proposition class with no logical content.
@@ -273,7 +273,7 @@ class Atom(UnaryProposition):
         
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, frozen=True, order=True)
 class Universal(Quantifier):
     """
     Unary proposition signifying logical 'for all ...'.
@@ -284,7 +284,7 @@ class Universal(Quantifier):
     symb = '∀'
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, frozen=True, order=True)
 class Existential(Quantifier):
     """
     Unary proposition signifying logical 'there is at least one ...'.
@@ -295,7 +295,7 @@ class Existential(Quantifier):
     symb = '∃'
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, frozen=True, order=True)
 class Negation(UnaryProposition):
     """
     Unary proposition signifying logical 'not ...'.
@@ -305,7 +305,7 @@ class Negation(UnaryProposition):
     arity = 1
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, frozen=True, order=True)
 class Conjunction(BinaryProposition):
     """
     Binary proposition signifying logical '... and ...'.
@@ -313,7 +313,7 @@ class Conjunction(BinaryProposition):
     symb = '&'
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, frozen=True, order=True)
 class Conditional(BinaryProposition):
     """
     Binary proposition signifying logical 'if ... then ...'
@@ -321,7 +321,7 @@ class Conditional(BinaryProposition):
     symb = '->'
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, frozen=True, order=True)
 class Disjunction(BinaryProposition):
     """
     Binary proposition signifying logical '... or ...'

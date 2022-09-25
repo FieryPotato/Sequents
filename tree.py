@@ -52,6 +52,11 @@ class Tree:
         self.branches.update({self.root: None})
         self.names.update({name for name in self.root.names})
 
+    @property
+    def leaves(self) -> int:
+        """Return the number of leaves (axioms) in self."""
+        pass
+
     def grow(self):
         """Solve the root, then recursively solve each branch."""
         if self.is_grown:

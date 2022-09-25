@@ -21,31 +21,31 @@ class __Settings(MutableMapping):
     def __init__(self) -> None:
         super().__init__()
         self.path = config_path
-        self.__dict = {}
+        self.dict = {}
         with open(self.path, 'r', encoding='utf-8') as cfg:
             self.update(json.load(cfg))
 
     def __setitem__(self, key, val) -> None:
-        self.__dict[key] = val
+        self.dict[key] = val
         self.save()
 
     def __getitem__(self, key) -> Any:
-        return self.__dict[key]
+        return self.dict[key]
 
     def __delitem__(self, key) -> None:
-        del self.__dict[key]
+        del self.dict[key]
 
     def __iter__(self):
-        yield from self.__dict.__iter__()
+        yield from self.dict.__iter__()
 
     def __len__(self) -> int:
-        return len(self.__dict)
+        return len(self.dict)
 
     def update(self, *args, **kwargs) -> None:
         """
-        Update self.__dict and save the results to disk.
+        Update self.dict and save the results to disk.
         """
-        self.__dict.update(*args, **kwargs)
+        self.dict.update(*args, **kwargs)
         self.save()
 
     def get_rule(self, connective: str, side: str) -> str:
@@ -60,7 +60,7 @@ class __Settings(MutableMapping):
     def save(self) -> None:
         """Save contents of self to config.json."""
         with open(self.path, 'w') as f:
-            json.dump(self.__dict, f, indent=4)
+            json.dump(self.dict, f, indent=4)
 
     def print_rules(self) -> None:
         """Print connective rules to console."""
