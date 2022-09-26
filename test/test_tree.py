@@ -3,7 +3,7 @@ import unittest
 
 from unittest.mock import patch
 
-from convert import dict_to_tree, tree_to_dict, string_to_sequent, sequent_to_tree
+from convert import dict_to_tree, tree_to_dict, string_to_tree, string_to_sequent
 from proposition import Atom, Conjunction, Negation, Disjunction, Conditional
 from sequent import Sequent
 from tree import Tree
@@ -642,19 +642,30 @@ class TestTree(unittest.TestCase):
             "A v B; A & B",
             "A -> B, A; B"
         ]
-        sequents = [string_to_sequent(s) for s in strings]
         leaf_numbers = 2, 1, 4, 2
-        pairs = zip(sequents, leaf_numbers)
+        pairs = zip(strings, leaf_numbers)
         for s, l in pairs:
             with self.subTest(i=s):
-                t = sequent_to_tree(s)
+                t = string_to_tree(s)
                 self.assertEqual(l, t.leaves)
 
     def test_trees_with_noninvertible_rules_have_0_leaves(self) -> None:
         string = 'forallx (Chipmunk<x> -> Sings<x>), Chipmunk<alvin>; Sings<alvin>'
-        sequent = string_to_sequent(string)   
-        tree = sequent_to_tree(sequent, names={'alvin', 'simon', 'theodore'})
+        tree = string_to_tree(string, names={'alvin', 'simon', 'theodore'})
         self.assertEqual(0, tree.leaves)
+
+
+class TestTreeSplitting(unittest.TestCase):
+    def test_fully_invertible_tree_returns_list_of_self(self) -> None:
+        t = string_to_tree('A, A -> B; B')
+        self.assertEqual([t], t.split())
+
+    def test_complexity_1_noninvertible_tree(self) -> None:
+        e_branches_a = {
+        }
+        with patch('rules.get_rule_setting', return_value='add'):
+            t = string_to_tree('A & B; A, B')
+            expected = 
 
 
 if __name__ == '__main__':

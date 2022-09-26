@@ -4,7 +4,7 @@ Package for converting objects of one type to another.
 
 __all__ = [
     'dict_to_tree', 'sequent_to_tree', 'string_to_proposition', 
-    'string_to_sequent'
+    'string_to_sequent', 'string_to_tree'
 ]
 
 from typing import Protocol
@@ -94,15 +94,27 @@ def string_to_proposition(string) -> Proposition:
     return fac().get_prop(*split_string)
 
 
-def sequent_to_tree(sequent: Sequent, names: set = None) -> Tree:
+def sequent_to_tree(sequent: Sequent, names: set = None, grow: bool = True) -> Tree:
     """
     Return a solved tree whose root is the input sequent. 
     """
     if names is None:
         names = set()
     tree = Tree(sequent, names=names)
-    tree.grow()
+    if grow:
+        tree.grow()
     return tree
+
+
+def string_to_tree(string: str, names: set = None, grow: bool = True) -> Tree:
+    """
+    Combines string_to_sequent and string_to_tree as a shortcut for
+    calling both functions.
+    """
+    if names is None: 
+        names = set()
+    sequent = string_to_sequent(string)
+    return sequent_to_tree(sequent, names, grow=grow)
 
 
 def dict_to_tree(dictionary: dict, is_grown: bool = True) -> Tree:

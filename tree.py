@@ -113,6 +113,15 @@ class Tree:
             sequent: self.grow_branch(sequent) for sequent in seq_dict.keys()
         }
 
+    def split(self) -> list['Tree']:
+        """
+        Return a list of all possible full trees in self, where a full
+        tree consists only of dict[Sequent, dict | None] pairs. All 
+        non-invertible rules are split into separate trees, which are 
+        identical until the rule application.
+        """
+        return [self]
+
     class TreeIsGrownError(Exception):
         """Trees should only be able to be grown once."""
         def __init__(self, tree) -> None:
