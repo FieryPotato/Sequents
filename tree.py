@@ -54,8 +54,27 @@ class Tree:
 
     @property
     def leaves(self) -> int:
-        """Return the number of leaves (axioms) in self."""
-        pass
+        """
+        Return the number of leaves (axioms) in self if there aren't 
+        any list branches (i.e. non-invertible rules) in it. Returns 0 
+        if any value in any branch is a list.
+        """
+        def search_leaves(d: dict) -> int:
+            total = 0
+            for parents in d.values():
+                if parents is None:
+                    total += 1
+                elif isinstance(parents, dict):
+                    for parent in parents.values():
+                        if parent is None:
+                            total += 1
+                        elif (result := search_leaves(parent)) != 0:
+                            total += search_leaves(parent)
+                elif isinstance(parents, list):
+                    return 0
+            return total
+        return search_leaves(self.branches)
+
 
     def grow(self):
         """Solve the root, then recursively solve each branch."""
