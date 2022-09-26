@@ -28,7 +28,7 @@ class TestProverSolvesComplexity1(unittest.TestCase):
     luni = Sequent((Universal('x', p_),), ())
     runi = Sequent((), (Universal('x', p_),))
 
-    def do(self, root, branches) -> Prover:
+    def prepare_prover(self, root, branches) -> Prover:
         """Helper function that runs theactual test logic."""
         tree = Tree(
             root=root,
@@ -48,7 +48,7 @@ class TestProverSolvesComplexity1(unittest.TestCase):
                 Sequent((self.p, self.q), ()): None
             }
         }
-        expected, actual = self.do(self.land, branches)
+        expected, actual = self.prepare_prover(self.land, branches)
         self.assertEqual(expected, actual)
 
     def test_rand(self) -> None:
@@ -58,7 +58,7 @@ class TestProverSolvesComplexity1(unittest.TestCase):
                 Sequent((), (self.q,)): None
             }
         }
-        expected, actual = self.do(self.rand, branches)
+        expected, actual = self.prepare_prover(self.rand, branches)
         self.assertEqual(expected, actual)
 
     def test_lor(self) -> None:
@@ -68,7 +68,7 @@ class TestProverSolvesComplexity1(unittest.TestCase):
                 Sequent((self.q,), ()): None
             }
         }
-        expected, actual = self.do(self.lor, branches)
+        expected, actual = self.prepare_prover(self.lor, branches)
         self.assertEqual(expected, actual)
 
     def test_ror(self) -> None:
@@ -77,7 +77,7 @@ class TestProverSolvesComplexity1(unittest.TestCase):
                 Sequent((), (self.p, self.q)): None
             }
         }
-        expected, actual = self.do(self.ror, branches)
+        expected, actual = self.prepare_prover(self.ror, branches)
         self.assertEqual(expected, actual)
 
     def test_lif(self) -> None:
@@ -87,7 +87,7 @@ class TestProverSolvesComplexity1(unittest.TestCase):
                 Sequent((self.q,), ()): None
             }
         }
-        expected, actual = self.do(self.lif, branches)
+        expected, actual = self.prepare_prover(self.lif, branches)
         self.assertEqual(expected, actual)
 
     def test_rif(self) -> None:
@@ -96,7 +96,7 @@ class TestProverSolvesComplexity1(unittest.TestCase):
                 Sequent((self.p,), (self.q,)): None
             }
         }
-        expected, actual = self.do(self.rif, branches)
+        expected, actual = self.prepare_prover(self.rif, branches)
         self.assertEqual(expected, actual)
 
     def test_lneg(self) -> None:
@@ -105,7 +105,7 @@ class TestProverSolvesComplexity1(unittest.TestCase):
                 Sequent((), (self.p,)): None
             }
         }
-        expected, actual = self.do(self.lneg, branches)
+        expected, actual = self.prepare_prover(self.lneg, branches)
         self.assertEqual(expected, actual)
 
     def test_rneg(self) -> None:
@@ -114,7 +114,7 @@ class TestProverSolvesComplexity1(unittest.TestCase):
                 Sequent((self.p,), ()): None
             }
         }
-        expected, actual = self.do(self.rneg, branches)
+        expected, actual = self.prepare_prover(self.rneg, branches)
         self.assertEqual(expected, actual)
 
     def test_lexi(self) -> None:
@@ -125,11 +125,11 @@ class TestProverSolvesComplexity1(unittest.TestCase):
 
             ]
         }        
-        _, p = self.do(self.lexi, branches)
-        s = lambda x: x.keys()
-        expected = sorted(branches[self.lexi], key=s)
-        actual = sorted(p[0].branches[self.lexi], key=s)
-        self.assertEqual(expected, actual)
+        _, p = self.prepare_prover(self.lexi, branches)
+        e_branches = {k for d in branches[self.lexi] for k in d.keys()}
+        a_branches = {k for d in p[0].branches[self.lexi] for k in d.keys()}
+        self.assertEqual(e_branches, a_branches)
+
 
     def test_rexi(self) -> None:
         branches = {
@@ -138,11 +138,10 @@ class TestProverSolvesComplexity1(unittest.TestCase):
                 {Sequent((), (self.pg,)): None}
             ]
         }
-        _, p = self.do(self.rexi, branches)
-        s = lambda x: x.keys()
-        expected = sorted(branches[self.rexi], key=s)
-        actual = sorted(p[0].branches[self.rexi], key=s)
-        self.assertEqual(expected, actual)
+        _, p = self.prepare_prover(self.rexi, branches)
+        e_branches = {k for d in branches[self.rexi] for k in d.keys()}
+        a_branches = {k for d in p[0].branches[self.rexi] for k in d.keys()}
+        self.assertEqual(e_branches, a_branches)
 
     def test_luni(self) -> None:
         branches = {
@@ -151,10 +150,10 @@ class TestProverSolvesComplexity1(unittest.TestCase):
                 {Sequent((self.pg,), ()): None}
             ]
         }
-        _, p = self.do(self.luni, branches)
-        expected = sorted(branches[self.luni], key=lambda x: x.keys())
-        actual = sorted(p[0].branches[self.luni], key=lambda x: x.keys())
-        self.assertEqual(expected, actual)
+        _, p = self.prepare_prover(self.luni, branches)
+        e_branches = {k for d in branches[self.luni] for k in d.keys()}
+        a_branches = {k for d in p[0].branches[self.luni] for k in d.keys()}
+        self.assertEqual(e_branches, a_branches)
 
     def test_runi(self) -> None:
         branches = {
@@ -163,10 +162,11 @@ class TestProverSolvesComplexity1(unittest.TestCase):
                 {Sequent((), (self.pg,)): None}
             ]
         }
-        _, p = self.do(self.runi, branches)
-        expected = sorted(branches[self.runi], key=lambda x: x.keys())
-        actual = sorted(p[0].branches[self.runi], key=lambda x: x.keys())
-        self.assertEqual(expected, actual)
+        _, p = self.prepare_prover(self.runi, branches)
+        e_branches = {k for d in branches[self.runi] for k in d.keys()}
+        a_branches = {k for d in p[0].branches[self.runi] for k in d.keys()}
+        self.assertEqual(e_branches, a_branches)
+
 
 
 

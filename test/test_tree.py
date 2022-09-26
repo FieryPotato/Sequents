@@ -3,7 +3,7 @@ import unittest
 
 from unittest.mock import patch
 
-from convert import dict_to_tree, tree_to_dict
+from convert import dict_to_tree, tree_to_dict, string_to_sequent, sequent_to_tree
 from proposition import Atom, Conjunction, Negation, Disjunction, Conditional
 from sequent import Sequent
 from tree import Tree
@@ -634,6 +634,27 @@ class TestTree(unittest.TestCase):
         names = {'alpha', 'beta', 'gamma'}
         tree = Tree(Sequent((), ()), names=names)
         self.assertEqual(names, tree.names)
+
+    def test_tree_knows_how_many_leaves_it_has(self) -> None:
+        strings = [
+            "A v B; A v B",
+            "A & B; A v B",
+            "A v B; A & B",
+            "A -> B, A; B"
+        ]
+        sequents = [string_to_sequent(s) for s in strings]
+        leaf_numbers = 2, 1, 4, 2
+        pairs = zip(sequents, leaf_numbers)
+        for s, l in pairs:
+            with self.subTest(i=s):
+                t = sequent_to_tree(s)
+                self.assertEqual(l, t.leaves)
+
+    def test_trees_with_noninvertible_rules_have_0_leaves(self) -> None:
+        string = 'forallx (Chipmunk<x> -> Sings<x>), Chipmunk<alvin>; Sings<alvin>'
+        sequent = string_to_sequent(string)   
+        tree = sequent_to_tree(sequent, names={'alvin', 'simon', 'theodore'})
+        self.assertEqual(0, tree.leaves)
 
 
 if __name__ == '__main__':

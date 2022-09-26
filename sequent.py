@@ -45,7 +45,7 @@ class Proposition(Protocol):
     complexity: int
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, order=True)
 class Sequent:
     ant: tuple
     con: tuple

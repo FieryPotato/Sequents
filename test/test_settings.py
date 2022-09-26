@@ -3,7 +3,7 @@ import unittest
 
 from unittest.mock import patch
 
-from settings import _Settings
+from settings import __Settings
 
 test_config_path = 'test/io_testing/test_config.json'
 mock_path = lambda: test_config_path
@@ -29,10 +29,12 @@ test_config = {
     }
 }
 
+settings_singleton = __Settings
+
 class TestSettings(unittest.TestCase): 
     @patch('settings.config_path', test_config_path)
     def setUp(self) -> None:
-        self.s = _Settings()
+        self.s = settings_singleton()
 
     def tearDown(self) -> None:
         with open(test_config_path, 'w') as f:
@@ -42,7 +44,7 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(test_config_path, self.s.path)
 
     def test_load_settings(self) -> None:
-        self.assertEqual(test_config, self.s._dict)
+        self.assertEqual(test_config, self.s.dict)
 
     def test_update(self) -> None:
         pos = {'positivists': 
