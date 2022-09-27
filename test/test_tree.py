@@ -656,17 +656,26 @@ class TestTree(unittest.TestCase):
 
 
 class TestTreeSplitting(unittest.TestCase):
+    maxDiff=None
     def test_fully_invertible_tree_returns_list_of_self(self) -> None:
         t = string_to_tree('A, A -> B; B')
         self.assertEqual([t], t.split())
 
     def test_complexity_1_noninvertible_tree(self) -> None:
-        e_branches_a = {
+        e_branch_a = {
+            Sequent((Conjunction(Atom('A'), Atom('B')),), (Atom('A'), Atom('B'))):
+                {Sequent((Atom('A'),), (Atom('A'), Atom('B'))): None}
+        }
+        e_branch_b = {
+            Sequent((Conjunction(Atom('A'), Atom('B')),), (Atom('A'), Atom('B'))):
+                {Sequent((Atom('B'),), (Atom('A'), Atom('B'))): None}
         }
         with patch('rules.get_rule_setting', return_value='add'):
-            t = string_to_tree('A & B; A, B')
-            expected = 
-
+            tree = string_to_tree('A & B; A, B')
+            expected = [e_branch_a, e_branch_b]
+            split = tree.split()
+            actual = [t.branches for t in split]
+            self.assertEqual(expected, actual)
 
 if __name__ == '__main__':
     unittest.main()
