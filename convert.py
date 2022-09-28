@@ -128,6 +128,7 @@ def dict_to_tree(dictionary: dict, is_grown: bool = True) -> Tree:
     tree = Tree(first_key, is_grown=is_grown)
     tree.branches = dictionary
     return tree
+    
 
 def split_tree(tree) -> list[Tree]:
     """
@@ -154,10 +155,13 @@ def split_branch(branch: dict | list) -> list[dict]:
     """
     The start of recursive branches for splitting trees. 
     """
-    return [split_dict(branch)]
+    if isinstance(branch, dict):
+        return [split_tree_dict(branch)]
+    if isinstance(branch, list):
+        return split_tree_list(branch)
 
 
-def split_dict(branch: dict) -> dict: 
+def split_tree_dict(branch: dict) -> dict: 
     """
     Does the work for split_tree if the branch is a dict.
     """
@@ -168,6 +172,16 @@ def split_dict(branch: dict) -> dict:
         else:
             sub_result[sequent] = {sequent: r for r in split_branch(sub_branch)}
     return sub_result
+    
+    
+def split_tree_list(branches: list) -> list[dict]:
+    """
+    Does the work for split_tree if the branch is a list.
+    """
+    result = []
+    for branch in branches:
+        result.extend(split_branch(branch))
+    return result
 
 
 def tree_to_dict(tree) -> dict:

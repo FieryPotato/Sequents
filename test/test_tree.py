@@ -667,9 +667,10 @@ class TestTreeSplitting(unittest.TestCase):
         expected = [dict_to_tree({
             s: {string_to_sequent('A, B; A, B'): None}
         })]
-        tree = sequent_to_tree(s)
-        actual = split_tree(tree)
-        self.assertEqual(expected, actual)
+        with patch('rules.get_rule_setting', return_value='mul'):
+            tree = sequent_to_tree(s)
+            actual = split_tree(tree)
+            self.assertEqual(expected, actual)
 
     def test_c1_2pi(self) -> None:
         s = string_to_sequent('A, B; A & B')
@@ -678,25 +679,26 @@ class TestTreeSplitting(unittest.TestCase):
                 string_to_sequent('A, B; B'): None
            }
         })]
-        t = sequent_to_tree(s)
-        actual = split_tree(t)
-        self.assertEqual(expected, actual)
+        with patch('rules.get_rule_setting', return_value='add'):
+            t = sequent_to_tree(s)
+            actual = split_tree(t)
+            self.assertEqual(expected, actual)
 
-#    def test_complexity_1_noninvertible_tree(self) -> None:
-#        e_branch_a = {
-#            Sequent((Conjunction(Atom('A'), Atom('B')),), (Atom('A'), Atom('B'))):
-#                {Sequent((Atom('A'),), (Atom('A'), Atom('B'))): None}
-#        }
-#        e_branch_b = {
-#            Sequent((Conjunction(Atom('A'), Atom('B')),), (Atom('A'), Atom('B'))):
-#                {Sequent((Atom('B'),), (Atom('A'), Atom('B'))): None}
-#        }
-#        with patch('rules.get_rule_setting', return_value='add'):
-#            tree = string_to_tree('A & B; A, B')
-#            expected = [e_branch_a, e_branch_b]
-#            split = tree.split()
-#            actual = [t.branches for t in split]
-#            self.assertEqual(expected, actual)
+    def test_c1_1pni(self) -> None:
+        e_branch_a = {
+            Sequent((Conjunction(Atom('A'), Atom('B')),), (Atom('A'), Atom('B'))):
+                {Sequent((Atom('A'),), (Atom('A'), Atom('B'))): None}
+        }
+        e_branch_b = {
+            Sequent((Conjunction(Atom('A'), Atom('B')),), (Atom('A'), Atom('B'))):
+                {Sequent((Atom('B'),), (Atom('A'), Atom('B'))): None}
+        }
+        with patch('rules.get_rule_setting', return_value='add'):
+            tree = string_to_tree('A & B; A, B')
+            expected = [e_branch_a, e_branch_b]
+            split = split_tree(tree)
+            actual = [t.branches for t in split]
+            self.assertEqual(expected, actual)
 
 if __name__ == '__main__':
     unittest.main()
