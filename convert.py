@@ -233,6 +233,7 @@ def find_connective(string: str) -> list[str]:
         return [connective, deparenthesize(negatum)]
 
     # Check for quantifiers as main connective.
+    # The first slice into word_list finds a word, the second, a letter
     if (connective := word_list[0][:-1]) in quantifiers:
         variable = word_list[0][-1]
         prop = ' '.join(word_list[1:])
