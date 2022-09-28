@@ -3,7 +3,8 @@ import unittest
 
 from unittest.mock import patch
 
-from convert import dict_to_tree, tree_to_dict, string_to_tree, string_to_sequent
+from convert import dict_to_tree, tree_to_dict, string_to_tree, \
+    string_to_sequent, sequent_to_tree, split_tree
 from proposition import Atom, Conjunction, Negation, Disjunction, Conditional
 from sequent import Sequent
 from tree import Tree
@@ -657,25 +658,45 @@ class TestTree(unittest.TestCase):
 
 class TestTreeSplitting(unittest.TestCase):
     maxDiff=None
-    def test_fully_invertible_tree_returns_list_of_self(self) -> None:
-        t = string_to_tree('A, A -> B; B')
-        self.assertEqual([t], t.split())
+    def test_complexity_0_tree(self) -> None:
+        t = string_to_tree('A; A')
+        self.assertEqual([t], split_tree(t))
 
-    def test_complexity_1_noninvertible_tree(self) -> None:
-        e_branch_a = {
-            Sequent((Conjunction(Atom('A'), Atom('B')),), (Atom('A'), Atom('B'))):
-                {Sequent((Atom('A'),), (Atom('A'), Atom('B'))): None}
-        }
-        e_branch_b = {
-            Sequent((Conjunction(Atom('A'), Atom('B')),), (Atom('A'), Atom('B'))):
-                {Sequent((Atom('B'),), (Atom('A'), Atom('B'))): None}
-        }
-        with patch('rules.get_rule_setting', return_value='add'):
-            tree = string_to_tree('A & B; A, B')
-            expected = [e_branch_a, e_branch_b]
-            split = tree.split()
-            actual = [t.branches for t in split]
-            self.assertEqual(expected, actual)
+    def test_c1_1pi(self) -> None:
+        s = string_to_sequent('A & B; A, B')
+        expected = [dict_to_tree({
+            s: {string_to_sequent('A, B; A, B'): None}
+        })]
+        tree = sequent_to_tree(s)
+        actual = split_tree(tree)
+        self.assertEqual(expected, actual)
+
+    def test_c1_2pi(self) -> None:
+        s = string_to_sequent('A, B; A & B')
+        expected = [dict_to_tree({
+            s: {string_to_sequent('A, B; A'): None,
+                string_to_sequent('A, B; B'): None
+           }
+        })]
+        t = sequent_to_tree(s)
+        actual = split_tree(t)
+        self.assertEqual(expected, actual)
+
+#    def test_complexity_1_noninvertible_tree(self) -> None:
+#        e_branch_a = {
+#            Sequent((Conjunction(Atom('A'), Atom('B')),), (Atom('A'), Atom('B'))):
+#                {Sequent((Atom('A'),), (Atom('A'), Atom('B'))): None}
+#        }
+#        e_branch_b = {
+#            Sequent((Conjunction(Atom('A'), Atom('B')),), (Atom('A'), Atom('B'))):
+#                {Sequent((Atom('B'),), (Atom('A'), Atom('B'))): None}
+#        }
+#        with patch('rules.get_rule_setting', return_value='add'):
+#            tree = string_to_tree('A & B; A, B')
+#            expected = [e_branch_a, e_branch_b]
+#            split = tree.split()
+#            actual = [t.branches for t in split]
+#            self.assertEqual(expected, actual)
 
 if __name__ == '__main__':
     unittest.main()

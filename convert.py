@@ -4,7 +4,7 @@ Package for converting objects of one type to another.
 
 __all__ = [
     'dict_to_tree', 'sequent_to_tree', 'string_to_proposition', 
-    'string_to_sequent', 'string_to_tree'
+    'string_to_sequent', 'string_to_tree', 'split_tree'
 ]
 
 from typing import Protocol
@@ -128,6 +128,46 @@ def dict_to_tree(dictionary: dict, is_grown: bool = True) -> Tree:
     tree = Tree(first_key, is_grown=is_grown)
     tree.branches = dictionary
     return tree
+
+def split_tree(tree) -> list[Tree]:
+    """
+    Return a list of all possible full trees in tree, where a full
+    tree consists only of dict[Sequent, dict | None] pairs. All 
+    non-invertible rules are split into separate trees, which are 
+    identical until the rule application.
+    """
+    if (root_parent := tree.branches[tree.root]) is None:
+        return [tree]
+    result = []
+    for sub_tree in split_branch(root_parent):
+        result.append(
+            Tree(root=tree.root,
+                 is_grown=True,
+                 names=tree.names,
+                 branches={tree.root: sub_tree}
+            )
+        )
+    return result            
+
+
+def split_branch(branch: dict | list) -> list[dict]:
+    """
+    The start of recursive branches for splitting trees. 
+    """
+    return [split_dict(branch)]
+
+
+def split_dict(branch: dict) -> dict: 
+    """
+    Does the work for split_tree if the branch is a dict.
+    """
+    sub_result = {}
+    for sequent, sub_tree in branch.items():
+        if (sub_branch := branch[sequent]) is None:
+            sub_result[sequent] = None
+        else:
+            sub_result[sequent] = {sequent: r for r in split_branch(sub_branch)}
+    return sub_result
 
 
 def tree_to_dict(tree) -> dict:

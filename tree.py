@@ -49,8 +49,9 @@ class Tree:
     branches: dict = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        self.branches.update({self.root: None})
-        self.names.update({name for name in self.root.names})
+        if not self.branches:
+            self.branches.update({self.root: None})
+            self.names.update({name for name in self.root.names})
 
     @property
     def leaves(self) -> int:
@@ -113,45 +114,6 @@ class Tree:
             sequent: self.grow_branch(sequent) for sequent in seq_dict.keys()
         }
 
-    def split(self) -> list['Tree']:
-        """
-        Return a list of all possible full trees in self, where a full
-        tree consists only of dict[Sequent, dict | None] pairs. All 
-        non-invertible rules are split into separate trees, which are 
-        identical until the rule application.
-        """
-        if (root_parent := self.branches[self.root]) is None:
-            return [self]
-            
-        def split_branch(b: dict | list) -> list[dict]:
-            if isinstance(b, dict):
-                r = {}
-                for k, v in b.items():
-                    if v is not None:
-                        r[k] = split_branch(v)
-                    else: 
-                        r[k] = None
-                return [r]
-            elif isinstance(b, list):
-                result = []
-                for sub_dict in b:
-                    r = {}
-                    for k, v in sub_dict.items():
-                        if v is not None:
-                            r.update(
-                                {k: split_branch(v)}
-                            )
-                    result.append(r)
-                return result
-                
-        return [
-            Tree(
-                root=self.root,
-                is_grown=True,
-                names=self.names,
-                branches=subtree
-            ) for subtree in split_branch(root_parent)
-        ]
 
 
     class TreeIsGrownError(Exception):
