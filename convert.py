@@ -9,10 +9,12 @@ __all__ = [
 
 from typing import Protocol, Type
 
+import utils
+
 from proposition import Atom, Negation, Universal, Existential, Conjunction, Disjunction, Conditional
 from sequent import Sequent
 from tree import Tree
-from utils import deparenthesize, split_branch, find_connective
+
 
 
 class Proposition(Protocol):
@@ -27,8 +29,8 @@ def string_to_proposition(string) -> Proposition:
     Empty strings raise a value error. If a connective word or symbol
     cannot be matched, an atom with the full string is returned.
     """
-    string = deparenthesize(string)
-    split_string: list[str] = find_connective(string)
+    string = utils.deparenthesize(string)
+    split_string: list[str] = utils.find_connective(string)
 
     fac: Type[PropositionFactory]
     match split_string:
@@ -161,7 +163,7 @@ def split_tree(tree) -> list[Tree]:
     if (root_parent := tree.branches[tree.root]) is None:
         return [tree]
     result = []
-    for sub_tree in split_branch(root_parent):
+    for sub_tree in utils.split_branch(root_parent):
         new_dict = {tree.root: sub_tree}
         result.append(
             dict_to_tree(new_dict)
