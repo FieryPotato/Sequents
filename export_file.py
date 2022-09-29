@@ -3,7 +3,7 @@ This package contains classes for exporting data to a given file.
 
 The only function you really need is get_exporter, which takes a
 desired output path as input and returns an exporter ready to export
-to that file by calling it's .export(data) function. Note that in all
+to that file by calling its .export(data) function. Note that in all
 cases, data should be an iterable container of Tree objects.
 
 """
@@ -11,13 +11,12 @@ __all__ = ['get_exporter']
 
 import json
 import pickle
-
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Protocol
 
 from convert import tree_to_dict
 
-    
+
 class Exporter(Protocol):
     """Protocol for exporters."""
     def export(self, data) -> None:
@@ -77,4 +76,3 @@ def get_exporter(dst: str) -> Exporter:
         raise ValueError(f'{suffix} is not an accepted file extension')
     exporter = exporters[suffix]
     return exporter(dst) 
-

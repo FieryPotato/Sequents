@@ -66,9 +66,9 @@ class __Settings(MutableMapping):
         """Print connective rules to console."""
         string = 'Rules:\n' 
         for connective in '&', 'v', '->', '~', '∀', '∃':
-            string += (f'{connective}:\n')
+            string += f'{connective}:\n'
             for side in 'ant', 'con':
-                string += (f'    {side}: {self.get_rule(connective, side)}\n')
+                string += f'    {side}: {self.get_rule(connective, side)}\n'
         print(string)
 
 

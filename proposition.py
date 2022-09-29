@@ -54,10 +54,10 @@ from dataclasses import dataclass
 SIDES: set[str] = {'ant', 'con'}
 
 # Match anything between angle brackets ('<' and '>')
-objects_re = re.compile(r'\<(.*)\>')
+objects_re = re.compile(r'<(.*)>')
 
 # Match anything before an opening angle bracket ('<')
-predicate_re = re.compile(r'(.+)\<')
+predicate_re = re.compile(r'(.+)<')
 
 @dataclass(frozen=True, slots=True, order=True)
 class Proposition(ABC):
@@ -100,7 +100,7 @@ class Proposition(ABC):
                 )
 
     @property
-    def names(self) -> tuple[str]:
+    def names(self) -> set[str]:
         """Return a tuple of names in self.content."""
         return {name for prop in self.content for name in prop.names}
         
