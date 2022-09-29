@@ -700,5 +700,9 @@ class TestTreeSplitting(unittest.TestCase):
             actual = [t.branches for t in split]
             self.assertEqual(expected, actual)
 
+    def test_c1_2pni(self) -> None:
+        self.assertTrue(False)
+
+
 if __name__ == '__main__':
     unittest.main()
