@@ -4,7 +4,7 @@ Package for converting objects of one type to another.
 
 __all__ = [
     'dict_to_tree', 'sequent_to_tree', 'string_to_proposition', 
-    'string_to_sequent', 'string_to_tree', 'split_tree'
+    'string_to_sequent', 'string_to_tree'
 ]
 
 from typing import Protocol
@@ -13,56 +13,14 @@ from proposition import Atom, Negation, Conjunction,\
     Disjunction, Conditional, Universal, Existential
 from sequent import Sequent
 from tree import Tree
+from utils import deparenthesize, split_branch, find_connective
 
 
 class Proposition(Protocol):
     ...
 
 
-NEST_MAP = {'(': 1, ')': -1}
-
-
-def deparenthesize(string: str) -> str:
-    """
-    Remove all linked outer parentheses from input string.
-    
-    >>> deparenthesize('(one set)')
-    'one set'
-    >>> deparenthesize('((two sets))')
-    'two sets'
-    >>> deparenthesize('(nested (sets))')
-    'nested (sets)'
-    >>> deparenthesize('(unconnected) (sets)')
-    '(unconnected) (sets)'
-    """
-    # Return early if there is not string.
-    if not string:
-        return ''
-
-    # While string is bookended by parentheses.
-    while string.startswith('(') and string.endswith(')'):
-
-        # Ensure outer parentheses are connected
-        nestedness = 0
-        for i, char in enumerate(string):
-
-            # Increase nestedness with each '('
-            # Decrease nestedness with each ')'
-            # No change otherwise.
-            nestedness += NEST_MAP[char] if char in NEST_MAP else 0
-
-            # If the first and last parentheses are not connected
-            # eg. (A v B) -> (C & D)
-            if nestedness <= 0 and ((i + 1) < len(string)):
-                return string
-
-        # If they are connected, remove them and check again.
-        string = string[1:-1]
-
-    return string
-
-
-def string_to_proposition(string) -> Proposition: 
+def string_to_proposition(string) -> Proposition:
     """
     Convert input string into proposition of the appropriate type.
     Strings are split by their connective i.e.  either the symbol (&, v,
@@ -128,60 +86,6 @@ def dict_to_tree(dictionary: dict, is_grown: bool = True) -> Tree:
     tree = Tree(first_key, is_grown=is_grown)
     tree.branches = dictionary
     return tree
-    
-
-def split_tree(tree) -> list[Tree]:
-    """
-    Return a list of all possible full trees in tree, where a full
-    tree consists only of dict[Sequent, dict | None] pairs. All 
-    non-invertible rules are split into separate trees, which are 
-    identical until the rule application.
-    """
-    if (root_parent := tree.branches[tree.root]) is None:
-        return [tree]
-    result = []
-    for sub_tree in split_branch(root_parent):
-        result.append(
-            Tree(root=tree.root,
-                 is_grown=True,
-                 names=tree.names,
-                 branches={tree.root: sub_tree}
-            )
-        )
-    return result            
-
-
-def split_branch(branch: dict | list) -> list[dict]:
-    """
-    The start of recursive branches for splitting trees. 
-    """
-    if isinstance(branch, dict):
-        return [split_tree_dict(branch)]
-    if isinstance(branch, list):
-        return split_tree_list(branch)
-
-
-def split_tree_dict(branch: dict) -> dict: 
-    """
-    Does the work for split_tree if the branch is a dict.
-    """
-    sub_result = {}
-    for sequent, sub_tree in branch.items():
-        if (sub_branch := branch[sequent]) is None:
-            sub_result[sequent] = None
-        else:
-            sub_result[sequent] = {sequent: r for r in split_branch(sub_branch)}
-    return sub_result
-    
-    
-def split_tree_list(branches: list) -> list[dict]:
-    """
-    Does the work for split_tree if the branch is a list.
-    """
-    result = []
-    for branch in branches:
-        result.extend(split_branch(branch))
-    return result
 
 
 def tree_to_dict(tree) -> dict:
@@ -198,63 +102,6 @@ def tree_to_dict(tree) -> dict:
             result = [serialize(element) for element in data]
         return result
     return serialize(tree.branches)
-
-
-def find_connective(string: str) -> list[str]:
-    """
-    Return a list of strings separating the main connective from 
-    surrounding propositional material. Deparenthesizes sub-
-    propositions.
-
-    >>> find_connective('A & B')
-    ['A', '&', 'B']
-    >>> find_connective('(A -> B) v (B -> A)')
-    ['(A -> B)', 'v', '(B -> A)']
-    >>> find_connective('not C')
-    ['not', 'C']
-    >>> find_connective('anything')
-    ['anything']
-    """
-    string = deparenthesize(string)
-    # Return early if the string is empty.
-    if not string: 
-        return ''
-
-    # connective keywords
-    negations = {'~', 'not'}
-    binaries = {'&', 'v', 'and', 'or', '->', 'implies'}
-    quantifiers = {'∃', '∀', 'exists', 'forall'}
-    
-    word_list = string.split(' ')
-
-    # Check for negation as main connective.
-    if (connective := word_list[0]) in negations:
-        negatum = ' '.join(word_list[1:])
-        return [connective, deparenthesize(negatum)]
-
-    # Check for quantifiers as main connective.
-    # The first slice into word_list finds a word, the second, a letter
-    if (connective := word_list[0][:-1]) in quantifiers:
-        variable = word_list[0][-1]
-        prop = ' '.join(word_list[1:])
-        return [connective, variable, deparenthesize(prop)]
-
-    # Check for binary connectives as main connective.
-    nestedness = 0
-    for i, word in enumerate(word_list):
-
-        for char in word:
-            # Increase nestedness with each '('
-            # Decrease nestedness with each ')'
-            # No change for other characters.
-            nestedness += NEST_MAP[char] if char in NEST_MAP else 0
-
-        if (connective := word) in binaries and nestedness == 0:
-            left = deparenthesize(' '.join(word_list[:i]))
-            right = deparenthesize(' '.join(word_list[i+1:]))
-            return [left, connective, right]
-    
-    return [string]
 
 
 def string_to_sequent(string: str) -> Sequent:
@@ -374,3 +221,20 @@ class ConditionalFactory:
             string_to_proposition(con)
         )
 
+
+def split_tree(tree) -> list[Tree]:
+    """
+    Return a list of all possible full trees in tree, where a full
+    tree consists only of dict[Sequent, dict | None] pairs. All
+    non-invertible rules are split into separate trees, which are
+    identical until the rule application.
+    """
+    if (root_parent := tree.branches[tree.root]) is None:
+        return [tree]
+    result = []
+    for sub_tree in split_branch(root_parent):
+        new_dict = {tree.root: sub_tree}
+        result.append(
+            dict_to_tree(new_dict)
+        )
+    return result
