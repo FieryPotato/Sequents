@@ -24,7 +24,7 @@ in config.json).
 
 __all__ = ['get_decomposer']
 
-from typing import Protocol
+from typing import Protocol, Union
 
 from sequent import Sequent
 from settings import Settings
@@ -32,8 +32,9 @@ from settings import Settings
 
 class Proposition(Protocol):
     content: tuple
-    left: 'Proposition' | str
-    right: 'Proposition' | str
+    left: 'Proposition'
+    right: 'Proposition'
+    prop: Union['Proposition', str]
     variable: str
     symb: str
 
