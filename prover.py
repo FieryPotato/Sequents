@@ -56,14 +56,13 @@ class Prover:
         the forest. Uses parallel processing if there are sufficiently
         many trees to prove.
         """
-        results: list[Tree]
+        results: itertools.starmap[Tree]
         if len(self.roots) > 10:
             with Pool() as pool:
                 results = pool.starmap(sequent_to_tree, [(root, self.names) for root in self.roots])
         else:
             results = itertools.starmap(sequent_to_tree, [(root, self.names) for root in self.roots])
         self.forest.extend(results)
-
 
     def export(self) -> dict:
         """

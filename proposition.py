@@ -198,7 +198,6 @@ class BinaryProposition(Proposition):
         return self.left, self.right
 
 
-
 @dataclass(slots=True, frozen=True, order=True)
 class Atom(UnaryProposition):
     """
@@ -271,7 +270,6 @@ class Atom(UnaryProposition):
 
         return Atom(new_content)
         
-
 
 @dataclass(slots=True, frozen=True, order=True)
 class Universal(Quantifier):

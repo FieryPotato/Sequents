@@ -19,19 +19,26 @@ from the decomposition of the initial sequent.
 The only function you should need to use, and which is only used in the
 development of trees, is get_decomposer, which returns the decomposer 
 object specific to its input sequent (accounting for the rules settings
-in config.json.
+in config.json).
 """
 
 __all__ = ['get_decomposer']
 
-from typing import Any, Protocol
+from typing import Protocol
 
 from sequent import Sequent
 from settings import Settings
 
 
 class Proposition(Protocol):
-    ...
+    content: tuple
+    left: 'Proposition' | str
+    right: 'Proposition' | str
+    variable: str
+    symb: str
+
+    def instantiate(self, variable, name) -> 'Proposition':
+        ...
 
 
 class Decomposer(Protocol):
@@ -41,6 +48,7 @@ class Decomposer(Protocol):
 
     def get_parents(self) -> dict | list | None:
         ...
+
 
 class AtomDecomposer:
     """Decomposer for axioms."""
@@ -175,6 +183,7 @@ class Rule(Protocol):
 
 class Axiom:
     """Rule for terminating tree branches."""
+
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
@@ -384,90 +393,91 @@ class LUni:
             names = set()
         self.proposition = proposition
         self.names = names
-        
+
     def apply(self) -> tuple[Sequent, ...]:
         """Apply left universal rule to self.sequent"""
         instantiated = [self.instantiate(name) for name in self.names]
         return tuple(Sequent((prop,), ()) for prop in instantiated)
-        
+
     def instantiate(self, name) -> Proposition:
         """
         Return self.proposition with bound variables replaced with name
         """
         var = self.proposition.variable
-        return self.proposition.instantiate(var, name) 
+        return self.proposition.instantiate(var, name)
 
 
 class RUni:
     is_invertible = False
     num_parents = 1
-    
+
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         if names is None:
             names = set()
         self.proposition = proposition
         self.names = names
-        
+
     def apply(self) -> tuple[Sequent, ...]:
         """Apply right universal rule to self.sequent"""
         instantiated = [self.instantiate(name) for name in self.names]
         return tuple(Sequent((), (prop,)) for prop in instantiated)
-        
+
     def instantiate(self, name) -> Proposition:
         """
         Return self.proposition with bound variables replaced with name
         """
         var = self.proposition.variable
-        return self.proposition.instantiate(var, name) 
+        return self.proposition.instantiate(var, name)
 
 
 class LExi:
     is_invertible = False
     num_parents = 1
-    
+
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         if names is None:
             names = set()
         self.proposition = proposition
         self.names = names
-        
+
     def apply(self) -> tuple[Sequent, ...]:
         """Apply left existential rule to self.sequent"""
         instantiated = [self.instantiate(name) for name in self.names]
         return tuple(Sequent((prop,), ()) for prop in instantiated)
-        
+
     def instantiate(self, name) -> Proposition:
         """
         Return self.proposition with bound variables replaced with name
         """
         var = self.proposition.variable
-        return self.proposition.instantiate(var, name) 
+        return self.proposition.instantiate(var, name)
 
 
 class RExi:
     is_invertible = False
     num_parents = 1
-    
+
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         if names is None:
             names = set()
         self.proposition = proposition
         self.names = names
-        
+
     def apply(self) -> tuple[Sequent, ...]:
         """Apply right existential rule to self.sequent"""
         instantiated = [self.instantiate(name) for name in self.names]
         return tuple(Sequent((), (prop,)) for prop in instantiated)
-        
+
     def instantiate(self, name) -> Proposition:
         """
         Return self.proposition with bound variables replaced with name
         """
         var = self.proposition.variable
-        return self.proposition.instantiate(var, name) 
+        return self.proposition.instantiate(var, name)
+
+    # Dictionary mapping connectives, sides, and types to their rule class.
 
 
-# Dictionary mapping connectives, sides, and types to their rule class.
 rules = {
     '~': {'ant': {
         'add': LNeg,
@@ -567,10 +577,12 @@ def get_rule_setting(connective, side) -> str:
     return Settings().get_rule(connective, side)
 
 
-def get_rule(proposition: Proposition, side: str, names=[]) -> Rule:
+def get_rule(proposition: Proposition, side: str, names=None) -> Rule:
     """
     Return the appropriate Rule class for input proposition and side.
     """
+    if names is None:
+        names = []
     connective = proposition.symb  # Convenience variable
     if not connective:  # Atoms have no connective
         return Axiom(proposition)
@@ -582,12 +594,11 @@ def get_rule(proposition: Proposition, side: str, names=[]) -> Rule:
 def get_decomposer(sequent: Sequent, names=None) -> Decomposer:
     """Return the appropriate decomposer for a given sequent."""
     if names is None:
-        names = {} 
+        names = {}
     if sequent.is_atomic:
         return AtomDecomposer(sequent)
-    prop, side, index = sequent.first_complex_prop() 
+    prop, side, index = sequent.first_complex_prop()
     connective = prop.symb
-    decomp_type = get_rule_setting(connective, side) 
+    decomp_type = get_rule_setting(connective, side)
     decomposer = decomposers[connective][side][decomp_type]
     return decomposer(sequent, names=names)
-

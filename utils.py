@@ -92,7 +92,7 @@ def find_connective(string: str) -> list[str]:
     string = deparenthesize(string)
     # Return early if the string is empty.
     if not string:
-        return ''
+        return ['']
 
     # connective keywords
     negations = {'~', 'not'}
