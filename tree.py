@@ -115,7 +115,6 @@ class Tree:
         }
 
 
-
     class TreeIsGrownError(Exception):
         """Trees should only be able to be grown once."""
         def __init__(self, tree) -> None:

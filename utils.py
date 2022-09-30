@@ -43,7 +43,8 @@ def deparenthesize(string: str) -> str:
 
 def split_branch(branch: dict | list) -> list[dict]:
     """
-    The start of recursive branches for splitting trees.
+    Functionally switch statement for tree splitting algorithms based 
+    on whether the input was a dict or list.
     """
     if isinstance(branch, dict):
         return [split_tree_dict(branch)]

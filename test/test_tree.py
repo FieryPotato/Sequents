@@ -701,7 +701,37 @@ class TestTreeSplitting(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     def test_c1_2pni(self) -> None:
-        self.assertTrue(False)
+        root = string_to_sequent('A, B; C & D')
+        a = {
+            root: { 
+                string_to_sequent('A, B; C'): None,
+                string_to_sequent('; D'): None
+            }
+        }
+        b = {
+            root: {
+                string_to_sequent('A; C'): None,
+                string_to_sequent('B; D'): None
+            }
+        }
+        c = {
+            root: {
+                string_to_sequent('B; C'): None,
+                string_to_sequent('A; D'): None
+            }
+        }
+        d = {
+            root: {
+                string_to_sequent('; C'): None,
+                string_to_sequent('A, B; D'): None
+            }
+        }
+        expected = [a, b, c, d]
+        with patch('rules.get_rule_setting', return_value='mul'):
+            tree = sequent_to_tree(root)
+            split = split_tree(tree)
+            actual = [t.branches for t in split]
+            self.assertEqual(expected, actual)
 
 
 if __name__ == '__main__':

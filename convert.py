@@ -83,6 +83,8 @@ def dict_to_tree(dictionary: dict, is_grown: bool = True) -> Tree:
     the is_grown parameter can be set to False to override this 
     behaviour.
     """
+    # We know that there is one and only one item in the dict but we
+    # do not kbow its key, so this is the quick way to get it.
     first_key = next(iter(dictionary.keys()))
     tree = Tree(first_key, is_grown=is_grown)
     tree.branches = dictionary
