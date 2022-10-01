@@ -611,7 +611,7 @@ class TestTree(unittest.TestCase):
                 },
                 {
                     Sequent((), (self.p,)): None,
-                    Sequent((self.p,), (self.q)): None
+                    Sequent((self.p,), (self.q,)): None
                 }
             ]
         }
