@@ -8,7 +8,7 @@ from sequent import Sequent
 
 
 class TestRules(unittest.TestCase):
-    names = ['alpha', 'beta', 'gamma']
+    names = {'alpha', 'beta', 'gamma'}
     p = Atom('P')
     q = Atom('Q')
     x = Atom('P<x>')
@@ -162,7 +162,7 @@ class TestRules(unittest.TestCase):
             with self.subTest(i=s):
                 decomposer = get_decomposer(s, names=self.names)
                 actual = decomposer.decompose()
-                self.assertEqual(e, actual)
+                self.assertEqual(sorted(e), sorted(actual))
 
 
     def test_runi_instantiates_only_nonpresent_names(self):
@@ -173,7 +173,7 @@ class TestRules(unittest.TestCase):
         ]
         decomposer = get_decomposer(s1, names=self.names)
         actual = decomposer.decompose()
-        self.assertEqual(expected, actual)
+        self.assertEqual(sorted(expected), sorted(actual))
 
 
 if __name__ == '__main__':

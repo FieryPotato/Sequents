@@ -136,7 +136,7 @@ class NonInvertibleOneParentDecomposer:
         self.rule = get_rule(prop, side, names=names)
 
     def decompose(self) -> list[Sequent]:
-        rule_result = self.rule.apply()
+        rule_result = self.rule.apply(sequent=self.sequent)
         return [
             Sequent.mix(self.removed_main_prop, result)
             for result in rule_result
@@ -184,7 +184,7 @@ class NonInvertibleTwoParentDecomposer:
 
 
 class Rule(Protocol):
-    def apply(self) -> Sequent | tuple[Sequent]:
+    def apply(self, **kwargs) -> Sequent | tuple[Sequent]:
         ...
 
 
@@ -194,7 +194,7 @@ class Axiom:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> None:
+    def apply(self, **kwargs) -> None:
         return None
 
 
@@ -205,7 +205,7 @@ class LNeg:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> Sequent:
+    def apply(self, **kwargs) -> Sequent:
         """Apply left negation rule to self.sequent."""
         return Sequent((), self.proposition.content)
 
@@ -217,7 +217,7 @@ class RNeg:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> Sequent:
+    def apply(self, **kwargs) -> Sequent:
         """Apply right negation rule to self.sequent."""
         return Sequent(self.proposition.content, ())
 
@@ -229,7 +229,7 @@ class MultLAnd:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> Sequent:
+    def apply(self, **kwargs) -> Sequent:
         """Apply multiplicative left conjunction rule to self.sequent."""
         return Sequent(self.proposition.content, ())
 
@@ -241,7 +241,7 @@ class AddLAnd:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply additive left conjunction rule to self.sequent."""
         return (Sequent((self.proposition.left,), ()),
                 Sequent((self.proposition.right,), ()))
@@ -254,7 +254,7 @@ class MultRAnd:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply multiplicative right conjunction rule to self.sequent."""
         return (
             Sequent((), (self.proposition.left,)),
@@ -269,7 +269,7 @@ class AddRAnd:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply additive right conjunction rule to self.sequent."""
         return (
             Sequent((), (self.proposition.left,)),
@@ -284,7 +284,7 @@ class MultLOr:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply multiplicative left disjunction rule to self.sequent."""
         return (
             Sequent((self.proposition.left,), ()),
@@ -299,7 +299,7 @@ class AddLOr:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply additive left disjunction rule to self.sequent."""
         return (
             Sequent((self.proposition.left,), ()),
@@ -314,7 +314,7 @@ class MultROr:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> Sequent:
+    def apply(self, **kwargs) -> Sequent:
         """Apply multiplicative right disjunction rule to self.sequent."""
         return Sequent((), self.proposition.content)
 
@@ -326,7 +326,7 @@ class AddROr:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply additive right disjunction rule to self.sequent."""
         return (
             Sequent((), (self.proposition.left,)),
@@ -341,7 +341,7 @@ class MultLIf:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply multiplicative left conditional rule to self.sequent."""
         return (
             Sequent((), (self.proposition.left,)),
@@ -356,7 +356,7 @@ class AddLIf:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply additive left conditional rule to self.sequent."""
         return (
             Sequent((), (self.proposition.left,)),
@@ -371,7 +371,7 @@ class MultRIf:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> Sequent:
+    def apply(self, **kwargs) -> Sequent:
         """Apply multiplicative right conditional rule to self.sequent."""
         return Sequent((self.proposition.left,), (self.proposition.right,))
 
@@ -383,7 +383,7 @@ class AddRIf:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply additive right conditional rule to self.sequent."""
         return (
             Sequent((self.proposition.left,), ()),
@@ -401,7 +401,7 @@ class LUni:
         self.proposition = proposition
         self.names = names
 
-    def apply(self) -> tuple[Sequent, ...]:
+    def apply(self, **kwargs) -> tuple[Sequent, ...]:
         """Apply left universal rule to self.sequent"""
         instantiated = [self.instantiate(name) for name in self.names]
         return tuple(Sequent((prop,), ()) for prop in instantiated)
@@ -424,9 +424,10 @@ class RUni:
         self.proposition = proposition
         self.names = names
 
-    def apply(self) -> tuple[Sequent, ...]:
+    def apply(self, sequent=None, **kwargs) -> tuple[Sequent, ...]:
         """Apply right universal rule to self.sequent"""
-        instantiated = [self.instantiate(name) for name in self.names]
+        legal_names = self.names - sequent.names
+        instantiated = [self.instantiate(name) for name in legal_names]
         return tuple(Sequent((), (prop,)) for prop in instantiated)
 
     def instantiate(self, name) -> Proposition:
@@ -447,7 +448,7 @@ class LExi:
         self.proposition = proposition
         self.names = names
 
-    def apply(self) -> tuple[Sequent, ...]:
+    def apply(self, **kwargs) -> tuple[Sequent, ...]:
         """Apply left existential rule to self.sequent"""
         instantiated = [self.instantiate(name) for name in self.names]
         return tuple(Sequent((prop,), ()) for prop in instantiated)
@@ -470,7 +471,7 @@ class RExi:
         self.proposition = proposition
         self.names = names
 
-    def apply(self) -> tuple[Sequent, ...]:
+    def apply(self, **kwargs) -> tuple[Sequent, ...]:
         """Apply right existential rule to self.sequent"""
         instantiated = [self.instantiate(name) for name in self.names]
         return tuple(Sequent((), (prop,)) for prop in instantiated)
