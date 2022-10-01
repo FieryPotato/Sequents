@@ -175,6 +175,17 @@ class TestRules(unittest.TestCase):
         actual = decomposer.decompose()
         self.assertEqual(sorted(expected), sorted(actual))
 
+    def test_lexi_instantiates_only_nonpresent_names(self):
+        s1 = Sequent((self.ex,), (Atom('T<gamma>'),))
+        expected = [
+            Sequent((Atom('P<alpha>'),), (Atom('T<gamma>'),)),
+            Sequent((Atom('P<beta>'),), (Atom('T<gamma>'),))
+        ]
+        decomposer = get_decomposer(s1, names=self.names)
+        actual = decomposer.decompose()
+        self.assertEqual(sorted(expected), sorted(actual))
+
+
 
 if __name__ == '__main__':
     unittest.main()

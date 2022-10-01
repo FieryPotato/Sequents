@@ -448,9 +448,10 @@ class LExi:
         self.proposition = proposition
         self.names = names
 
-    def apply(self, **kwargs) -> tuple[Sequent, ...]:
+    def apply(self, sequent=None, **kwargs) -> tuple[Sequent, ...]:
         """Apply left existential rule to self.sequent"""
-        instantiated = [self.instantiate(name) for name in self.names]
+        legal_names = self.names - sequent.names
+        instantiated = [self.instantiate(name) for name in legal_names]
         return tuple(Sequent((prop,), ()) for prop in instantiated)
 
     def instantiate(self, name) -> Proposition:
