@@ -49,6 +49,9 @@ class Decomposer(Protocol):
 
     def get_parents(self) -> dict | list | None:
         ...
+        
+    def decompose(self) -> Sequent | None:
+        ...
 
 
 class AtomDecomposer:
@@ -62,6 +65,9 @@ class AtomDecomposer:
 
     def get_parents(self) -> None:
         return None
+    
+    def decompose(self) -> None:
+        raise AttributeError('Atomic sequents cannot be decomposed.')
 
 
 class InvertibleOneParentDecomposer:

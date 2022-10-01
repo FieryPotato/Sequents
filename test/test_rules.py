@@ -165,6 +165,16 @@ class TestRules(unittest.TestCase):
                 self.assertEqual(e, actual)
 
 
+    def test_runi_instantiates_only_nonpresent_names(self):
+        s1 = Sequent((Atom('T<beta>'),), (self.un,))
+        expected = [
+            Sequent((Atom('T<beta>'),), (Atom('P<alpha>'),)),
+            Sequent((Atom('T<beta>'),), (Atom('P<gamma>'),))
+        ]
+        decomposer = get_decomposer(s1, names=self.names)
+        actual = decomposer.decompose()
+        self.assertEqual(expected, actual)
+
 
 if __name__ == '__main__':
     unittest.main()
