@@ -28,8 +28,9 @@ __all__ = ['Tree']
 from dataclasses import dataclass, field
 from typing import Protocol
 
+import utils
 from rules import get_decomposer
-from utils import count_dict_nones
+from utils import count_dict_nones, split_branch
 
 
 class Sequent(Protocol):
@@ -58,9 +59,18 @@ class Tree:
     @property
     def height(self) -> int:
         """
-        Return the proof height of this tree.
+        Return the proof height of this tree, which is just the
+        complexity of its root.
         """
         return 1 + self.root.complexity
+
+    def width(self) -> int:
+        """
+        Return the width of this tree.
+        """
+        return utils.count_dict_branches(self.branches)
+
+
 
     def leaves(self) -> int:
         """
@@ -139,35 +149,3 @@ def split_tree(tree) -> list[Tree]:
     return result
 
 
-def split_branch(branch: dict | list) -> list[dict]:
-    """
-    Functionally switch statement for tree splitting algorithms based
-    on whether the input was a dict or list.
-    """
-    if isinstance(branch, dict):
-        return [split_tree_dict(branch)]
-    if isinstance(branch, list):
-        return split_tree_list(branch)
-
-
-def split_tree_dict(branch: dict) -> dict:
-    """
-    Does the work for split_tree if the branch is a dict.
-    """
-    sub_result = {}
-    for sequent, sub_tree in branch.items():
-        if (sub_branch := branch[sequent]) is None:
-            sub_result[sequent] = None
-        else:
-            sub_result[sequent] = {sequent: r for r in split_branch(sub_branch)}
-    return sub_result
-
-
-def split_tree_list(branches: list) -> list[dict]:
-    """
-    Does the work for split_tree if the branch is a list.
-    """
-    result = []
-    for branch in branches:
-        result.extend(split_branch(branch))
-    return result

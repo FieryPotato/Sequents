@@ -1,3 +1,5 @@
+from typing import Callable, Any
+
 NEST_MAP = {'(': 1, ')': -1}
 
 
@@ -98,6 +100,22 @@ def find_connective(string: str) -> list[str]:
     return [string]
 
 
+def count_dict_branches(d: dict) -> int:
+    total = max(next(iter(d)).main_connective_arity(), 1)
+    for parents in d.values():
+        if parents is None:
+            pass
+        elif isinstance(parents, dict):
+            for parent, g_parent in parents.items():
+                total += (parent.main_connective_arity() - 1)
+                if g_parent is not None:
+                    total += count_dict_branches(g_parent)
+        elif isinstance(parents, list):
+            raise RuntimeError('Input dictionary must not contain lists.' \
+                               'Please run utils.split_branch first.')
+    return total
+
+
 def count_dict_nones(d: dict) -> int:
     total = 0
     for parents in d.values():
@@ -112,3 +130,37 @@ def count_dict_nones(d: dict) -> int:
         elif isinstance(parents, list):
             return 0
     return total
+
+
+def split_branch(branch: dict | list) -> list[dict]:
+    """
+    Functionally switch statement for tree splitting algorithms based
+    on whether the input was a dict or list.
+    """
+    if isinstance(branch, dict):
+        return [split_tree_dict(branch)]
+    if isinstance(branch, list):
+        return split_tree_list(branch)
+
+
+def split_tree_dict(branch: dict) -> dict:
+    """
+    Does the work for split_tree if the branch is a dict.
+    """
+    sub_result = {}
+    for sequent, sub_tree in branch.items():
+        if (sub_branch := branch[sequent]) is None:
+            sub_result[sequent] = None
+        else:
+            sub_result[sequent] = {sequent: r for r in split_branch(sub_branch)}
+    return sub_result
+
+
+def split_tree_list(branches: list) -> list[dict]:
+    """
+    Does the work for split_tree if the branch is a list.
+    """
+    result = []
+    for branch in branches:
+        result.extend(split_branch(branch))
+    return result

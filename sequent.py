@@ -125,6 +125,10 @@ class Sequent:
                 if prop.complexity >= 1:
                     return prop, side, i
         return None, None, None
+
+    def main_connective_arity(self) -> int:
+        prop, _, _ = self.first_complex_prop()
+        return prop.arity if prop is not None else 0
         
 
     def possible_mix_parents(self) -> list[tuple['Sequent']]:
