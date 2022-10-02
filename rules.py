@@ -19,19 +19,27 @@ from the decomposition of the initial sequent.
 The only function you should need to use, and which is only used in the
 development of trees, is get_decomposer, which returns the decomposer 
 object specific to its input sequent (accounting for the rules settings
-in config.json.
+in config.json).
 """
 
 __all__ = ['get_decomposer']
 
-from typing import Any, Protocol
+from typing import Protocol, Union
 
 from sequent import Sequent
 from settings import Settings
 
 
 class Proposition(Protocol):
-    ...
+    content: tuple
+    left: 'Proposition'
+    right: 'Proposition'
+    prop: Union['Proposition', str]
+    variable: str
+    symb: str
+
+    def instantiate(self, variable, name) -> 'Proposition':
+        ...
 
 
 class Decomposer(Protocol):
@@ -41,6 +49,10 @@ class Decomposer(Protocol):
 
     def get_parents(self) -> dict | list | None:
         ...
+        
+    def decompose(self) -> Sequent | None:
+        ...
+
 
 class AtomDecomposer:
     """Decomposer for axioms."""
@@ -53,6 +65,9 @@ class AtomDecomposer:
 
     def get_parents(self) -> None:
         return None
+    
+    def decompose(self) -> None:
+        raise AttributeError('Atomic sequents cannot be decomposed.')
 
 
 class InvertibleOneParentDecomposer:
@@ -121,7 +136,7 @@ class NonInvertibleOneParentDecomposer:
         self.rule = get_rule(prop, side, names=names)
 
     def decompose(self) -> list[Sequent]:
-        rule_result = self.rule.apply()
+        rule_result = self.rule.apply(sequent=self.sequent)
         return [
             Sequent.mix(self.removed_main_prop, result)
             for result in rule_result
@@ -169,16 +184,17 @@ class NonInvertibleTwoParentDecomposer:
 
 
 class Rule(Protocol):
-    def apply(self) -> Sequent | tuple[Sequent]:
+    def apply(self, **kwargs) -> Sequent | tuple[Sequent]:
         ...
 
 
 class Axiom:
     """Rule for terminating tree branches."""
+
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> None:
+    def apply(self, **kwargs) -> None:
         return None
 
 
@@ -189,7 +205,7 @@ class LNeg:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> Sequent:
+    def apply(self, **kwargs) -> Sequent:
         """Apply left negation rule to self.sequent."""
         return Sequent((), self.proposition.content)
 
@@ -201,7 +217,7 @@ class RNeg:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> Sequent:
+    def apply(self, **kwargs) -> Sequent:
         """Apply right negation rule to self.sequent."""
         return Sequent(self.proposition.content, ())
 
@@ -213,7 +229,7 @@ class MultLAnd:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> Sequent:
+    def apply(self, **kwargs) -> Sequent:
         """Apply multiplicative left conjunction rule to self.sequent."""
         return Sequent(self.proposition.content, ())
 
@@ -225,7 +241,7 @@ class AddLAnd:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply additive left conjunction rule to self.sequent."""
         return (Sequent((self.proposition.left,), ()),
                 Sequent((self.proposition.right,), ()))
@@ -238,7 +254,7 @@ class MultRAnd:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply multiplicative right conjunction rule to self.sequent."""
         return (
             Sequent((), (self.proposition.left,)),
@@ -253,7 +269,7 @@ class AddRAnd:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply additive right conjunction rule to self.sequent."""
         return (
             Sequent((), (self.proposition.left,)),
@@ -268,7 +284,7 @@ class MultLOr:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply multiplicative left disjunction rule to self.sequent."""
         return (
             Sequent((self.proposition.left,), ()),
@@ -283,7 +299,7 @@ class AddLOr:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply additive left disjunction rule to self.sequent."""
         return (
             Sequent((self.proposition.left,), ()),
@@ -298,7 +314,7 @@ class MultROr:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> Sequent:
+    def apply(self, **kwargs) -> Sequent:
         """Apply multiplicative right disjunction rule to self.sequent."""
         return Sequent((), self.proposition.content)
 
@@ -310,7 +326,7 @@ class AddROr:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply additive right disjunction rule to self.sequent."""
         return (
             Sequent((), (self.proposition.left,)),
@@ -325,7 +341,7 @@ class MultLIf:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply multiplicative left conditional rule to self.sequent."""
         return (
             Sequent((), (self.proposition.left,)),
@@ -340,7 +356,7 @@ class AddLIf:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply additive left conditional rule to self.sequent."""
         return (
             Sequent((), (self.proposition.left,)),
@@ -355,7 +371,7 @@ class MultRIf:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> Sequent:
+    def apply(self, **kwargs) -> Sequent:
         """Apply multiplicative right conditional rule to self.sequent."""
         return Sequent((self.proposition.left,), (self.proposition.right,))
 
@@ -367,7 +383,7 @@ class AddRIf:
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         self.proposition = proposition
 
-    def apply(self) -> tuple[Sequent, Sequent]:
+    def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply additive right conditional rule to self.sequent."""
         return (
             Sequent((self.proposition.left,), ()),
@@ -384,90 +400,93 @@ class LUni:
             names = set()
         self.proposition = proposition
         self.names = names
-        
-    def apply(self) -> tuple[Sequent, ...]:
+
+    def apply(self, **kwargs) -> tuple[Sequent, ...]:
         """Apply left universal rule to self.sequent"""
         instantiated = [self.instantiate(name) for name in self.names]
         return tuple(Sequent((prop,), ()) for prop in instantiated)
-        
+
     def instantiate(self, name) -> Proposition:
         """
         Return self.proposition with bound variables replaced with name
         """
         var = self.proposition.variable
-        return self.proposition.instantiate(var, name) 
+        return self.proposition.instantiate(var, name)
 
 
 class RUni:
     is_invertible = False
     num_parents = 1
-    
+
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         if names is None:
             names = set()
         self.proposition = proposition
         self.names = names
-        
-    def apply(self) -> tuple[Sequent, ...]:
+
+    def apply(self, sequent=None, **kwargs) -> tuple[Sequent, ...]:
         """Apply right universal rule to self.sequent"""
-        instantiated = [self.instantiate(name) for name in self.names]
+        legal_names = self.names - sequent.names
+        instantiated = [self.instantiate(name) for name in legal_names]
         return tuple(Sequent((), (prop,)) for prop in instantiated)
-        
+
     def instantiate(self, name) -> Proposition:
         """
         Return self.proposition with bound variables replaced with name
         """
         var = self.proposition.variable
-        return self.proposition.instantiate(var, name) 
+        return self.proposition.instantiate(var, name)
 
 
 class LExi:
     is_invertible = False
     num_parents = 1
-    
+
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         if names is None:
             names = set()
         self.proposition = proposition
         self.names = names
-        
-    def apply(self) -> tuple[Sequent, ...]:
+
+    def apply(self, sequent=None, **kwargs) -> tuple[Sequent, ...]:
         """Apply left existential rule to self.sequent"""
-        instantiated = [self.instantiate(name) for name in self.names]
+        legal_names = self.names - sequent.names
+        instantiated = [self.instantiate(name) for name in legal_names]
         return tuple(Sequent((prop,), ()) for prop in instantiated)
-        
+
     def instantiate(self, name) -> Proposition:
         """
         Return self.proposition with bound variables replaced with name
         """
         var = self.proposition.variable
-        return self.proposition.instantiate(var, name) 
+        return self.proposition.instantiate(var, name)
 
 
 class RExi:
     is_invertible = False
     num_parents = 1
-    
+
     def __init__(self, proposition: Proposition = None, names=None) -> None:
         if names is None:
             names = set()
         self.proposition = proposition
         self.names = names
-        
-    def apply(self) -> tuple[Sequent, ...]:
+
+    def apply(self, **kwargs) -> tuple[Sequent, ...]:
         """Apply right existential rule to self.sequent"""
         instantiated = [self.instantiate(name) for name in self.names]
         return tuple(Sequent((), (prop,)) for prop in instantiated)
-        
+
     def instantiate(self, name) -> Proposition:
         """
         Return self.proposition with bound variables replaced with name
         """
         var = self.proposition.variable
-        return self.proposition.instantiate(var, name) 
+        return self.proposition.instantiate(var, name)
+
+    # Dictionary mapping connectives, sides, and types to their rule class.
 
 
-# Dictionary mapping connectives, sides, and types to their rule class.
 rules = {
     '~': {'ant': {
         'add': LNeg,
@@ -567,10 +586,12 @@ def get_rule_setting(connective, side) -> str:
     return Settings().get_rule(connective, side)
 
 
-def get_rule(proposition: Proposition, side: str, names=[]) -> Rule:
+def get_rule(proposition: Proposition, side: str, names=None) -> Rule:
     """
     Return the appropriate Rule class for input proposition and side.
     """
+    if names is None:
+        names = []
     connective = proposition.symb  # Convenience variable
     if not connective:  # Atoms have no connective
         return Axiom(proposition)
@@ -582,12 +603,11 @@ def get_rule(proposition: Proposition, side: str, names=[]) -> Rule:
 def get_decomposer(sequent: Sequent, names=None) -> Decomposer:
     """Return the appropriate decomposer for a given sequent."""
     if names is None:
-        names = {} 
+        names = {}
     if sequent.is_atomic:
         return AtomDecomposer(sequent)
-    prop, side, index = sequent.first_complex_prop() 
+    prop, side, index = sequent.first_complex_prop()
     connective = prop.symb
-    decomp_type = get_rule_setting(connective, side) 
+    decomp_type = get_rule_setting(connective, side)
     decomposer = decomposers[connective][side][decomp_type]
     return decomposer(sequent, names=names)
-

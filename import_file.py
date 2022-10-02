@@ -8,13 +8,13 @@ bytes files are supported import file types.
 Text files are imported as a list of strings, JSON files are imported 
 as dictionaries and bytes are imported as whatever was pickled in them.
 Notably, this means that you should only import data you trust, as 
-Python's pickle module allows for abritrary code execution if used 
+Python's pickle module allows for arbitrary code execution if used
 improperly.
 """
 
 __all__ = ['get_importer']
 
-import json 
+import json
 import pickle
 
 from pathlib import Path
@@ -24,7 +24,8 @@ from typing import Any, Protocol
 class Importer(Protocol):
     """
     Protocol for importers.
-    """ 
+    """
+
     def import_(self) -> dict:
         """Import input file as lines for prover use."""
         ...
@@ -34,6 +35,7 @@ class TextImporter:
     """
     Class for importing text files.
     """
+
     def __init__(self, path) -> None:
         self.path = path
 
@@ -52,6 +54,7 @@ class JSONImporter:
     """
     Class for importing json files.
     """
+
     def __init__(self, path) -> None:
         self.path = path
 
@@ -60,30 +63,32 @@ class JSONImporter:
         with open(self.path, 'r') as file:
             data = self.validate(json.load(file))
         return data
-        
+
     def validate(self, data: dict) -> dict:
         """
         Ensure names, sequents, and forest keys are present in data.
         """
         # names comes in as a list, but we want it as a set.
         if 'names' in data:
-            data['names'] = set(names)
+            data['names'] = set(data['names'])
         else:
             data['names'] = set()
 
         if 'sequents' not in data:
             data['sequents'] = []
 
-        if 'forest' not in data: 
+        if 'forest' not in data:
             data['forest'] = []
 
         return data
+
 
 class ByteImporter:
     """
     Class for importing bytes-like objects.
     """
-    def __init__(self, path) -> dict:
+
+    def __init__(self, path) -> None:
         self.path = path
 
     def import_(self) -> Any:
@@ -102,9 +107,8 @@ def get_importer(src: str) -> Importer:
         '.json': JSONImporter,
         '': ByteImporter
     }
-    
+
     suffix = Path(src).suffix  # the file extension
     if suffix not in importers.keys():
         raise KeyError(f'{suffix} is not a supported import file type')
     return importers[suffix](src)
-

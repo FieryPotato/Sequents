@@ -8,7 +8,7 @@ from sequent import Sequent
 
 
 class TestRules(unittest.TestCase):
-    names = ['alpha', 'beta', 'gamma']
+    names = {'alpha', 'beta', 'gamma'}
     p = Atom('P')
     q = Atom('Q')
     x = Atom('P<x>')
@@ -162,7 +162,28 @@ class TestRules(unittest.TestCase):
             with self.subTest(i=s):
                 decomposer = get_decomposer(s, names=self.names)
                 actual = decomposer.decompose()
-                self.assertEqual(e, actual)
+                self.assertEqual(sorted(e), sorted(actual))
+
+
+    def test_runi_instantiates_only_nonpresent_names(self):
+        s1 = Sequent((Atom('T<beta>'),), (self.un,))
+        expected = [
+            Sequent((Atom('T<beta>'),), (Atom('P<alpha>'),)),
+            Sequent((Atom('T<beta>'),), (Atom('P<gamma>'),))
+        ]
+        decomposer = get_decomposer(s1, names=self.names)
+        actual = decomposer.decompose()
+        self.assertEqual(sorted(expected), sorted(actual))
+
+    def test_lexi_instantiates_only_nonpresent_names(self):
+        s1 = Sequent((self.ex,), (Atom('T<gamma>'),))
+        expected = [
+            Sequent((Atom('P<alpha>'),), (Atom('T<gamma>'),)),
+            Sequent((Atom('P<beta>'),), (Atom('T<gamma>'),))
+        ]
+        decomposer = get_decomposer(s1, names=self.names)
+        actual = decomposer.decompose()
+        self.assertEqual(sorted(expected), sorted(actual))
 
 
 

@@ -49,6 +49,11 @@ class Proposition(Protocol):
 class Sequent:
     ant: tuple
     con: tuple
+    
+    def __post_init__(self):
+        for side in self:
+            if not isinstance(side, tuple):
+                raise ValueError(f'Sequent sides must be of type tuple, not {type(side)}.')
 
     def __iter__(self):
         yield from (self.ant, self.con)

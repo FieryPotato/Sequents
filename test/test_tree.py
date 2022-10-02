@@ -3,10 +3,11 @@ import unittest
 
 from unittest.mock import patch
 
-from convert import dict_to_tree, tree_to_dict, string_to_sequent, sequent_to_tree
+from convert import dict_to_tree, tree_to_dict, string_to_tree, \
+    string_to_sequent, sequent_to_tree
 from proposition import Atom, Conjunction, Negation, Disjunction, Conditional
 from sequent import Sequent
-from tree import Tree
+from tree import Tree, split_tree
 
 
 class TestTree(unittest.TestCase):
@@ -610,7 +611,7 @@ class TestTree(unittest.TestCase):
                 },
                 {
                     Sequent((), (self.p,)): None,
-                    Sequent((self.p,), (self.q)): None
+                    Sequent((self.p,), (self.q,)): None
                 }
             ]
         }
@@ -642,19 +643,95 @@ class TestTree(unittest.TestCase):
             "A v B; A & B",
             "A -> B, A; B"
         ]
-        sequents = [string_to_sequent(s) for s in strings]
         leaf_numbers = 2, 1, 4, 2
-        pairs = zip(sequents, leaf_numbers)
+        pairs = zip(strings, leaf_numbers)
         for s, l in pairs:
             with self.subTest(i=s):
-                t = sequent_to_tree(s)
+                t = string_to_tree(s)
                 self.assertEqual(l, t.leaves)
 
     def test_trees_with_noninvertible_rules_have_0_leaves(self) -> None:
         string = 'forallx (Chipmunk<x> -> Sings<x>), Chipmunk<alvin>; Sings<alvin>'
-        sequent = string_to_sequent(string)   
-        tree = sequent_to_tree(sequent, names={'alvin', 'simon', 'theodore'})
+        tree = string_to_tree(string, names={'alvin', 'simon', 'theodore'})
         self.assertEqual(0, tree.leaves)
+
+
+class TestTreeSplitting(unittest.TestCase):
+    maxDiff=None
+    def test_complexity_0_tree(self) -> None:
+        t = string_to_tree('A; A')
+        self.assertEqual([t], split_tree(t))
+
+    def test_c1_1pi(self) -> None:
+        s = string_to_sequent('A & B; A, B')
+        expected = [dict_to_tree({
+            s: {string_to_sequent('A, B; A, B'): None}
+        })]
+        with patch('rules.get_rule_setting', return_value='mul'):
+            tree = sequent_to_tree(s)
+            actual = split_tree(tree)
+            self.assertEqual(expected, actual)
+
+    def test_c1_2pi(self) -> None:
+        s = string_to_sequent('A, B; A & B')
+        expected = [dict_to_tree({
+            s: {string_to_sequent('A, B; A'): None,
+                string_to_sequent('A, B; B'): None
+           }
+        })]
+        with patch('rules.get_rule_setting', return_value='add'):
+            t = sequent_to_tree(s)
+            actual = split_tree(t)
+            self.assertEqual(expected, actual)
+
+    def test_c1_1pni(self) -> None:
+        e_branch_a = {
+            Sequent((Conjunction(Atom('A'), Atom('B')),), (Atom('A'), Atom('B'))):
+                {Sequent((Atom('A'),), (Atom('A'), Atom('B'))): None}
+        }
+        e_branch_b = {
+            Sequent((Conjunction(Atom('A'), Atom('B')),), (Atom('A'), Atom('B'))):
+                {Sequent((Atom('B'),), (Atom('A'), Atom('B'))): None}
+        }
+        with patch('rules.get_rule_setting', return_value='add'):
+            tree = string_to_tree('A & B; A, B')
+            expected = [e_branch_a, e_branch_b]
+            split = split_tree(tree)
+            actual = [t.branches for t in split]
+            self.assertEqual(expected, actual)
+
+    def test_c1_2pni(self) -> None:
+        root = string_to_sequent('A, B; C & D')
+        a = {
+            root: { 
+                string_to_sequent('A, B; C'): None,
+                string_to_sequent('; D'): None
+            }
+        }
+        b = {
+            root: {
+                string_to_sequent('A; C'): None,
+                string_to_sequent('B; D'): None
+            }
+        }
+        c = {
+            root: {
+                string_to_sequent('B; C'): None,
+                string_to_sequent('A; D'): None
+            }
+        }
+        d = {
+            root: {
+                string_to_sequent('; C'): None,
+                string_to_sequent('A, B; D'): None
+            }
+        }
+        expected = [a, b, c, d]
+        with patch('rules.get_rule_setting', return_value='mul'):
+            tree = sequent_to_tree(root)
+            split = split_tree(tree)
+            actual = [t.branches for t in split]
+            self.assertEqual(expected, actual)
 
 
 if __name__ == '__main__':

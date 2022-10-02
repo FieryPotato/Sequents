@@ -28,11 +28,13 @@ __all__ = ['Tree']
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
+import utils
+
 from rules import get_decomposer
 
 
 class Sequent(Protocol):
-    ...    
+    names: set
 
 
 @dataclass(slots=True)
@@ -46,10 +48,11 @@ class Tree:
     root: Sequent
     is_grown: bool = field(default=False)
     names: set[str] = field(default_factory=set)
-    branches: dict = field(default_factory=dict, init=False)
+    branches: dict = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        self.branches.update({self.root: None})
+        if not self.branches:
+            self.branches.update({self.root: None})
         self.names.update({name for name in self.root.names})
 
     @property
@@ -113,9 +116,66 @@ class Tree:
             sequent: self.grow_branch(sequent) for sequent in seq_dict.keys()
         }
 
+
     class TreeIsGrownError(Exception):
         """Trees should only be able to be grown once."""
         def __init__(self, tree) -> None:
             m = f'The tree beginning in {tree.root} has already been decomposed.'
             super().__init__(m)
 
+
+def split_tree(tree) -> list[Tree]:
+    """
+    Return a list of all possible full trees in tree, where a full
+    tree consists only of dict[Sequent, dict | None] pairs. All
+    non-invertible rules are split into separate trees, which are
+    identical until the rule application.
+    """
+    if (root_parent := tree.branches[tree.root]) is None:
+        return [tree]
+    result = []
+    for sub_tree in split_branch(root_parent):
+        new_dict = {tree.root: sub_tree}
+        result.append(
+            Tree(
+                root=tree.root,
+                is_grown=True,
+                names=tree.names,
+                branches=new_dict
+            )
+        )
+    return result
+
+
+def split_branch(branch: dict | list) -> list[dict]:
+    """
+    Functionally switch statement for tree splitting algorithms based
+    on whether the input was a dict or list.
+    """
+    if isinstance(branch, dict):
+        return [split_tree_dict(branch)]
+    if isinstance(branch, list):
+        return split_tree_list(branch)
+
+
+def split_tree_dict(branch: dict) -> dict:
+    """
+    Does the work for split_tree if the branch is a dict.
+    """
+    sub_result = {}
+    for sequent, sub_tree in branch.items():
+        if (sub_branch := branch[sequent]) is None:
+            sub_result[sequent] = None
+        else:
+            sub_result[sequent] = {sequent: r for r in split_branch(sub_branch)}
+    return sub_result
+
+
+def split_tree_list(branches: list) -> list[dict]:
+    """
+    Does the work for split_tree if the branch is a list.
+    """
+    result = []
+    for branch in branches:
+        result.extend(split_branch(branch))
+    return result

@@ -1,7 +1,8 @@
 import unittest
 
-from convert import deparenthesize, string_to_proposition, \
-    string_to_sequent, find_connective
+from convert import string_to_proposition, \
+    string_to_sequent
+from utils import deparenthesize, find_connective
 from proposition import Atom, Conditional, Conjunction, \
     Disjunction, Negation, Universal, Existential
 from sequent import Sequent

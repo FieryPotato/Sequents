@@ -11,6 +11,7 @@ class TestSequent(unittest.TestCase):
     cj = Conjunction(p, q)
     dj = Disjunction(p, q)
     cd = Conditional(p, q)
+    propositions = p, n, cj, dj, cd
 
     def test_sequent_has_antecedent_and_consequent(self) -> None:
         s = Sequent((self.p,), (self.q,))
@@ -130,9 +131,14 @@ class TestSequent(unittest.TestCase):
         self.assertEqual(names, s1.names)
 
     def test_sequent_is_sortable(self) -> None:
-        s1 = Sequent(self.p, self.q)
-        s2 = Sequent(self.q, self.p)
+        s1 = Sequent((self.p,), (self.q,))
+        s2 = Sequent((self.q,), (self.p,))
         self.assertTrue(s1 > s2 or s1 < s2)
+
+    def test_raise_error_when_ant_or_con_is_proposition(self):
+        for p in self.propositions:
+            with self.subTest(i=p):
+                self.assertRaises(ValueError, lambda: Sequent(p, p))
 
 
 if __name__ == '__main__':

@@ -4,65 +4,24 @@ Package for converting objects of one type to another.
 
 __all__ = [
     'dict_to_tree', 'sequent_to_tree', 'string_to_proposition', 
-    'string_to_sequent'
+    'string_to_sequent', 'string_to_tree', 'tree_to_dict'
 ]
 
-from typing import Protocol
+from typing import Protocol, Type
 
-from proposition import Atom, Negation, Conjunction,\
-    Disjunction, Conditional, Universal, Existential
+import utils
+
+from proposition import Atom, Negation, Universal, Existential, Conjunction, Disjunction, Conditional
 from sequent import Sequent
 from tree import Tree
+
 
 
 class Proposition(Protocol):
     ...
 
 
-NEST_MAP = {'(': 1, ')': -1}
-
-
-def deparenthesize(string: str) -> str:
-    """
-    Remove all linked outer parentheses from input string.
-    
-    >>> deparenthesize('(one set)')
-    'one set'
-    >>> deparenthesize('((two sets))')
-    'two sets'
-    >>> deparenthesize('(nested (sets))')
-    'nested (sets)'
-    >>> deparenthesize('(unconnected) (sets)')
-    '(unconnected) (sets)'
-    """
-    # Return early if there is not string.
-    if not string:
-        return ''
-
-    # While string is bookended by parentheses.
-    while string.startswith('(') and string.endswith(')'):
-
-        # Ensure outer parentheses are connected
-        nestedness = 0
-        for i, char in enumerate(string):
-
-            # Increase nestedness with each '('
-            # Decrease nestedness with each ')'
-            # No change otherwise.
-            nestedness += NEST_MAP[char] if char in NEST_MAP else 0
-
-            # If the first and last parentheses are not connected
-            # eg. (A v B) -> (C & D)
-            if nestedness <= 0 and ((i + 1) < len(string)):
-                return string
-
-        # If they are connected, remove them and check again.
-        string = string[1:-1]
-
-    return string
-
-
-def string_to_proposition(string) -> Proposition: 
+def string_to_proposition(string) -> Proposition:
     """
     Convert input string into proposition of the appropriate type.
     Strings are split by their connective i.e.  either the symbol (&, v,
@@ -70,10 +29,10 @@ def string_to_proposition(string) -> Proposition:
     Empty strings raise a value error. If a connective word or symbol
     cannot be matched, an atom with the full string is returned.
     """
-    string = deparenthesize(string)
-    split_string: list[str] = find_connective(string)
+    string = utils.deparenthesize(string)
+    split_string: list[str] = utils.find_connective(string)
 
-    fac: PropositionFactory 
+    fac: Type[PropositionFactory]
     match split_string:
         case [left, '&' | 'and', right]:
             fac = ConjunctionFactory
@@ -94,15 +53,27 @@ def string_to_proposition(string) -> Proposition:
     return fac().get_prop(*split_string)
 
 
-def sequent_to_tree(sequent: Sequent, names: set = None) -> Tree:
+def sequent_to_tree(sequent: Sequent, names: set = None, grow: bool = True) -> Tree:
     """
     Return a solved tree whose root is the input sequent. 
     """
     if names is None:
         names = set()
     tree = Tree(sequent, names=names)
-    tree.grow()
+    if grow:
+        tree.grow()
     return tree
+
+
+def string_to_tree(string: str, names: set = None, grow: bool = True) -> Tree:
+    """
+    Combines string_to_sequent and string_to_tree as a shortcut for
+    calling both functions.
+    """
+    if names is None: 
+        names = set()
+    sequent = string_to_sequent(string)
+    return sequent_to_tree(sequent, names, grow=grow)
 
 
 def dict_to_tree(dictionary: dict, is_grown: bool = True) -> Tree:
@@ -112,6 +83,8 @@ def dict_to_tree(dictionary: dict, is_grown: bool = True) -> Tree:
     the is_grown parameter can be set to False to override this 
     behaviour.
     """
+    # We know that there is one and only one item in the dict but we
+    # do not know its key, so this is the quick way to get it.
     first_key = next(iter(dictionary.keys()))
     tree = Tree(first_key, is_grown=is_grown)
     tree.branches = dictionary
@@ -132,62 +105,6 @@ def tree_to_dict(tree) -> dict:
             result = [serialize(element) for element in data]
         return result
     return serialize(tree.branches)
-
-
-def find_connective(string: str) -> list[str]:
-    """
-    Return a list of strings separating the main connective from 
-    surrounding propositional material. Deparenthesizes sub-
-    propositions.
-
-    >>> find_connective('A & B')
-    ['A', '&', 'B']
-    >>> find_connective('(A -> B) v (B -> A)')
-    ['(A -> B)', 'v', '(B -> A)']
-    >>> find_connective('not C')
-    ['not', 'C']
-    >>> find_connective('anything')
-    ['anything']
-    """
-    string = deparenthesize(string)
-    # Return early if the string is empty.
-    if not string: 
-        return ''
-
-    # connective keywords
-    negations = {'~', 'not'}
-    binaries = {'&', 'v', 'and', 'or', '->', 'implies'}
-    quantifiers = {'∃', '∀', 'exists', 'forall'}
-    
-    word_list = string.split(' ')
-
-    # Check for negation as main connective.
-    if (connective := word_list[0]) in negations:
-        negatum = ' '.join(word_list[1:])
-        return [connective, deparenthesize(negatum)]
-
-    # Check for quantifiers as main connective.
-    if (connective := word_list[0][:-1]) in quantifiers:
-        variable = word_list[0][-1]
-        prop = ' '.join(word_list[1:])
-        return [connective, variable, deparenthesize(prop)]
-
-    # Check for binary connectives as main connective.
-    nestedness = 0
-    for i, word in enumerate(word_list):
-
-        for char in word:
-            # Increase nestedness with each '('
-            # Decrease nestedness with each ')'
-            # No change for other characters.
-            nestedness += NEST_MAP[char] if char in NEST_MAP else 0
-
-        if (connective := word) in binaries and nestedness == 0:
-            left = deparenthesize(' '.join(word_list[:i]))
-            right = deparenthesize(' '.join(word_list[i+1:]))
-            return [left, connective, right]
-    
-    return [string]
 
 
 def string_to_sequent(string: str) -> Sequent:
@@ -244,6 +161,7 @@ class PropositionFactory(Protocol):
     def get_prop(self, *content) -> Proposition:
         ...
 
+
 class AtomFactory:
     """Factory for Atoms."""
 
@@ -262,17 +180,16 @@ class NegationFactory:
 
 class UniversalFactory:
     """Factory for Universals."""
-    
+
     def get_prop(self, _, var, prop) -> Universal:
         return Universal(var, string_to_proposition(prop))
 
 
 class ExistentialFactory:
     """Factory for Existentials."""
-    
+
     def get_prop(self, _, var, prop) -> Existential:
         return Existential(var, string_to_proposition(prop))
-
 
 
 class ConjunctionFactory:
@@ -306,4 +223,3 @@ class ConditionalFactory:
             string_to_proposition(ant),
             string_to_proposition(con)
         )
-
