@@ -4,10 +4,10 @@ import unittest
 from unittest.mock import patch
 
 from convert import dict_to_tree, tree_to_dict, string_to_tree, \
-    string_to_sequent, sequent_to_tree, split_tree
+    string_to_sequent, sequent_to_tree
 from proposition import Atom, Conjunction, Negation, Disjunction, Conditional
 from sequent import Sequent
-from tree import Tree
+from tree import Tree, split_tree
 
 
 class TestTree(unittest.TestCase):

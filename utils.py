@@ -41,40 +41,6 @@ def deparenthesize(string: str) -> str:
     return string
 
 
-def split_branch(branch: dict | list) -> list[dict]:
-    """
-    Functionally switch statement for tree splitting algorithms based 
-    on whether the input was a dict or list.
-    """
-    if isinstance(branch, dict):
-        return [split_tree_dict(branch)]
-    if isinstance(branch, list):
-        return split_tree_list(branch)
-
-
-def split_tree_dict(branch: dict) -> dict:
-    """
-    Does the work for split_tree if the branch is a dict.
-    """
-    sub_result = {}
-    for sequent, sub_tree in branch.items():
-        if (sub_branch := branch[sequent]) is None:
-            sub_result[sequent] = None
-        else:
-            sub_result[sequent] = {sequent: r for r in split_branch(sub_branch)}
-    return sub_result
-
-
-def split_tree_list(branches: list) -> list[dict]:
-    """
-    Does the work for split_tree if the branch is a list.
-    """
-    result = []
-    for branch in branches:
-        result.extend(split_branch(branch))
-    return result
-
-
 def find_connective(string: str) -> list[str]:
     """
     Return a list of strings separating the main connective from

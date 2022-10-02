@@ -84,7 +84,7 @@ def dict_to_tree(dictionary: dict, is_grown: bool = True) -> Tree:
     behaviour.
     """
     # We know that there is one and only one item in the dict but we
-    # do not kbow its key, so this is the quick way to get it.
+    # do not know its key, so this is the quick way to get it.
     first_key = next(iter(dictionary.keys()))
     tree = Tree(first_key, is_grown=is_grown)
     tree.branches = dictionary
@@ -153,24 +153,6 @@ def string_to_sequent(string: str) -> Sequent:
         tuple(antecedents),
         tuple(consequents)
     )
-
-
-def split_tree(tree) -> list[Tree]:
-    """
-    Return a list of all possible full trees in tree, where a full
-    tree consists only of dict[Sequent, dict | None] pairs. All
-    non-invertible rules are split into separate trees, which are
-    identical until the rule application.
-    """
-    if (root_parent := tree.branches[tree.root]) is None:
-        return [tree]
-    result = []
-    for sub_tree in utils.split_branch(root_parent):
-        new_dict = {tree.root: sub_tree}
-        result.append(
-            dict_to_tree(new_dict)
-        )
-    return result
 
 
 class PropositionFactory(Protocol):
