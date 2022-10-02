@@ -26,15 +26,15 @@ Tree(root: str, is_grown: bool = False, names: list[str] = [])
 __all__ = ['Tree']
 
 from dataclasses import dataclass, field
-from typing import Any, Protocol
-
-import utils
+from typing import Protocol
 
 from rules import get_decomposer
+from utils import count_dict_nones
 
 
 class Sequent(Protocol):
     names: set
+    complexity: int
 
 
 @dataclass(slots=True)
@@ -56,27 +56,19 @@ class Tree:
         self.names.update({name for name in self.root.names})
 
     @property
+    def height(self) -> int:
+        """
+        Return the proof height of this tree.
+        """
+        return 1 + self.root.complexity
+
     def leaves(self) -> int:
         """
         Return the number of leaves (axioms) in self if there aren't 
         any list branches (i.e. non-invertible rules) in it. Returns 0 
         if any value in any branch is a list.
         """
-        def search_leaves(d: dict) -> int:
-            total = 0
-            for parents in d.values():
-                if parents is None:
-                    total += 1
-                elif isinstance(parents, dict):
-                    for parent in parents.values():
-                        if parent is None:
-                            total += 1
-                        elif (result := search_leaves(parent)) != 0:
-                            total += search_leaves(parent)
-                elif isinstance(parents, list):
-                    return 0
-            return total
-        return search_leaves(self.branches)
+        return count_dict_nones(self.branches)
 
 
     def grow(self):

@@ -10,7 +10,7 @@ from sequent import Sequent
 from tree import Tree, split_tree
 
 
-class TestTree(unittest.TestCase):
+class TestTreeMethods(unittest.TestCase):
     p = Atom('p')
     q = Atom('q')
     n = Negation(p)
@@ -28,6 +28,24 @@ class TestTree(unittest.TestCase):
         sequent = Sequent((self.p,), (self.q,))
         tree = Tree(sequent)
         self.assertFalse(tree.is_grown)
+
+    def test_tree_height(self) -> None:
+        strings = 'A; B', 'A v B; C', 'A v B; C v D'
+        expected = 1, 2, 3
+        with patch('rules.get_rule_setting', return_value='add'):
+            for s, e in zip(strings, expected):
+                with self.subTest(i=s):
+                    actual = string_to_tree(s).height
+                    self.assertEqual(e, actual)
+
+
+class TestTreeGrowth(unittest.TestCase):
+    p = Atom('p')
+    q = Atom('q')
+    n = Negation(p)
+    cj = Conjunction(p, q)
+    cd = Conditional(p, q)
+    dj = Disjunction(p, q)
 
     def test_tree_can_only_be_grown_once(self) -> None:
         sequent = Sequent((), ())
@@ -648,12 +666,12 @@ class TestTree(unittest.TestCase):
         for s, l in pairs:
             with self.subTest(i=s):
                 t = string_to_tree(s)
-                self.assertEqual(l, t.leaves)
+                self.assertEqual(l, t.leaves())
 
     def test_trees_with_noninvertible_rules_have_0_leaves(self) -> None:
         string = 'forallx (Chipmunk<x> -> Sings<x>), Chipmunk<alvin>; Sings<alvin>'
         tree = string_to_tree(string, names={'alvin', 'simon', 'theodore'})
-        self.assertEqual(0, tree.leaves)
+        self.assertEqual(0, tree.leaves())
 
 
 class TestTreeSplitting(unittest.TestCase):

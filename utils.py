@@ -96,3 +96,19 @@ def find_connective(string: str) -> list[str]:
             return [left, connective, right]
 
     return [string]
+
+
+def count_dict_nones(d: dict) -> int:
+    total = 0
+    for parents in d.values():
+        if parents is None:
+            total += 1
+        elif isinstance(parents, dict):
+            for parent in parents.values():
+                if parent is None:
+                    total += 1
+                elif count_dict_nones(parent) != 0:
+                    total += count_dict_nones(parent)
+        elif isinstance(parents, list):
+            return 0
+    return total
