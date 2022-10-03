@@ -30,15 +30,18 @@ non-invertible rule) to achieve it.
 
 Note that for most purposes, you should prefer to create sequents 
 using the string_to_sequent function in the convert module, rather than
-importing this module and creating them from scratch.
+importing this module and creating them from scratch, not least because
+it's very easy to input bare propositions rather than single-item
+tuples or to put in a list. If there's need for a function to turn
+other data types into sequents, I'll add one there.
 """
 
 __all__ = ['Sequent']
 
-import itertools 
-
 from dataclasses import dataclass
 from typing import Protocol
+
+import utils
 
 
 class Proposition(Protocol):
@@ -53,6 +56,9 @@ class Sequent:
     def __post_init__(self):
         for side in self:
             if not isinstance(side, tuple):
+                # I'd like to be able to convert on the fly for people
+                # not using the convert module, but I can't make sequents
+                # frozen if I do.
                 raise ValueError(f'Sequent sides must be of type tuple, not {type(side)}.')
 
     def __iter__(self):
@@ -74,8 +80,9 @@ class Sequent:
 
     @property
     def names(self) -> set[str]:
-        names = {name for side in self for prop in side for name in prop.names}
-        return names
+        # this set comprehension saves like 5 lines of nested for loops.
+        # It just collects all the names from all the props in self into a set.
+        return {name for side in self for prop in side for name in prop.names}
 
     @property
     def complexity(self) -> int:
@@ -87,7 +94,7 @@ class Sequent:
         con_complexity = sum(prop.complexity for prop in self.con)
         return ant_complexity + con_complexity
 
-    def remove(self, side: str, index: int) -> 'Sequent':
+    def remove_proposition_at(self, side: str, index: int) -> 'Sequent':
         """
         Return a new sequent object identical to this one but with the
         proposition at side, index removed.
@@ -104,7 +111,7 @@ class Sequent:
     def mix(*args) -> 'Sequent':
         """
         Return a sequent whose antecedent is the combined antecedents
-        of all seqeunts in args, and likewise for consequents.
+        of all sequents in args, and likewise for consequents.
         """
         new_ant = ()
         new_con = ()
@@ -126,26 +133,14 @@ class Sequent:
                     return prop, side, i
         return None, None, None
 
-
-    def possible_mix_parents(self) -> list[tuple['Sequent']]:
+    def possible_mix_parents(self) -> list[tuple['Sequent', 'Sequent']]:
         """
         Return a list of all possible parents this sequent may have had
         from an application of mix or another non-invertible rule.
         """
-        def two_parent_combinations(props):
-            """Yield possible combinations for props into two groups."""
-            # Represent which parent had the proposition by allocating True
-            # to one and false to the other (in all combinations).
-            combinations = itertools.product([True, False], repeat=len(props))
-            for combination in combinations:
-                # Where x is the left parent and y is the right parent
-                x = [props[i] for i, v in enumerate(combination) if v]
-                y = [props[i] for i, v in enumerate(combination) if not v]
-                yield tuple(x), tuple(y)
-
         results = []
-        for antecedents in two_parent_combinations(self.ant):
-            for consequents in two_parent_combinations(self.con):
+        for antecedents in utils.binary_combinations(self.ant):
+            for consequents in utils.binary_combinations(self.con):
                 left_parent = Sequent(antecedents[0], consequents[0])
                 right_parent = Sequent(antecedents[1], consequents[1])
                 results.append((left_parent, right_parent))

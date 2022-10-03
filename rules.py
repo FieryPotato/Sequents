@@ -80,7 +80,7 @@ class InvertibleOneParentDecomposer:
             names = set()
         self.sequent = sequent
         prop, side, index = sequent.first_complex_prop()
-        self.removed_main_prop = sequent.remove(side, index)
+        self.removed_main_prop = sequent.remove_proposition_at(side, index)
         self.rule = get_rule(prop, side, names=names)
 
     def decompose(self) -> Sequent | None:
@@ -104,7 +104,7 @@ class InvertibleTwoParentDecomposer:
             names = set()
         self.sequent = sequent
         prop, side, index = sequent.first_complex_prop()
-        self.removed_main_prop = sequent.remove(side, index)
+        self.removed_main_prop = sequent.remove_proposition_at(side, index)
         self.rule = get_rule(prop, side, names=names)
 
     def decompose(self) -> tuple[Sequent, Sequent]:
@@ -132,7 +132,7 @@ class NonInvertibleOneParentDecomposer:
             names = set()
         self.sequent = sequent
         prop, side, index = sequent.first_complex_prop()
-        self.removed_main_prop = sequent.remove(side, index)
+        self.removed_main_prop = sequent.remove_proposition_at(side, index)
         self.rule = get_rule(prop, side, names=names)
 
     def decompose(self) -> list[Sequent]:
@@ -158,7 +158,7 @@ class NonInvertibleTwoParentDecomposer:
             names = set()
         self.sequent = sequent
         prop, side, index = sequent.first_complex_prop()
-        self.removed_main_prop = sequent.remove(side, index)
+        self.removed_main_prop = sequent.remove_proposition_at(side, index)
         self.rule = get_rule(prop, side, names=names)
 
     def decompose(self) -> list[tuple[Sequent, Sequent]]:
@@ -184,7 +184,7 @@ class NonInvertibleTwoParentDecomposer:
 
 
 class Rule(Protocol):
-    def apply(self, **kwargs) -> Sequent | tuple[Sequent]:
+    def apply(self, **kwargs) -> Sequent | tuple[Sequent] | None:
         ...
 
 

@@ -56,7 +56,9 @@ class Prover:
         the forest. Uses parallel processing if there are sufficiently
         many trees to prove.
         """
-        results: itertools.starmap[Tree]
+        # 10 seems like an okay number to start, but at some point I
+        # want to figure out what a good cutoff is, where the benefits
+        # of parallelism start to outweigh the costs of pool creation.
         if len(self.roots) > 10:
             with Pool() as pool:
                 results = pool.starmap(sequent_to_tree, [(root, self.names) for root in self.roots])

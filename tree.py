@@ -28,7 +28,6 @@ __all__ = ['Tree']
 from dataclasses import dataclass, field
 from typing import Protocol
 
-import utils
 from rules import get_decomposer
 from utils import count_dict_branches, split_branch
 
@@ -111,7 +110,6 @@ class Tree:
             sequent: self.grow_branch(sequent) for sequent in seq_dict.keys()
         }
 
-
     class TreeIsGrownError(Exception):
         """Trees should only be able to be grown once."""
         def __init__(self, tree) -> None:
@@ -121,10 +119,12 @@ class Tree:
 
 def split_tree(tree) -> list[Tree]:
     """
-    Return a list of all possible full trees in tree, where a full
-    tree consists only of dict[Sequent, dict | None] pairs. All
-    non-invertible rules are split into separate trees, which are
-    identical until the rule application.
+    Return a list of all possible full trees in tree, where a full tree
+    consists only of dict[Sequent, dict | None] pairs. All non-
+    invertible rules are split into separate trees, which are identical
+    to each other up to the rule application, after which they each
+    follow one of the possibilities in the list from
+    sequent.possible_mix_parents.
     """
     if (root_parent := tree.branches[tree.root]) is None:
         return [tree]

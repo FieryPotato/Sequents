@@ -3,7 +3,7 @@ Package for converting objects of one type to another.
 """
 
 __all__ = [
-    'dict_to_tree', 'sequent_to_tree', 'string_to_proposition', 
+    'dict_to_tree', 'sequent_to_tree', 'string_to_proposition',
     'string_to_sequent', 'string_to_tree', 'tree_to_dict'
 ]
 
@@ -14,7 +14,7 @@ import utils
 from proposition import Atom, Negation, Universal, Existential, Conjunction, Disjunction, Conditional
 from sequent import Sequent
 from tree import Tree
-
+from utils import serialize
 
 
 class Proposition(Protocol):
@@ -95,15 +95,6 @@ def tree_to_dict(tree) -> dict:
     """
     Create a dictionary from a tree.
     """
-    def serialize(data):
-        """Recursively make elements of data json-serializable."""
-        result = None
-        if isinstance(data, dict):
-            result = {str(key): serialize(element) 
-                      for key, element in data.items()}
-        elif isinstance(data, list):
-            result = [serialize(element) for element in data]
-        return result
     return serialize(tree.branches)
 
 

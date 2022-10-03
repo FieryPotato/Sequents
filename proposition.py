@@ -43,8 +43,8 @@ module by using the functions in the convert module (e.g.,
 string_to_proposition) over creating these classes directly.
 """
 
-__all__ = ['Atom', 'Negation', 'Conjunction', 'Conditional', 'Disjunction', 
-    'Universal', 'Existential']
+__all__ = ['Atom', 'Negation', 'Conjunction', 'Conditional', 'Disjunction',
+           'Universal', 'Existential']
 
 import re
 
@@ -58,6 +58,7 @@ objects_re = re.compile(r'<(.*)>')
 
 # Match anything before an opening angle bracket ('<')
 predicate_re = re.compile(r'(.+)<')
+
 
 @dataclass(frozen=True, slots=True, order=True)
 class Proposition(ABC):
@@ -103,7 +104,6 @@ class Proposition(ABC):
     def names(self) -> set[str]:
         """Return a tuple of names in self.content."""
         return {name for prop in self.content for name in prop.names}
-        
 
     @property
     def unbound_variables(self) -> tuple[str]:
@@ -127,7 +127,7 @@ class UnaryProposition(Proposition):
     """
     Super class for unary propositions.
     """
-    prop: Proposition = None
+    prop: Proposition
     arity = 1
     symb = None
     variable = ''
@@ -137,7 +137,8 @@ class UnaryProposition(Proposition):
 
     @property
     def content(self) -> tuple[Proposition | str]:
-        return (self.prop,)
+        return self.prop,
+
 
 @dataclass(slots=True, frozen=True, order=True)
 class Quantifier(Proposition):
@@ -154,7 +155,7 @@ class Quantifier(Proposition):
 
     @property
     def content(self) -> tuple[Proposition]:
-        return (self.prop,)
+        return self.prop,
 
     @property
     def unbound_variables(self) -> tuple[str]:
@@ -204,8 +205,8 @@ class Atom(UnaryProposition):
     Proposition class with no logical content.
     """
     prop: str
-    symb = ''
     arity = 1
+    symb = ''
 
     def __str__(self) -> str:
         return f'{self[0]}'
@@ -219,7 +220,7 @@ class Atom(UnaryProposition):
             raise TypeError(
                 f'{self.__class__} content requires string, not {type(self.prop)}.'
             )
-    
+
     @property
     def objects(self) -> list[str]:
         """
@@ -237,9 +238,9 @@ class Atom(UnaryProposition):
         result = re.search(predicate_re, self.content[0])
         string = result.group(1)
         return [string]
-            
+
     @property
-    def names(self) -> tuple[str]:
+    def names(self) -> set[str]:
         """Return a tuple of names in self.content."""
         objects: list[str] = self.objects
         return {o for o in objects if len(o) > 1}
@@ -269,7 +270,7 @@ class Atom(UnaryProposition):
         new_content = f"{self.predicates[0]}<{', '.join(new_objects)}>"
 
         return Atom(new_content)
-        
+
 
 @dataclass(slots=True, frozen=True, order=True)
 class Universal(Quantifier):
@@ -325,4 +326,3 @@ class Disjunction(BinaryProposition):
     Binary proposition signifying logical '... or ...'
     """
     symb = 'v'
-

@@ -1,4 +1,11 @@
-from typing import Callable, Any
+"""
+Package containing a bunch of functions that might be useful enough
+not to hide away in some other file, and which mainly operate on
+builtin data types (dict, str, etc.). Most of these started out as
+inner functions that become more complex than just a line or two.
+"""
+import itertools
+from typing import Generator
 
 NEST_MAP = {'(': 1, ')': -1}
 
@@ -16,7 +23,7 @@ def deparenthesize(string: str) -> str:
     >>> deparenthesize('(unconnected) (sets)')
     '(unconnected) (sets)'
     """
-    # Return early if there is not string.
+    # Return early if the string is empty.
     if not string:
         return ''
 
@@ -52,7 +59,7 @@ def find_connective(string: str) -> list[str]:
     >>> find_connective('A & B')
     ['A', '&', 'B']
     >>> find_connective('(A -> B) v (B -> A)')
-    ['(A -> B)', 'v', '(B -> A)']
+    ['A -> B', 'v', 'B -> A']
     >>> find_connective('not C')
     ['not', 'C']
     >>> find_connective('anything')
@@ -103,18 +110,22 @@ def find_connective(string: str) -> list[str]:
 def count_dict_branches(d: dict) -> int:
     """
     Return the number of branches in d. Fails for dicts containing
-    anything other than dict[dict|None] (i.e. no lists).
+    anything other than dict[dict|None] (i.e. no lists). In the context
+    of trees, this counts the trees axioms.
     """
     total = len(parents := d.values())
     for parent in parents:
         if isinstance(parent, dict):
+            # We subtract 1 because the number of branches is constant
+            # for one-parent connectives, but increases by one for two-
+            # parent connectives.
             total += (count_dict_branches(parent) - 1)
     return total
 
 
 def split_branch(branch: dict | list) -> list[dict]:
     """
-    Functionally switch statement for tree splitting algorithms based
+    Functions as a switch statement for tree splitting algorithms based
     on whether the input was a dict or list.
     """
     if isinstance(branch, dict):
@@ -144,3 +155,29 @@ def split_tree_list(branches: list) -> list[dict]:
     for branch in branches:
         result.extend(split_branch(branch))
     return result
+
+
+def serialize(data: list | dict) -> list | dict:
+    """
+    Recursively make elements of data json-serializable.
+    """
+    result = None
+    if isinstance(data, dict):
+        result = {str(key): serialize(element)
+                  for key, element in data.items()}
+    elif isinstance(data, list):
+        result = [serialize(element) for element in data]
+    return result
+
+
+def binary_combinations(data: tuple) -> Generator[tuple[tuple, tuple], None, None]:
+    """
+    Yields all possible ways to split input data into two groups.
+    """
+    # Represent which parent had the proposition by allocating True
+    # to one and false to the other (in all combinations).
+    combinations = itertools.product([True, False], repeat=len(data))
+    for combination in combinations:
+        x = [data[i] for i, v in enumerate(combination) if v]
+        y = [data[i] for i, v in enumerate(combination) if not v]
+        yield tuple(x), tuple(y)
