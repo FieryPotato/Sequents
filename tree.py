@@ -30,7 +30,7 @@ from typing import Protocol
 
 import utils
 from rules import get_decomposer
-from utils import count_dict_nones, split_branch
+from utils import count_dict_branches, split_branch
 
 
 class Sequent(Protocol):
@@ -64,13 +64,6 @@ class Tree:
         """
         return 1 + self.root.complexity
 
-    def width(self) -> int:
-        """
-        Return the width of this tree.
-        """
-        return utils.count_dict_branches(self.branches)
-
-
 
     def leaves(self) -> int:
         """
@@ -78,7 +71,7 @@ class Tree:
         any list branches (i.e. non-invertible rules) in it. Returns 0 
         if any value in any branch is a list.
         """
-        return count_dict_nones(self.branches)
+        return count_dict_branches(self.branches)
 
 
     def grow(self):

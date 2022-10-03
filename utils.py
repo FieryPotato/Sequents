@@ -101,34 +101,14 @@ def find_connective(string: str) -> list[str]:
 
 
 def count_dict_branches(d: dict) -> int:
-    total = max(next(iter(d)).main_connective_arity(), 1)
-    for parents in d.values():
-        if parents is None:
-            pass
-        elif isinstance(parents, dict):
-            for parent, g_parent in parents.items():
-                total += (parent.main_connective_arity() - 1)
-                if g_parent is not None:
-                    total += count_dict_branches(g_parent)
-        elif isinstance(parents, list):
-            raise RuntimeError('Input dictionary must not contain lists.' \
-                               'Please run utils.split_branch first.')
-    return total
-
-
-def count_dict_nones(d: dict) -> int:
-    total = 0
-    for parents in d.values():
-        if parents is None:
-            total += 1
-        elif isinstance(parents, dict):
-            for parent in parents.values():
-                if parent is None:
-                    total += 1
-                elif count_dict_nones(parent) != 0:
-                    total += count_dict_nones(parent)
-        elif isinstance(parents, list):
-            return 0
+    """
+    Return the number of branches in d. Fails for dicts containing
+    anything other than dict[dict|None] (i.e. no lists).
+    """
+    total = len(parents := d.values())
+    for parent in parents:
+        if isinstance(parent, dict):
+            total += (count_dict_branches(parent) - 1)
     return total
 
 

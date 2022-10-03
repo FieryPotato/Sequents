@@ -41,14 +41,14 @@ class TestTreeMethods(unittest.TestCase):
     def test_tree_width(self) -> None:
         with patch('rules.get_rule_setting', return_value='add'):
             t_1 = string_to_tree('A; B')
-            self.assertEqual(1, t_1.width())
+            self.assertEqual(1, t_1.leaves())
 
             t_2 = string_to_tree('A; B & C')
-            self.assertEqual(2, t_2.width())
+            self.assertEqual(2, t_2.leaves())
 
         with patch('rules.get_rule_setting', return_value='mul'):
             t_1_ = string_to_tree('A & B; C')
-            self.assertEqual(1, t_1_.width())
+            self.assertEqual(1, t_1_.leaves())
 
 class TestTreeGrowth(unittest.TestCase):
     p = Atom('p')
@@ -678,11 +678,6 @@ class TestTreeGrowth(unittest.TestCase):
             with self.subTest(i=s):
                 t = string_to_tree(s)
                 self.assertEqual(l, t.leaves())
-
-    def test_trees_with_noninvertible_rules_have_0_leaves(self) -> None:
-        string = 'forallx (Chipmunk<x> -> Sings<x>), Chipmunk<alvin>; Sings<alvin>'
-        tree = string_to_tree(string, names={'alvin', 'simon', 'theodore'})
-        self.assertEqual(0, tree.leaves())
 
 
 class TestTreeSplitting(unittest.TestCase):
