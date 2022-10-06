@@ -55,7 +55,6 @@ class Tree:
             self.branches.update({self.root: None})
         self.names.update({name for name in self.root.names})
 
-    @property
     def height(self) -> int:
         """
         Return the proof height of this tree, which is just the
@@ -63,15 +62,13 @@ class Tree:
         """
         return 1 + self.root.complexity
 
-
-    def leaves(self) -> int:
+    def width(self) -> int:
         """
         Return the number of leaves (axioms) in self if there aren't 
         any list branches (i.e. non-invertible rules) in it. Returns 0 
         if any value in any branch is a list.
         """
         return count_dict_branches(self.branches)
-
 
     def grow(self):
         """Solve the root, then recursively solve each branch."""
@@ -112,6 +109,7 @@ class Tree:
 
     class TreeIsGrownError(Exception):
         """Trees should only be able to be grown once."""
+
         def __init__(self, tree) -> None:
             m = f'The tree beginning in {tree.root} has already been decomposed.'
             super().__init__(m)
@@ -140,5 +138,3 @@ def split_tree(tree) -> list[Tree]:
             )
         )
     return result
-
-

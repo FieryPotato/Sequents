@@ -39,7 +39,7 @@ The HTML spec for sequents is as follows:
         - ";" -> 6
     Moreover, because we cannot start with digits or hyphens followed 
     by digits, all classes will begin with an underscore to allow 
-    sequens which would begin with parentheses.
+    sequents which would begin with parentheses.
     We reserve hyphens for the class identifier. We follow sequents'
     paths from the root by going either left (l), right (r) or neither 
     (m), so that sequents with two parents always have an l and r 
@@ -57,4 +57,12 @@ The HTML spec for sequents is as follows:
     instantiated in a tree will cause collisions. I will wait to 
     implement these properly until I have a better handle on how 
     quantifiers should be decomposed.
+
+Thoughts after a bit of testing:
+    - The width of a grid should be 2 * the tree's width
+        -> one column for each leaf node, and another for its label
+    - The height of a grid should be 1 + (2 * the tree's height)
+        -> Two rows for each node, plus one for the top label
+
+
 

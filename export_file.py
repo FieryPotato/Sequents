@@ -54,15 +54,14 @@ class HTMLExporter:
     """
     Class for exporting data to an .html file for viewing.
     The plan is to eventually be able to typeset trees as an html
-    file that can be opened in any web browser. This will not be 
-    implemented until I get a handle on html and any relevant 
-    javascript.
+    file that can be opened in any web browser.
     """
     def __init__(self, file) -> None:
         self.file = file
 
     def export(self, data) -> None:
         raise NotImplementedError
+
 
 
 def get_exporter(dst: str) -> Exporter:

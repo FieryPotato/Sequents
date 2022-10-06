@@ -35,20 +35,20 @@ class TestTreeMethods(unittest.TestCase):
         with patch('rules.get_rule_setting', return_value='add'):
             for s, e in zip(strings, expected):
                 with self.subTest(i=s):
-                    actual = string_to_tree(s).height
+                    actual = string_to_tree(s).height()
                     self.assertEqual(e, actual)
 
     def test_tree_width(self) -> None:
         with patch('rules.get_rule_setting', return_value='add'):
             t_1 = string_to_tree('A; B')
-            self.assertEqual(1, t_1.leaves())
+            self.assertEqual(1, t_1.width())
 
             t_2 = string_to_tree('A; B & C')
-            self.assertEqual(2, t_2.leaves())
+            self.assertEqual(2, t_2.width())
 
         with patch('rules.get_rule_setting', return_value='mul'):
             t_1_ = string_to_tree('A & B; C')
-            self.assertEqual(1, t_1_.leaves())
+            self.assertEqual(1, t_1_.width())
 
 class TestTreeGrowth(unittest.TestCase):
     p = Atom('p')
@@ -677,7 +677,7 @@ class TestTreeGrowth(unittest.TestCase):
         for s, l in pairs:
             with self.subTest(i=s):
                 t = string_to_tree(s)
-                self.assertEqual(l, t.leaves())
+                self.assertEqual(l, t.width())
 
 
 class TestTreeSplitting(unittest.TestCase):

@@ -83,6 +83,7 @@ class Proposition(ABC):
         """
         return self.content[index]
 
+    @property
     @abstractmethod
     def content(self) -> tuple:
         """Return this object's propositional content."""
