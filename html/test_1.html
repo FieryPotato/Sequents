@@ -95,6 +95,29 @@
         ._forallx_1Human3x4_implies_Mortal3x425_Human3socrates46_Mortal3socrates4-mlt { grid-area: mlt; }
         ._forallx_1Human3x4_implies_Mortal3x425_Human3socrates46_Mortal3socrates4-mr { grid-area: mr; }
         ._forallx_1Human3x4_implies_Mortal3x425_Human3socrates46_Mortal3socrates4-mrt { grid-area: mrt; }
+        
+        /* A, (B v C) -> (D & E); F */
+        ._A5_1B_or_C2_implies_1D_and_E26_F {
+            grid-template_areas: 
+            ".   lmt .   rmt"
+            "lm  lmt rm  rmt"
+            "lm  lt  rm  rt "
+            "l   lt  r   rt "
+            "l   .   r   ft "
+            "f   f   f   ft "
+            "f   f   f   .  "
+        }
+        
+        ._A5_1B_or_C2_implies_1D_and_E26_F-f { grid-area: f }
+        ._A5_1B_or_C2_implies_1D_and_E26_F-ft { grid-area: ft }
+        ._A5_1B_or_C2_implies_1D_and_E26_F-l { grid-area: l }
+        ._A5_1B_or_C2_implies_1D_and_E26_F-lt { grid-area: lt }
+        ._A5_1B_or_C2_implies_1D_and_E26_F-r { grid-area: r }
+        ._A5_1B_or_C2_implies_1D_and_E26_F-rt { grid-area: rt }
+        ._A5_1B_or_C2_implies_1D_and_E26_F-lm { grid-area: lm }
+        ._A5_1B_or_C2_implies_1D_and_E26_F-lmt { grid-area: lmt }
+        ._A5_1B_or_C2_implies_1D_and_E26_F-rm { grid-area: rm }
+        ._A5_1B_or_C2_implies_1D_and_E26_F-rmt { grid-area: rmt }
     </style>
 </head>
 <body>
@@ -147,6 +170,19 @@
         <div class="_forallx_1Human3x4_implies_Mortal3x425_Human3socrates46_Mortal3socrates4-mlt">Ax</div>
         <div class="cell _forallx_1Human3x4_implies_Mortal3x425_Human3socrates46_Mortal3socrates4-mr">Mortal&lt;socrates&gt; &vdash; Mortal&lt;socrates&gt;</div>
         <div class="_forallx_1Human3x4_implies_Mortal3x425_Human3socrates46_Mortal3socrates4-mrt">Ax</div>
+    </div>
+    
+    <h3>A, (B &or; C) &rarr; (D &and; E) &vdash; F</h3>
+    <div class="tree _A5_1B_or_C2_implies_1D_and_E26_F">
+        <div class="cell _A5_1B_or_C2_implies_1D_and_E26_F-f">A, (B &or; C) &rarr; (D &and; E) &vdash; F</div>
+        <div class="_A5_1B_or_C2_implies_1D_and_E26_F-ft">L&rarr;</div>
+        <div class="cell _A5_1B_or_C2_implies_1D_and_E26_F-l">A &vdash; F, B &or; C</div>
+        <div class="cell _A5_1B_or_C2_implies_1D_and_E26_F-r">A, D &and; E &vdash; F</div>
+        <div class="_A5_1B_or_C2_implies_1D_and_E26_F-lt">L&or;</div>
+        <div class="cell _A5_1B_or_C2_implies_1D_and_E26_F-lm">A &vdash; F, B, C</div>
+        <div class="_A5_1B_or_C2_implies_1D_and_E26_F-lmt">R&or;</div>
+        <div class="cell _A5_1B_or_C2_implies_1D_and_E26_F-rm">A, D, E &vdash; F
+        <div class="_A5_1B_or_C2_implies_1D_and_E26_F-rmt">L&and;</div>
     </div>
 </body>
 </html>
