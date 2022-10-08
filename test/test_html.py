@@ -118,6 +118,9 @@ class TestHTMLArrayCreation(unittest.TestCase):
         self.assertEqual(e_8, a_8)
 
 
+class TestHTMLification(unittest.TestCase):
+    pass
+
 
 if __name__ == '__main__':
     unittest.main()
