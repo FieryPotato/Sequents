@@ -1,125 +1,150 @@
 import unittest
 
-from convert import string_to_tree
-from html.utils import get_array
+from convert import string_to_tree, string_to_sequent
+from html.utils import get_array, gridify
 
 
 class TestHTMLArrayCreation(unittest.TestCase):
     def test_atom(self) -> None:
         t = string_to_tree('A; B')
-        actual = get_array(t)
+        actual = get_array(t).tolist()
         expected = [
-            ['.', '.'],
-            ['.', '.'],
-            ['.', '.'],
+            [b'', b''],
+            [b'', b''],
+            [b'', b''],
         ]
         self.assertEqual(expected, actual)
 
     def test_complexity_1(self) -> None:
         t_1 = string_to_tree('A & B; C')
-        a_1 = get_array(t_1)
+        a_1 = get_array(t_1).tolist()
+
         e_1 = [
-            ['.', '.'],
-            ['.', '.'],
-            ['.', '.'],
-            ['.', '.'],
-            ['.', '.'],
+            [b'', b''],
+            [b'', b''],
+            [b'', b''],
+            [b'', b''],
+            [b'', b''],
         ]
         self.assertEqual(e_1, a_1)
 
         t_2 = string_to_tree('A; B & C')
-        a_2 = get_array(t_2)
+        a_2 = get_array(t_2).tolist()
+
         e_2 = [
-            ['.', '.', '.', '.'],
-            ['.', '.', '.', '.'],
-            ['.', '.', '.', '.'],
-            ['.', '.', '.', '.'],
-            ['.', '.', '.', '.'],
+            [b'', b'', b'', b''],
+            [b'', b'', b'', b''],
+            [b'', b'', b'', b''],
+            [b'', b'', b'', b''],
+            [b'', b'', b'', b''],
         ]
         self.assertEqual(e_2, a_2)
 
     def test_complexity_2(self) -> None:
         t_1 = string_to_tree('A; B -> (C -> D)')
-        a_1 = get_array(t_1)
+        a_1 = get_array(t_1).tolist()
+
         e_1 = [
-            ['.', '.'],
-            ['.', '.'],
-            ['.', '.'],
-            ['.', '.'],
-            ['.', '.'],
-            ['.', '.'],
-            ['.', '.'],
+            [b'', b''],
+            [b'', b''],
+            [b'', b''],
+            [b'', b''],
+            [b'', b''],
+            [b'', b''],
+            [b'', b''],
         ]
         self.assertEqual(e_1, a_1)
 
         t_2 = string_to_tree('; A & (B v C)')
-        a_2 = get_array(t_2)
+        a_2 = get_array(t_2).tolist()
+
         e_2 = [
-            ['.', '.', '.', '.'],
-            ['.', '.', '.', '.'],
-            ['.', '.', '.', '.'],
-            ['.', '.', '.', '.'],
-            ['.', '.', '.', '.'],
-            ['.', '.', '.', '.'],
-            ['.', '.', '.', '.'],
+            [b'', b'', b'', b''],
+            [b'', b'', b'', b''],
+            [b'', b'', b'', b''],
+            [b'', b'', b'', b''],
+            [b'', b'', b'', b''],
+            [b'', b'', b'', b''],
+            [b'', b'', b'', b''],
         ]
         self.assertEqual(e_2, a_2)
 
         t_5 = string_to_tree('; A v (B & C)')
-        a_5 = get_array(t_5)
+        a_5 = get_array(t_5).tolist()
+
         e_5 = [
-            ['.', '.', '.', '.'],
-            ['.', '.', '.', '.'],
-            ['.', '.', '.', '.'],
-            ['.', '.', '.', '.'],
-            ['.', '.', '.', '.'],
-            ['.', '.', '.', '.'],
-            ['.', '.', '.', '.'],
+            [b'', b'', b'', b''],
+            [b'', b'', b'', b''],
+            [b'', b'', b'', b''],
+            [b'', b'', b'', b''],
+            [b'', b'', b'', b''],
+            [b'', b'', b'', b''],
+            [b'', b'', b'', b''],
         ]
         self.assertEqual(e_5, a_5)
 
         t_6 = string_to_tree('(A v B) v C; ')
-        a_6 = get_array(t_6)
+        a_6 = get_array(t_6).tolist()
+
         e_6 = [
-            ['.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.'],
+            [b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b''],
         ]
         self.assertEqual(e_6, a_6)
 
         t_7 = string_to_tree('; A & (B & C)')
-        a_7 = get_array(t_7)
+        a_7 = get_array(t_7).tolist()
+
         e_7 = [
-            ['.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.'],
+            [b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b''],
         ]
         self.assertEqual(e_7, a_7)
 
         t_8 = string_to_tree('A v B; C & D')
-        a_8 = get_array(t_8)
+        a_8 = get_array(t_8).tolist()
+
         e_8 = [
-            ['.', '.', '.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.', '.', '.'],
-            ['.', '.', '.', '.', '.', '.', '.', '.']
+            [b'', b'', b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b'', b'', b''],
+            [b'', b'', b'', b'', b'', b'', b'', b'']
         ]
         self.assertEqual(e_8, a_8)
 
 
-class TestHTMLification(unittest.TestCase):
-    pass
+class TestGridification(unittest.TestCase):
+    def test_one(self) -> None:
+        tree = string_to_tree('A; B')
+        expected_css = [
+            ['', 'ft'],
+            ['', 'ft'],
+            ['', '' ],
+        ]
+
+        seq = string_to_sequent('A; B')
+        expected_objects = [
+            [None, seq.tag()],
+            [seq,  seq.tag()],
+            [seq,  None]
+        ]
+        expected = expected_css, expected_objects
+        actual = gridify(tree)
+        self.assertEqual(expected, actual)
+
 
 
 if __name__ == '__main__':
