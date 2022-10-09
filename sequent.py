@@ -120,6 +120,18 @@ class Sequent:
             new_con = new_con + arg.con
         return Sequent(new_ant, new_con)
 
+    def tag(self) -> str:
+        """
+        Return a string representing the rule to be applied to the 
+        first complex proposition in self.
+        """
+        prop, side, _ = self.first_complex_prop()
+        symbol = prop.symb if prop else None
+        side_map = {'ant': 'L', 'con': 'R'}
+        if symbol:
+            return side_map[side] + prop.symb  
+        return 'Ax'  
+
     def first_complex_prop(self) ->\
             tuple[Proposition, str, int] | tuple[None, None, None]:
         """

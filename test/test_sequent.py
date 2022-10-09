@@ -140,6 +140,32 @@ class TestSequent(unittest.TestCase):
             with self.subTest(i=p):
                 self.assertRaises(ValueError, lambda: Sequent(p, p))
 
+    def test_sequent_tag(self) -> None:
+        sequents = [
+            Sequent((self.p,), (self.q,)),
+            Sequent((self.n,), ()),
+            Sequent((), (self.n,)),
+            Sequent((self.cj,), ()),
+            Sequent((), (self.cj,)),
+            Sequent((self.cd,), ()),
+            Sequent((), (self.cd,)),
+            Sequent((self.dj,), ()),
+            Sequent((), (self.dj,)),
+        ]   
+        expected = [
+            'Ax',
+            'L~',
+            'R~',
+            'L&',
+            'R&',
+            'L->',
+            'R->',
+            'Lv',
+            'Rv',
+        ]
+        for s, e in zip(sequents, expected):
+            self.assertEqual(e, s.tag())
+
 
 if __name__ == '__main__':
     unittest.main()
