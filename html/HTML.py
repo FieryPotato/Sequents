@@ -6,7 +6,7 @@ from dominate import tags
 class HTML:
     def __init__(self, out_path, title='') -> None:
         self.path = out_path
-        self.file = dominate.fileument(title=title)
+        self.file = dominate.document(title=title)
 
     def __enter__(self):
         return self
