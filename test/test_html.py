@@ -1,6 +1,6 @@
 import unittest
 
-from convert import string_to_tree, string_to_sequent
+from convert import string_to_tree, string_to_sequent, sequent_to_tree
 from html.utils import get_array, gridify
 
 
@@ -127,15 +127,16 @@ class TestHTMLArrayCreation(unittest.TestCase):
 
 
 class TestGridification(unittest.TestCase):
-    def test_one(self) -> None:
-        tree = string_to_tree('A; B')
+    def test_atomic_gridify(self) -> None:
+        string = 'A; B'
+        seq = string_to_sequent(string)
+        tree = sequent_to_tree(seq)
         expected_css = [
             ['.', 'ft'],
             ['f', 'ft'],
             ['f', '.' ],
         ]
 
-        seq = string_to_sequent('A; B')
         expected_objects = [
             [None, seq.tag()],
             [str(seq),  seq.tag()],
@@ -145,7 +146,28 @@ class TestGridification(unittest.TestCase):
         actual = gridify(tree)
         self.assertEqual(expected, actual)
 
-
+    def test_c1_1p(self) -> None:
+        string = '; A -> B'
+        f = string_to_sequent(string)
+        fm = string_to_sequent('A; B')
+        tree = sequent_to_tree(f)
+        expected_css = [
+            ['.', 'fmt'],
+            ['fm', 'fmt'],
+            ['fm', 'ft'],
+            ['f', 'ft'],
+            ['f', '.']
+        ]
+        expected_objects = [
+            [None, fm.tag()],
+            [str(fm), fm.tag()],
+            [str(fm), f.tag()],
+            [str(f), f.tag()],
+            [str(f), None]
+        ]
+        expected = expected_css, expected_objects
+        actual = gridify(tree)
+        self.assertEqual(expected, actual)
 
 if __name__ == '__main__':
     unittest.main()
