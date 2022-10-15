@@ -49,10 +49,10 @@ def gridify_branch(branch: dict, css: list, objects: list,
         rightmost_index: int = len(css[0]) - 1
         if x == y == 0:
             # place tags
-            css[1][rightmost_index] = 'ft'
-            css[2][rightmost_index] = 'ft'
-            objects[1][rightmost_index] = sequent.tag()
-            objects[2][rightmost_index] = sequent.tag()
+            css[1][-1] = 'ft'
+            css[2][-1] = 'ft'
+            objects[1][-1] = sequent.tag()
+            objects[2][-1] = sequent.tag()
 
             # place objects
             for i in range(rightmost_index):
@@ -63,6 +63,19 @@ def gridify_branch(branch: dict, css: list, objects: list,
 
         elif len(parents) == 1:
             # do 1-parent gridification
-            pass
+            parent, g_parents = parents.items()
+
+            # place objects
+            css[2][0] = tag + 'm'
+            css[3][0] = tag + 'm'
+            objects[2][0] = str(parent)
+            objects[3][0] = str(parent)
+
+            # place tags
+            css[3][-1] = tag + 'mt'
+            css[4][-1] = tag + 'mt'
+            objects[3][-1] = parent.tag()
+            objects[4][-1] = parent.tag()
+
     return css, objects
 
