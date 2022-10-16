@@ -67,18 +67,17 @@ def gridify(tree: Tree) -> tuple[list, list]:
     return css, objects
 
 
-def gridify_branch(branch: dict, css: list, objects: list, tag: str = 'f') -> tuple[list, list]:
+def gridify_branch(branch: dict, css: list, objects: list, tag: str = 'f',
+        x=0, y=2) -> tuple[list, list]:
     """Do the gridify work."""
     match len(branch.values()):
         case 1:
-            gridify_one_parent_branch(branch, css, objects, tag)
+            return gridify_one_parent_branch(branch, css, objects, tag, x, y)
         case 2:
-            gridify_two_parent_branch(branch, css, objects, tag)
-
-    return css, objects
+            return gridify_two_parent_branch(branch, css, objects, tag, x, y)
 
 
-def gridify_two_parent_branch(branch, css, objects, tag):
+def gridify_two_parent_branch(branch, css, objects, tag, x, y):
     for i, items in enumerate(branch.items()):
         sequent, parents = items
         j = i + 1
@@ -95,18 +94,26 @@ def gridify_two_parent_branch(branch, css, objects, tag):
         objects[3][2 * j - 1] = sequent.tag()
         objects[4][2 * j - 1] = sequent.tag()
 
+    return css, objects
 
-def gridify_one_parent_branch(branch, css, objects, tag):
+
+def gridify_one_parent_branch(branch, css, objects, tag, x, y):
     sequent = next(iter(branch.keys()))
+    new_tag = tag + 'm'
 
     # place objects
-    css[2][0] = tag + 'm'
-    css[3][0] = tag + 'm'
-    objects[2][0] = str(sequent)
-    objects[3][0] = str(sequent)
+    css[y][0] = new_tag
+    css[y + 1][0] = new_tag
+    objects[y][0] = str(sequent)
+    objects[y + 1][0] = str(sequent)
 
     # place tags
-    css[3][-1] = tag + 'mt'
-    css[4][-1] = tag + 'mt'
-    objects[3][-1] = sequent.tag()
-    objects[4][-1] = sequent.tag()
+    css[y + 1][-1] = new_tag + 't'
+    css[y + 2][-1] = new_tag + 't'
+    objects[y + 1][-1] = sequent.tag()
+    objects[y + 2][-1] = sequent.tag()
+
+    if (parent := branch[sequent]) is None:
+        return css, objects
+    return gridify_branch(parent, css, objects, tag=new_tag, x=x, y = y + 2) 
+
