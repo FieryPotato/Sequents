@@ -19,9 +19,8 @@ ARRAY_VALS = {
 }
 
 TAG_VALS = {
-    0: 'm',
-    1: 'l',
-    2: 'r'
+    0: 'l',
+    1: 'r',
 }
 
 
@@ -68,36 +67,48 @@ def gridify(tree: Tree) -> tuple[list, list]:
 
 
 def gridify_branch(branch: dict, css: list, objects: list, tag: str = 'f',
-        x=0, y=2) -> tuple[list, list]:
+        x_start=0, x_end=-1, y=2) -> tuple[list, list]:
     """Do the gridify work."""
     match len(branch.values()):
         case 1:
-            return gridify_one_parent_branch(branch, css, objects, tag, x, y)
+            return gridify_one_parent_branch(
+                branch, css, objects, tag, x_start, x_end, y
+            )
         case 2:
-            return gridify_two_parent_branch(branch, css, objects, tag, x, y)
+            return gridify_two_parent_branch(
+                branch, css, objects, tag, x_start, x_end, y
+            )
 
 
-def gridify_two_parent_branch(branch, css, objects, tag, x, y):
+def gridify_two_parent_branch(branch, css, objects, tag, x_start, x_end, y):
     for i, items in enumerate(branch.items()):
         sequent, parents = items
         j = i + 1
+        new_x_start = 2 * i
+        new_x_end = 2 * j - 1
+        new_tag = tag + TAG_VALS[i]
 
         # place objects
-        css[2][2 * i] = tag + TAG_VALS[j]
-        css[3][2 * i] = tag + TAG_VALS[j]
-        objects[2][2 * i] = str(sequent)
-        objects[3][2 * i] = str(sequent)
+        css[y][new_x_start] = new_tag
+        css[y + 1][new_x_start] = new_tag
+        objects[y][new_x_start] = str(sequent)
+        objects[y + 1][new_x_start] = str(sequent)
 
         # place tags
-        css[3][2 * j - 1] = tag + TAG_VALS[j] + 't'
-        css[4][2 * j - 1] = tag + TAG_VALS[j] + 't'
-        objects[3][2 * j - 1] = sequent.tag()
-        objects[4][2 * j - 1] = sequent.tag()
+        css[y + 1][new_x_end] = new_tag + 't'
+        css[y + 2][new_x_end] = new_tag + 't'
+        objects[y + 1][new_x_end] = sequent.tag()
+        objects[y + 2][new_x_end] = sequent.tag()
+    
+        if parents is not None:
+            css, objects = gridify_branch(
+                parents, css, objects, new_tag, x_start=new_x_start, x_end=new_x_end, y=y + 2
+            )
 
     return css, objects
 
 
-def gridify_one_parent_branch(branch, css, objects, tag, x, y):
+def gridify_one_parent_branch(branch, css, objects, tag, x_start, x_end, y):
     sequent = next(iter(branch.keys()))
     new_tag = tag + 'm'
 
@@ -115,5 +126,6 @@ def gridify_one_parent_branch(branch, css, objects, tag, x, y):
 
     if (parent := branch[sequent]) is None:
         return css, objects
-    return gridify_branch(parent, css, objects, tag=new_tag, x=x, y = y + 2) 
-
+    return gridify_branch(
+        parent, css, objects, tag=new_tag, x_start=x_start, x_end=x_end, y = y + 2
+    )
