@@ -53,7 +53,7 @@ def gridify(tree: Tree) -> tuple[list, list]:
         objects[1][i] = str(root)
 
     if branches is not None:
-        css, objects = gridify_branch(tree.branches, css, objects, 
+        css, objects = gridify_branch(branches, css, objects, 
             x=0, y=2)       
     css.reverse()
     objects.reverse()
@@ -64,21 +64,18 @@ def gridify_branch(branch: dict, css: list, objects: list,
     """Do the gridify work."""
     for sequent, parents in branch.items():
         rightmost_index: int = len(css[0]) - 1
-        if len(parents) == 1:
-            # do 1-parent gridification
-            parent, g_parents = parents.items()
 
-            # place objects
-            css[2][0] = tag + 'm'
-            css[3][0] = tag + 'm'
-            objects[2][0] = str(parent)
-            objects[3][0] = str(parent)
+        # place objects
+        css[2][0] = tag + 'm'
+        css[3][0] = tag + 'm'
+        objects[2][0] = str(sequent)
+        objects[3][0] = str(sequent)
 
-            # place tags
-            css[3][-1] = tag + 'mt'
-            css[4][-1] = tag + 'mt'
-            objects[3][-1] = parent.tag()
-            objects[4][-1] = parent.tag()
+        # place tags
+        css[3][-1] = tag + 'mt'
+        css[4][-1] = tag + 'mt'
+        objects[3][-1] = sequent.tag()
+        objects[4][-1] = sequent.tag()
 
     return css, objects
 
