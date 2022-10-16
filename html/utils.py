@@ -37,7 +37,24 @@ def gridify(tree: Tree) -> tuple[list, list]:
 
     css = get_array(tree, dtype='css')
     objects = get_array(tree, dtype=None)
-    css, objects = gridify_branch(tree.branches, css, objects)       
+
+    root, branches = next(iter(tree.branches.items()))
+    
+    # place root tags
+    css[1][-1] = 'ft'
+    css[2][-1] = 'ft'
+    objects[1][-1] = root.tag()
+    objects[2][-1] = root.tag()
+
+    for i in range(len(css[0]) - 1):
+        css[0][i] = 'f'
+        css[1][i] = 'f'
+        objects[0][i] = str(root)
+        objects[1][i] = str(root)
+
+    if branches is not None:
+        css, objects = gridify_branch(tree.branches, css, objects, 
+            x=0, y=2)       
     css.reverse()
     objects.reverse()
     return css, objects
@@ -47,21 +64,7 @@ def gridify_branch(branch: dict, css: list, objects: list,
     """Do the gridify work."""
     for sequent, parents in branch.items():
         rightmost_index: int = len(css[0]) - 1
-        if x == y == 0:
-            # place tags
-            css[1][-1] = 'ft'
-            css[2][-1] = 'ft'
-            objects[1][-1] = sequent.tag()
-            objects[2][-1] = sequent.tag()
-
-            # place objects
-            for i in range(rightmost_index):
-                css[0][i] = 'f'
-                css[1][i] = 'f'
-                objects[0][i] = str(sequent)
-                objects[1][i] = str(sequent)
-
-        elif len(parents) == 1:
+        if len(parents) == 1:
             # do 1-parent gridification
             parent, g_parents = parents.items()
 
