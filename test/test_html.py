@@ -143,8 +143,11 @@ class TestGridification(unittest.TestCase):
             [str(seq),  None]
         ]
         expected = expected_css, expected_objects
+        sub_test_strings = 'css', 'objects'
         actual = gridify(tree)
-        self.assertEqual(expected, actual)
+        for e, a, s in zip(expected, actual, sub_test_strings):
+            with self.subTest(i=s):
+                self.assertEqual(e, a)
 
     def test_c1_1p(self) -> None:
         string = '; A -> B'
@@ -152,22 +155,53 @@ class TestGridification(unittest.TestCase):
         fm = string_to_sequent('A; B')
         tree = sequent_to_tree(f)
         expected_css = [
-            ['.', 'fmt'],
+            ['.',  'fmt'],
             ['fm', 'fmt'],
             ['fm', 'ft'],
-            ['f', 'ft'],
-            ['f', '.']
+            ['f',  'ft'],
+            ['f',  '.']
         ]
         expected_objects = [
-            [None, fm.tag()],
+            [None,    fm.tag()],
             [str(fm), fm.tag()],
             [str(fm), f.tag()],
-            [str(f), f.tag()],
-            [str(f), None]
+            [str(f),  f.tag()],
+            [str(f),  None]
+        ]
+        expected = expected_css, expected_objects
+        sub_test_strings = 'css', 'objects'
+        actual = gridify(tree)
+        for e, a, s in zip(expected, actual, sub_test_strings):
+            with self.subTest(i=s):
+                self.assertEqual(e, a)
+
+    def test_c1_2p(self) -> None:
+        string = 'A -> B;'
+        f = string_to_sequent(string)
+        fl = string_to_sequent('; A')
+        fr = string_to_sequent('B; ')
+        tree = sequent_to_tree(f)
+        expected_css = [
+            ['.',  'flt', '.',  'frt'],
+            ['fl', 'flt', 'fr', 'frt'],
+            ['fl', '.',   'fr', 'ft'],
+            ['f',  'f',   'f',  'ft'],
+            ['f',  'f',   'f',  '.']
+        ]
+        expected_objects = [
+            [None, fl.tag(), None, fr.tag()],
+            [str(fl),   fl.tag(),      str(fr),   fr.tag()],
+            [str(fl),   None,          str(fr),   f.tag()],
+            [str(f),    str(f),        str(f),    f.tag()],
+            [str(f),    str(f),        str(f),    None]
         ]
         expected = expected_css, expected_objects
         actual = gridify(tree)
-        self.assertEqual(expected, actual)
+        sub_test_strings = 'css', 'objects'
+        for e, a, s in zip(expected, actual, sub_test_strings):
+            with self.subTest(i=s):
+                self.assertEqual(e, a)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -62,20 +62,40 @@ def gridify(tree: Tree) -> tuple[list, list]:
 def gridify_branch(branch: dict, css: list, objects: list,
         x: int = 0, y: int = 0, tag: str = 'f') -> tuple[list, list]:
     """Do the gridify work."""
-    for sequent, parents in branch.items():
-        rightmost_index: int = len(css[0]) - 1
+    mymap = {
+        0: 'm',
+        1: 'l',
+        2: 'r'
+    }
+    for i, items in enumerate(branch.items()):
+        sequent, parents = items
+        if len(branch.values()) == 1:
+            # place objects
+            css[2][0] = tag + 'm'
+            css[3][0] = tag + 'm'
+            objects[2][0] = str(sequent)
+            objects[3][0] = str(sequent)
 
-        # place objects
-        css[2][0] = tag + 'm'
-        css[3][0] = tag + 'm'
-        objects[2][0] = str(sequent)
-        objects[3][0] = str(sequent)
+            # place tags
+            css[3][-1] = tag + 'mt'
+            css[4][-1] = tag + 'mt'
+            objects[3][-1] = sequent.tag()
+            objects[4][-1] = sequent.tag()
 
-        # place tags
-        css[3][-1] = tag + 'mt'
-        css[4][-1] = tag + 'mt'
-        objects[3][-1] = sequent.tag()
-        objects[4][-1] = sequent.tag()
+        elif len(branch.values()) == 2:
+            j = i + 1
+
+            # place objects
+            css[2][2 * i] = tag + mymap[j]
+            css[3][2 * i] = tag + mymap[j]
+            objects[2][2 * i] = str(sequent)
+            objects[3][2 * i] = str(sequent)
+
+            # place tags
+            css[3][2 * j - 1] = tag + mymap[j] + 't'
+            css[4][2 * j - 1] = tag + mymap[j] + 't'
+            objects[3][2 * j - 1] = sequent.tag()
+            objects[4][2 * j - 1] = sequent.tag()
 
     return css, objects
 
