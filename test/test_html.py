@@ -266,6 +266,38 @@ class TestGridification(unittest.TestCase):
             with self.subTest(i=s):
                 self.assertEqual(e, a)
 
+    def test_c2_1_2(self) -> None:
+        string = 'A & B; A & B'
+        f = string_to_sequent(string)
+        fm = string_to_sequent('A, B; A & B')
+        fml = string_to_sequent('A, B; A')
+        fmr = string_to_sequent('A, B; B')
+        tree = sequent_to_tree(f)
+        expected_css = [
+            ['.', 'fmlt', '.', 'fmrt'],
+            ['fml', 'fmlt', 'fmr', 'fmrt'],
+            ['fml', '.', 'fmr',' fmt'],
+            ['fm', 'fm', 'fm', 'fmt'],
+            ['fm', 'fm', 'fm', 'ft'],
+            ['f', 'f', 'f', 'ft'],
+            ['f', 'f', 'f', '.'],
+        ]
+        expected_objects = [
+            [None, fml.tag(), None, fmr.tag()],
+            [fml, fml.tag(), fmr, fmr.tag()],
+            [fml, None, fmr, fm.tag()],
+            [fm, fm, fm, fm.tag()],
+            [fm, fm, fm, f.tag()],
+            [f, f, f, f.tag()],
+            [f, f, f, None]
+        ]
+        expected = expected_css, expected_objects
+        actual = gridify(tree)
+        sub_test_strings = 'css', 'objects'
+        for e, a, s in zip(expected, actual, sub_test_strings):
+            with self.subTest(i=s):
+                self.assertEqual(e, a)
+
 
 if __name__ == '__main__':
     unittest.main()
