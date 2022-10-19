@@ -68,7 +68,7 @@ def gridify(tree: Tree) -> tuple[list, list]:
 
 def gridify_branch(branch: dict, css: list, objects: list, tag: str = 'f',
         x_start=0, x_end=-1, y=2) -> tuple[list, list]:
-    """Do the gridify work."""
+    """Returned tuple contains css and objects in that order."""
     match len(branch.values()):
         case 1:
             return gridify_one_parent_branch(
@@ -78,31 +78,32 @@ def gridify_branch(branch: dict, css: list, objects: list, tag: str = 'f',
             return gridify_two_parent_branch(
                 branch, css, objects, tag, x_start, x_end, y
             )
-
+        case _:
+            raise ValueError(f'Malformed branch: {branch}')
 
 def gridify_two_parent_branch(branch, css, objects, tag, x_start, x_end, y):
     for i, items in enumerate(branch.items()):
         sequent, parents = items
-        j = i + 1
-        new_x_start = 2 * i
-        new_x_end = 2 * j - 1
         new_tag = tag + TAG_VALS[i]
+        j = i + 1
+        x_start = 2 * i
+        x_end = 2 * j - 1
 
         # place objects
-        css[y][new_x_start] = new_tag
-        css[y + 1][new_x_start] = new_tag
-        objects[y][new_x_start] = str(sequent)
-        objects[y + 1][new_x_start] = str(sequent)
+        css[y][x_start] = new_tag
+        css[y + 1][x_start] = new_tag
+        objects[y][x_start] = str(sequent)
+        objects[y + 1][x_start] = str(sequent)
 
         # place tags
-        css[y + 1][new_x_end] = new_tag + 't'
-        css[y + 2][new_x_end] = new_tag + 't'
-        objects[y + 1][new_x_end] = sequent.tag()
-        objects[y + 2][new_x_end] = sequent.tag()
+        css[y + 1][x_end] = new_tag + 't'
+        css[y + 2][x_end] = new_tag + 't'
+        objects[y + 1][x_end] = sequent.tag()
+        objects[y + 2][x_end] = sequent.tag()
     
         if parents is not None:
             css, objects = gridify_branch(
-                parents, css, objects, new_tag, x_start=new_x_start, x_end=new_x_end, y=y + 2
+                parents, css, objects, new_tag, x_start=x_start, x_end=x_end, y=y + 2
             )
 
     return css, objects
@@ -113,16 +114,16 @@ def gridify_one_parent_branch(branch, css, objects, tag, x_start, x_end, y):
     new_tag = tag + 'm'
 
     # place objects
-    css[y][0] = new_tag
-    css[y + 1][0] = new_tag
-    objects[y][0] = str(sequent)
-    objects[y + 1][0] = str(sequent)
+    css[y][x_start] = new_tag
+    css[y + 1][x_start] = new_tag
+    objects[y][x_start] = str(sequent)
+    objects[y + 1][x_start] = str(sequent)
 
     # place tags
-    css[y + 1][-1] = new_tag + 't'
-    css[y + 2][-1] = new_tag + 't'
-    objects[y + 1][-1] = sequent.tag()
-    objects[y + 2][-1] = sequent.tag()
+    css[y + 1][x_end] = new_tag + 't'
+    css[y + 2][x_end] = new_tag + 't'
+    objects[y + 1][x_end] = sequent.tag()
+    objects[y + 2][x_end] = sequent.tag()
 
     if (parent := branch[sequent]) is None:
         return css, objects
