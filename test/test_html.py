@@ -298,6 +298,39 @@ class TestGridification(unittest.TestCase):
             with self.subTest(i=s):
                 self.assertEqual(e, a)
 
+    def test_lopsided_tree(self) -> None:
+        string = '(A v B) v C;'
+        f = string_to_sequent(string)
+        fl = string_to_sequent('A v B;')
+        fr = string_to_sequent('C;')
+        fll = string_to_sequent('A;')
+        flr = string_to_sequent('B;')
+        tree = string_to_tree(string)
+        expected_css = [
+            ['.',   'fllt', '.',   'flrt', '.',  '.'],
+            ['fll', 'fllt', 'flr', 'flrt', '.',  '.'],
+            ['fll', '.',    'flr', 'flt',  '.',  'frt'],
+            ['fl',  'fl',   'fl',  'flt',  'fr', 'frt'],
+            ['fl',  'fl',   'fl',  '.',    'fr', 'ft'],
+            ['f',   'f',    'f',   'f',    'f',  'ft'],
+            ['f',   'f',    'f',   'f',    'f',  '.']
+        ]
+        expected_objects = [
+            [None, fll.tag(), None, flr.tag(), None, None],
+            [str(fll), fll.tag(), str(flr), flr.tag(), None, None],
+            [str(fll), None, str(flr), fl.tag(), None, fr.tag()],
+            [str(fl), str(fl), str(fl), fl.tag(), str(fr), fr.tag()],
+            [str(fl), str(fl), str(fl), None, str(fr), f.tag()],
+            [str(f), str(f), str(f), str(f), str(f), f.tag()],
+            [str(f), str(f), str(f), str(f), str(f), None]
+        ]
+        expected = expected_css, expected_objects
+        actual = gridify(tree)
+        sub_test_strings = 'css', 'objects'
+        for e, a, s in zip(expected, actual, sub_test_strings):
+            with self.subTest(i=s):
+                self.assertEqual(e, a)
+
 
 if __name__ == '__main__':
     unittest.main()
