@@ -60,7 +60,9 @@ def gridify(tree: Tree) -> tuple[list, list]:
         objects[1][i] = str(root)
 
     if branches is not None:
-        css, objects = gridify_branch(branches, css, objects)
+        css, objects = gridify_branch(
+            branches, css, objects, tag='f', x_start=0, x_end=len(css[0]), y=2
+        )
     css.reverse()
     objects.reverse()
     return css, objects
@@ -112,18 +114,20 @@ def gridify_two_parent_branch(branch, css, objects, tag, x_start, x_end, y):
 def gridify_one_parent_branch(branch, css, objects, tag, x_start, x_end, y):
     sequent = next(iter(branch.keys()))
     new_tag = tag + 'm'
+    array_end = x_end if x_end != len(css[0]) else x_end - 1
 
     # place objects
-    css[y][x_start] = new_tag
-    css[y + 1][x_start] = new_tag
-    objects[y][x_start] = str(sequent)
-    objects[y + 1][x_start] = str(sequent)
+    for i in range(x_start, array_end):
+        css[y][i] = new_tag
+        css[y + 1][i] = new_tag
+        objects[y][i] = str(sequent)
+        objects[y + 1][i] = str(sequent)
 
     # place tags
-    css[y + 1][x_end] = new_tag + 't'
-    css[y + 2][x_end] = new_tag + 't'
-    objects[y + 1][x_end] = sequent.tag()
-    objects[y + 2][x_end] = sequent.tag()
+    css[y + 1][array_end] = new_tag + 't'
+    css[y + 2][array_end] = new_tag + 't'
+    objects[y + 1][array_end] = sequent.tag()
+    objects[y + 2][array_end] = sequent.tag()
 
     if (parent := branch[sequent]) is None:
         return css, objects

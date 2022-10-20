@@ -276,7 +276,7 @@ class TestGridification(unittest.TestCase):
         expected_css = [
             ['.', 'fmlt', '.', 'fmrt'],
             ['fml', 'fmlt', 'fmr', 'fmrt'],
-            ['fml', '.', 'fmr',' fmt'],
+            ['fml', '.', 'fmr','fmt'],
             ['fm', 'fm', 'fm', 'fmt'],
             ['fm', 'fm', 'fm', 'ft'],
             ['f', 'f', 'f', 'ft'],
@@ -284,12 +284,12 @@ class TestGridification(unittest.TestCase):
         ]
         expected_objects = [
             [None, fml.tag(), None, fmr.tag()],
-            [fml, fml.tag(), fmr, fmr.tag()],
-            [fml, None, fmr, fm.tag()],
-            [fm, fm, fm, fm.tag()],
-            [fm, fm, fm, f.tag()],
-            [f, f, f, f.tag()],
-            [f, f, f, None]
+            [str(fml), fml.tag(), str(fmr), fmr.tag()],
+            [str(fml), None, str(fmr), fm.tag()],
+            [str(fm), str(fm), str(fm), fm.tag()],
+            [str(fm), str(fm), str(fm), f.tag()],
+            [str(f), str(f), str(f), f.tag()],
+            [str(f), str(f), str(f), None]
         ]
         expected = expected_css, expected_objects
         actual = gridify(tree)
