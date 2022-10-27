@@ -298,6 +298,44 @@ class TestGridification(unittest.TestCase):
             with self.subTest(i=s):
                 self.assertEqual(e, a)
 
+    def test_c2_2_2(self) -> None:
+        string = 'A v B; C & D'
+        f = string_to_sequent(string)
+        fl = string_to_sequent('A; C & D')
+        fr = string_to_sequent('B; C & D')
+        fll = string_to_sequent('A; C')
+        flr = string_to_sequent('A; D')
+        frl = string_to_sequent('B; C')
+        frr = string_to_sequent('B; D')
+        tree = string_to_tree(string)
+        expected_css = [
+            ['.',   'fllt', '.',   'flrt', '.',   'frlt', '.',   'frrt'],
+            ['fll', 'fllt', 'flr', 'flrt', 'frl', 'frlt', 'frr', 'frrt'],
+            ['fll', '.',    'flr', 'flt',  'frl', '.',    'frr', 'frt'],
+            ['fl',  'fl',   'fl',  'flt',  'fr',  'fr',   'fr',  'frt'],
+            ['fl',  'fl',   'fl',  '.',    'fr',  'fr',   'fr',  'ft'],
+            ['f',   'f',    'f',   'f',    'f',   'f',    'f',   'ft'],
+            ['f',   'f',    'f',   'f',    'f',   'f',    'f',   '.'],
+        ]
+        expected_objects = [
+            [None,     fll.tag(), None,     flr.tag(), None,     frl.tag(), None,     frr.tag()],
+            [str(fll), fll.tag(), str(flr), flr.tag(), str(frl), frl.tag(), str(frr), frr.tag()],
+            [str(fll), None,      str(flr), fl.tag(),  str(frl), None,      str(frr), fr.tag()],
+            [str(fl),  str(fl),   str(fl),  fl.tag(),  str(fr),  str(fr),   str(fr),  fr.tag()], 
+            [str(fl),  str(fl),   str(fl),  None,      str(fr),  str(fr),   str(fr),  f.tag()],
+            [str(f),   str(f),    str(f),   str(f),    str(f),   str(f),    str(f),   f.tag()], 
+            [str(f),   str(f),    str(f),   str(f),    str(f),   str(f),    str(f),   None], 
+        ]
+        expected = expected_css, expected_objects
+        actual = gridify(tree)
+        sub_test_strings = 'css', 'objects'
+        for e, a, s in zip(expected, actual, sub_test_strings):
+            with self.subTest(i=s):
+                self.assertEqual(e, a)
+
+
+
+    @unittest.skip('to be done after 2-2 trees are solved')
     def test_lopsided_tree(self) -> None:
         string = '(A v B) v C;'
         f = string_to_sequent(string)
