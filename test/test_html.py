@@ -368,5 +368,39 @@ class TestGridification(unittest.TestCase):
                 self.assertEqual(e, a)
 
 
+    def test_lopsided_right_tree(self) -> None:
+        string = '; A & (B & C)'
+        f = string_to_sequent(string)
+        fl = string_to_sequent('; A')
+        fr = string_to_sequent('; (B & C)')
+        frl = string_to_sequent('; B')
+        frr = string_to_sequent('; C')
+        tree = string_to_tree(string)
+        expected_css = [
+            ['.',   '.',   '.',   'frlt', '.',    'frrt'],
+            ['.',   '.',   'frl', 'frlt', 'frr',  'frrt'],
+            ['.',   'flt', 'frl', '.' ,   'frr',  'frt'],
+            ['fl',  'flt', 'fr',  'fr',   'fr',   'frt'],
+            ['fl',  '.',   'fr',  'fr',   'fr',   'ft'],
+            ['f',   'f',   'f',   'f',    'f',    'ft'],
+            ['f',   'f',   'f',   'f',    'f',    '.']
+        ]
+        expected_objects = [
+            [None,     None,     None,     frl.tag(), None,      frr.tag()],
+            [None,     None,     str(frl), frl.tag(), str(frr),  frr.tag()],
+            [None,     fl.tag(), str(frl), None ,     str(frr),  fr.tag()],
+            [str(fl),  fl.tag(), str(fr),  str(fr),   str(fr),   fr.tag()],
+            [str(fl),  None,     str(fr),  str(fr),   str(fr),   f.tag()],
+            [str(f),   str(f),   str(f),   str(f),    str(f),    f.tag()],
+            [str(f),   str(f),   str(f),   str(f),    str(f),    None]
+        ]
+        expected = expected_css, expected_objects
+        actual = gridify(tree)
+        sub_test_strings = 'css', 'objects'
+        for e, a, s in zip(expected, actual, sub_test_strings):
+            with self.subTest(i=s):
+                self.assertEqual(e, a)
+
+
 if __name__ == '__main__':
     unittest.main()

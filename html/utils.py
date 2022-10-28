@@ -105,7 +105,7 @@ def gridify_two_parent_branch(branch, css, objects, tag, x_start, x_end, y):
         new_x_start = x_start if not i else x_start + (2 * parent_lengths[0])
         # Left branches use x_start plus the width of the left branch (minus 1)
         # Right branches use x_end.
-        new_x_end = x_end if i else (x_start + 2 * parent_lengths[i]) - 1
+        new_x_end = x_end if i else (x_start + 2 * parent_lengths[0]) - 1
 
         # Place objects
         for j in range(new_x_start, new_x_end):
