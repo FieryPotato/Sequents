@@ -125,25 +125,26 @@ class Sequent:
         Return a string representing the rule to be applied to the 
         first complex proposition in self.
         """
-        prop, side, _ = self.first_complex_prop()
-        symbol = prop.symb if prop else None
-        side_map = {'ant': 'L', 'con': 'R'}
-        if symbol:
-            return side_map[side] + prop.symb  
-        return 'Ax'  
+        if (proposition := self.first_complex_prop()) is None:
+            return 'Ax'
+        else:
+            symbol = proposition[0].symb
+            side = proposition[1]
+            side_map = {'ant': 'L', 'con': 'R'}
+            return side_map[side] + symbol
 
     def first_complex_prop(self) ->\
-            tuple[Proposition, str, int] | tuple[None, None, None]:
+            tuple[Proposition, str, int] | None:
         """
         Return the leftmost complex proposition in the sequent, the
         side of the sequent it's on, and its index on that side. If
-        self.is_atomic, return None, None, None.
+        self.is_atomic, return None.
         """
         for side in ('ant', 'con'):
             for i, prop in enumerate(getattr(self, side)):
                 if prop.complexity >= 1:
                     return prop, side, i
-        return None, None, None
+        return None
 
     def possible_mix_parents(self) -> list[tuple['Sequent', 'Sequent']]:
         """

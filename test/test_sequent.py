@@ -76,7 +76,7 @@ class TestSequent(unittest.TestCase):
 
     def test_atomic_first_complex_prop(self) -> None:
         s = Sequent((self.p,), (self.q,))
-        expected = None, None, None
+        expected = None
         actual = s.first_complex_prop()
         self.assertEqual(expected, actual)
 
