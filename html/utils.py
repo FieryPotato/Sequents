@@ -85,31 +85,42 @@ def gridify_branch(branch: dict, css: list, objects: list, tag: str = 'f',
         case _:
             raise ValueError(f'Malformed branch: {branch}')
 
+
 def gridify_two_parent_branch(branch, css, objects, tag, x_start, x_end, y):
+    # The width of each parent tree, ordered left to right.
     parent_lengths = [
         count_dict_branches(sub_branch) 
         if sub_branch is not None else 1
         for sub_branch in branch.values()
     ]
-    css_width = len(css[0])
-    x_end = x_end if x_end != css_width else css_width - 1
+    # Prevent index errors trying to access the nth index of a length n list.
+    grid_width = len(css[0])
+    x_end = x_end if x_end != grid_width else grid_width - 1
 
     for i, items in enumerate(branch.items()):
         sequent, parents = items
         new_tag = tag + TAG_VALS[i]
-        new_x_start = x_start if not i else x_start + (2 * parent_lengths[i]) 
+        # Left branches use x_start.
+        # Right branches use x_start plus the width of the left branch.
+        new_x_start = x_start if not i else x_start + (2 * parent_lengths[i])
+        # Left branches use x_start plus the width of the left branch (minus 1)
+        # Right branches use x_end.
         new_x_end = x_end if i else (x_start + 2 * parent_lengths[i]) - 1
 
         # place objects
         for j in range(new_x_start, new_x_end):
+            # Place css grid template items in css.
             css[y][j] = new_tag
             css[y + 1][j] = new_tag
+            # Place strings in objects.
             objects[y][j] = str(sequent)
             objects[y + 1][j] = str(sequent)
 
         # place new_tags
+        # Place css grid template items in css.
         css[y + 1][new_x_end] = new_tag + 't'
         css[y + 2][new_x_end] = new_tag + 't'
+        # Place sequent tags in objects.
         objects[y + 1][new_x_end] = sequent.tag()
         objects[y + 2][new_x_end] = sequent.tag()
     
