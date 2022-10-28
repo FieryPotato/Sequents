@@ -334,8 +334,6 @@ class TestGridification(unittest.TestCase):
                 self.assertEqual(e, a)
 
 
-
-    @unittest.skip('to be done after 2-2 trees are solved')
     def test_lopsided_tree(self) -> None:
         string = '(A v B) v C;'
         f = string_to_sequent(string)
