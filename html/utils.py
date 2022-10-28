@@ -1,5 +1,7 @@
 from typing import Protocol
 
+from utils import count_dict_branches
+
 
 class Tree(Protocol):
     branches: dict
@@ -84,28 +86,36 @@ def gridify_branch(branch: dict, css: list, objects: list, tag: str = 'f',
             raise ValueError(f'Malformed branch: {branch}')
 
 def gridify_two_parent_branch(branch, css, objects, tag, x_start, x_end, y):
+    parent_lengths = [
+        count_dict_branches(sub_branch) 
+        if sub_branch is not None else 1
+        for sub_branch in branch.values()
+    ]
+    css_width = len(css[0])
+    x_end = x_end if x_end != css_width else css_width - 1
+
     for i, items in enumerate(branch.items()):
         sequent, parents = items
         new_tag = tag + TAG_VALS[i]
-        j = i + 1
-        x_start = 2 * i
-        x_end = 2 * j - 1
+        new_x_start = x_start if not i else x_start + (2 * parent_lengths[i]) 
+        new_x_end = x_end if i else (x_start + 2 * parent_lengths[i]) - 1
 
         # place objects
-        css[y][x_start] = new_tag
-        css[y + 1][x_start] = new_tag
-        objects[y][x_start] = str(sequent)
-        objects[y + 1][x_start] = str(sequent)
+        for j in range(new_x_start, new_x_end):
+            css[y][j] = new_tag
+            css[y + 1][j] = new_tag
+            objects[y][j] = str(sequent)
+            objects[y + 1][j] = str(sequent)
 
-        # place tags
-        css[y + 1][x_end] = new_tag + 't'
-        css[y + 2][x_end] = new_tag + 't'
-        objects[y + 1][x_end] = sequent.tag()
-        objects[y + 2][x_end] = sequent.tag()
+        # place new_tags
+        css[y + 1][new_x_end] = new_tag + 't'
+        css[y + 2][new_x_end] = new_tag + 't'
+        objects[y + 1][new_x_end] = sequent.tag()
+        objects[y + 2][new_x_end] = sequent.tag()
     
         if parents is not None:
             css, objects = gridify_branch(
-                parents, css, objects, new_tag, x_start=x_start, x_end=x_end, y=y + 2
+                parents, css, objects, new_tag, x_start=new_x_start, x_end=new_x_end, y=y + 2
             )
 
     return css, objects
