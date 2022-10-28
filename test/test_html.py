@@ -334,7 +334,7 @@ class TestGridification(unittest.TestCase):
                 self.assertEqual(e, a)
 
 
-    def test_lopsided_tree(self) -> None:
+    def test_lopsided_left_tree(self) -> None:
         string = '(A v B) v C;'
         f = string_to_sequent(string)
         fl = string_to_sequent('A v B;')

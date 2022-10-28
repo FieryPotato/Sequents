@@ -102,12 +102,12 @@ def gridify_two_parent_branch(branch, css, objects, tag, x_start, x_end, y):
         new_tag = tag + TAG_VALS[i]
         # Left branches use x_start.
         # Right branches use x_start plus the width of the left branch.
-        new_x_start = x_start if not i else x_start + (2 * parent_lengths[i])
+        new_x_start = x_start if not i else x_start + (2 * parent_lengths[0])
         # Left branches use x_start plus the width of the left branch (minus 1)
         # Right branches use x_end.
         new_x_end = x_end if i else (x_start + 2 * parent_lengths[i]) - 1
 
-        # place objects
+        # Place objects
         for j in range(new_x_start, new_x_end):
             # Place css grid template items in css.
             css[y][j] = new_tag
@@ -116,7 +116,7 @@ def gridify_two_parent_branch(branch, css, objects, tag, x_start, x_end, y):
             objects[y][j] = str(sequent)
             objects[y + 1][j] = str(sequent)
 
-        # place new_tags
+        # Place new_tags
         # Place css grid template items in css.
         css[y + 1][new_x_end] = new_tag + 't'
         css[y + 2][new_x_end] = new_tag + 't'
