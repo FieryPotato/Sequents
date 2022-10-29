@@ -44,25 +44,28 @@ def gridify(tree: Tree) -> tuple[list, list]:
     """
 
     css = get_array(tree, dtype='css')
-    objects = []
+    objects = get_array(tree, dtype=None)
 
     root, branches = next(iter(tree.branches.items()))
 
     # place root tags
     css[1][-1] = 'ft'
     css[2][-1] = 'ft'
-    objects.append(str(root))
-    objects.append(root.tag())
+    objects[1][-1] = root.tag()
+    objects[2][-1] = root.tag()
 
     for i in range(len(css[0]) - 1):
         css[0][i] = 'f'
         css[1][i] = 'f'
+        objects[0][i] = str(root)
+        objects[1][i] = str(root)
 
     if branches is not None:
         css, objects = gridify_branch(
             branches, css, objects, tag='f', x_start=0, x_end=len(css[0]), y=2
         )
     css.reverse()
+    objects.reverse()
     return css, objects
 
 
@@ -108,13 +111,17 @@ def gridify_two_parent_branch(branch, css, objects, tag, x_start, x_end, y):
             # Place css grid template items in css.
             css[y][j] = new_tag
             css[y + 1][j] = new_tag
+            # Place strings in objects.
+            objects[y][j] = str(sequent)
+            objects[y + 1][j] = str(sequent)
 
         # Place new_tags
         # Place css grid template items in css.
         css[y + 1][new_x_end] = new_tag + 't'
         css[y + 2][new_x_end] = new_tag + 't'
-        objects.append(str(sequent))
-        objects.append(sequent.tag())
+        # Place sequent tags in objects.
+        objects[y + 1][new_x_end] = sequent.tag()
+        objects[y + 2][new_x_end] = sequent.tag()
     
         if parents is not None:
             css, objects = gridify_branch(
@@ -133,12 +140,14 @@ def gridify_one_parent_branch(branch, css, objects, tag, x_start, x_end, y):
     for i in range(x_start, array_end):
         css[y][i] = new_tag
         css[y + 1][i] = new_tag
+        objects[y][i] = str(sequent)
+        objects[y + 1][i] = str(sequent)
 
     # place tags
     css[y + 1][array_end] = new_tag + 't'
     css[y + 2][array_end] = new_tag + 't'
-    objects.append(str(sequent))
-    objects.append(sequent.tag())
+    objects[y + 1][array_end] = sequent.tag()
+    objects[y + 2][array_end] = sequent.tag()
 
     if (parent := branch[sequent]) is None:
         return css, objects
