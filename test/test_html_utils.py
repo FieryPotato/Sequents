@@ -137,11 +137,7 @@ class TestGridification(unittest.TestCase):
             ['f', '.' ],
         ]
 
-        expected_objects = [
-            [None, seq.tag()],
-            [str(seq),  seq.tag()],
-            [str(seq),  None]
-        ]
+        expected_objects = [str(seq), seq.tag()]
         expected = expected_css, expected_objects
         sub_test_strings = 'css', 'objects'
         actual = gridify(tree)
@@ -161,13 +157,7 @@ class TestGridification(unittest.TestCase):
             ['f',  'ft'],
             ['f',  '.']
         ]
-        expected_objects = [
-            [None,    fm.tag()],
-            [str(fm), fm.tag()],
-            [str(fm), f.tag()],
-            [str(f),  f.tag()],
-            [str(f),  None]
-        ]
+        expected_objects = [str(f), f.tag(), str(fm), fm.tag()]
         expected = expected_css, expected_objects
         sub_test_strings = 'css', 'objects'
         actual = gridify(tree)
@@ -189,11 +179,7 @@ class TestGridification(unittest.TestCase):
             ['f',  'f',   'f',  '.']
         ]
         expected_objects = [
-            [None, fl.tag(), None, fr.tag()],
-            [str(fl),   fl.tag(),      str(fr),   fr.tag()],
-            [str(fl),   None,          str(fr),   f.tag()],
-            [str(f),    str(f),        str(f),    f.tag()],
-            [str(f),    str(f),        str(f),    None]
+            str(f), f.tag(), str(fl), fl.tag(), str(fr), fr.tag()
         ]
         expected = expected_css, expected_objects
         actual = gridify(tree)
@@ -218,13 +204,7 @@ class TestGridification(unittest.TestCase):
             ['f', '.']
         ]
         expected_objects = [
-            [None, fmm.tag()],
-            [str(fmm), fmm.tag()],
-            [str(fmm), fm.tag()],
-            [str(fm), fm.tag()],
-            [str(fm), f.tag()],
-            [str(f), f.tag()],
-            [str(f), None]
+            str(f), f.tag(), str(fm), fm.tag(), str(fmm), fmm.tag()
         ]
         expected = expected_css, expected_objects
         actual = gridify(tree)
@@ -251,13 +231,8 @@ class TestGridification(unittest.TestCase):
             ['f', 'f', 'f', '.'],
         ]
         expected_objects = [
-            [None, flm.tag(), None, frm.tag()],
-            [str(flm), flm.tag(), str(frm), frm.tag()],
-            [str(flm), fl.tag(), str(frm), fr.tag()],
-            [str(fl), fl.tag(), str(fr), fr.tag()],
-            [str(fl), None, str(fr), f.tag()],
-            [str(f), str(f), str(f), f.tag()],
-            [str(f), str(f), str(f), None]
+            str(f), f.tag(), str(fl), fl.tag(),
+            str(flm), flm.tag(), str(fr), fr.tag(), str(frm), frm.tag()
         ]
         expected = expected_css, expected_objects
         actual = gridify(tree)
@@ -283,13 +258,8 @@ class TestGridification(unittest.TestCase):
             ['f', 'f', 'f', '.'],
         ]
         expected_objects = [
-            [None, fml.tag(), None, fmr.tag()],
-            [str(fml), fml.tag(), str(fmr), fmr.tag()],
-            [str(fml), None, str(fmr), fm.tag()],
-            [str(fm), str(fm), str(fm), fm.tag()],
-            [str(fm), str(fm), str(fm), f.tag()],
-            [str(f), str(f), str(f), f.tag()],
-            [str(f), str(f), str(f), None]
+            str(f), f.tag(), str(fm), fm.tag(), str(fml), fml.tag(),
+            str(fmr), fmr.tag()
         ]
         expected = expected_css, expected_objects
         actual = gridify(tree)
@@ -318,13 +288,9 @@ class TestGridification(unittest.TestCase):
             ['f',   'f',    'f',   'f',    'f',   'f',    'f',   '.'],
         ]
         expected_objects = [
-            [None,     fll.tag(), None,     flr.tag(), None,     frl.tag(), None,     frr.tag()],
-            [str(fll), fll.tag(), str(flr), flr.tag(), str(frl), frl.tag(), str(frr), frr.tag()],
-            [str(fll), None,      str(flr), fl.tag(),  str(frl), None,      str(frr), fr.tag()],
-            [str(fl),  str(fl),   str(fl),  fl.tag(),  str(fr),  str(fr),   str(fr),  fr.tag()], 
-            [str(fl),  str(fl),   str(fl),  None,      str(fr),  str(fr),   str(fr),  f.tag()],
-            [str(f),   str(f),    str(f),   str(f),    str(f),   str(f),    str(f),   f.tag()], 
-            [str(f),   str(f),    str(f),   str(f),    str(f),   str(f),    str(f),   None], 
+            str(f), f.tag(), str(fl), fl.tag(), str(fll), fll.tag(), 
+            str(flr), flr.tag(), str(fr), fr.tag(), str(frl), 
+            frl.tag(), str(frr), frr.tag()
         ]
         expected = expected_css, expected_objects
         actual = gridify(tree)
@@ -352,13 +318,9 @@ class TestGridification(unittest.TestCase):
             ['f',   'f',    'f',   'f',    'f',  '.']
         ]
         expected_objects = [
-            [None, fll.tag(), None, flr.tag(), None, None],
-            [str(fll), fll.tag(), str(flr), flr.tag(), None, None],
-            [str(fll), None, str(flr), fl.tag(), None, fr.tag()],
-            [str(fl), str(fl), str(fl), fl.tag(), str(fr), fr.tag()],
-            [str(fl), str(fl), str(fl), None, str(fr), f.tag()],
-            [str(f), str(f), str(f), str(f), str(f), f.tag()],
-            [str(f), str(f), str(f), str(f), str(f), None]
+            str(f), f.tag(), str(fl), fl.tag(), str(fll), fll.tag(), 
+            str(flr), flr.tag(), str(fr), fr.tag(),
+
         ]
         expected = expected_css, expected_objects
         actual = gridify(tree)
@@ -386,13 +348,8 @@ class TestGridification(unittest.TestCase):
             ['f',   'f',   'f',   'f',    'f',    '.']
         ]
         expected_objects = [
-            [None,     None,     None,     frl.tag(), None,      frr.tag()],
-            [None,     None,     str(frl), frl.tag(), str(frr),  frr.tag()],
-            [None,     fl.tag(), str(frl), None ,     str(frr),  fr.tag()],
-            [str(fl),  fl.tag(), str(fr),  str(fr),   str(fr),   fr.tag()],
-            [str(fl),  None,     str(fr),  str(fr),   str(fr),   f.tag()],
-            [str(f),   str(f),   str(f),   str(f),    str(f),    f.tag()],
-            [str(f),   str(f),   str(f),   str(f),    str(f),    None]
+            str(f), f.tag(), str(fl), fl.tag(), str(fr), fr.tag(),
+            str(frl), frl.tag(), str(frr), frr.tag()
         ]
         expected = expected_css, expected_objects
         actual = gridify(tree)
