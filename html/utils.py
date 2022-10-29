@@ -40,8 +40,7 @@ def get_array(tree: Tree, dtype=None) -> list[list[str]]:
 
 def gridify(tree: Tree) -> tuple[list, list]:
     """
-    Return a pair of lists of lists which represent grids in which a
-    tree's branches are embedded. Returns css and objects in that order.
+    Return a pair of lists 
     """
 
     css = get_array(tree, dtype='css')
@@ -148,6 +147,6 @@ def gridify_one_parent_branch(branch, css, objects, tag, x_start, x_end, y):
     )
 
 
-def grid_to_tree(grid: list[str]) -> dict[str, str]:
+def grid_to_tree(css: list[str], objects) -> dict[str, str]:
     pass
 
