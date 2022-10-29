@@ -34,17 +34,17 @@ def string_to_proposition(string) -> Proposition:
 
     fac: Type[PropositionFactory]
     match split_string:
-        case [left, '&' | 'and', right]:
+        case [_, '&' | 'and', _]:
             fac = ConjunctionFactory
-        case [left, '->' | 'implies', right]:
+        case [_, '->' | 'implies', _]:
             fac = ConditionalFactory
-        case [left, 'v' | 'or', right]:
+        case [_, 'v' | 'or', _]:
             fac = DisjunctionFactory
-        case ['~' | 'not', negatum]:
+        case ['~' | 'not', _]:
             fac = NegationFactory
-        case ['∀' | 'forall', var, prop]:
+        case ['∀' | 'forall', _, _]:
             fac = UniversalFactory
-        case ['∃' | 'exists', var, prop]:
+        case ['∃' | 'exists', _, _]:
             fac = ExistentialFactory
         case '':
             raise ValueError('Cannot convert empty string to proposition.')

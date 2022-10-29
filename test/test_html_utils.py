@@ -402,5 +402,10 @@ class TestGridification(unittest.TestCase):
                 self.assertEqual(e, a)
 
 
+class TestGridToTree(unittest.TestCase):
+    def test_atomic_tree(self) -> None:
+        pass
+
+
 if __name__ == '__main__':
     unittest.main()

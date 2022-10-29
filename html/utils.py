@@ -155,3 +155,8 @@ def gridify_one_parent_branch(branch, css, objects, tag, x_start, x_end, y):
     return gridify_branch(
         parent, css, objects, tag=new_tag, x_start=x_start, x_end=x_end, y = y + 2
     )
+
+
+def grid_to_tree(grid: list[str]) -> dict[str, str]:
+    pass
+

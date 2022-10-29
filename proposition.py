@@ -50,6 +50,7 @@ import re
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Self
 
 SIDES: set[str] = {'ant', 'con'}
 
@@ -114,7 +115,7 @@ class Proposition(ABC):
             variables.update({v for v in prop.unbound_variables})
         return tuple(sorted(variables))
 
-    def instantiate(self, variable, name) -> 'cls':
+    def instantiate(self, variable, name) -> Self:
         """
         Return an instance of this class whose instances of variable
         are replaced with name.

@@ -39,7 +39,7 @@ other data types into sequents, I'll add one there.
 __all__ = ['Sequent']
 
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Protocol, Self
 
 import utils
 
@@ -94,7 +94,7 @@ class Sequent:
         con_complexity = sum(prop.complexity for prop in self.con)
         return ant_complexity + con_complexity
 
-    def remove_proposition_at(self, side: str, index: int) -> 'Sequent':
+    def remove_proposition_at(self, side: str, index: int) -> Self:
         """
         Return a new sequent object identical to this one but with the
         proposition at side, index removed.
@@ -108,7 +108,7 @@ class Sequent:
         return Sequent(ant, con)
 
     @staticmethod
-    def mix(*args) -> 'Sequent':
+    def mix(*args) -> Self:
         """
         Return a sequent whose antecedent is the combined antecedents
         of all sequents in args, and likewise for consequents.
@@ -146,7 +146,7 @@ class Sequent:
                     return prop, side, i
         return None
 
-    def possible_mix_parents(self) -> list[tuple['Sequent', 'Sequent']]:
+    def possible_mix_parents(self) -> list[tuple[Self, Self]]:
         """
         Return a list of all possible parents this sequent may have had
         from an application of mix or another non-invertible rule.
