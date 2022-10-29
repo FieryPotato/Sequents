@@ -13,6 +13,8 @@ The following correspond to propositions in the expected way: &, v, ~,
 ->. (Atoms have no logical content and are therefore associated with the 
 empty string ('').)
 
+- 'word': the string which corresponds to self.symb in natural language.
+
 - 'complexity': a measure of how deeply nested the most-nested 
 subproposition is. This is measured recursively for each proposition and
 subproposition, with Atoms having complexity 0.
@@ -68,6 +70,7 @@ class Proposition(ABC):
     """
     arity = None  # How many propositions this object contains.
     symb = None  # The logical symbol this object assumes.
+    word = None  # The english language word representing self.symb.
 
     def __post_init__(self) -> None:
         self.validate_content()
@@ -132,10 +135,15 @@ class UnaryProposition(Proposition):
     prop: Proposition
     arity = 1
     symb = None
+    word = None
     variable = ''
 
     def __str__(self) -> str:
         return f'{self.symb} {self.prop}'
+
+    @property
+    def long_string(self) -> str:
+        return f'{self.word} {self.prop.long_string}'
 
     @property
     def content(self) -> tuple[Proposition | str]:
@@ -151,9 +159,14 @@ class Quantifier(Proposition):
     prop: Proposition
     arity = 1
     symb = None
+    word = None
 
     def __str__(self) -> str:
         return f'{self.symb}{self.variable} {self.prop}'
+
+    @property
+    def long_string(self) -> str:
+        return f'{self.word}{self.variable} {self.prop.long_string}'
 
     @property
     def content(self) -> tuple[Proposition]:
@@ -192,9 +205,14 @@ class BinaryProposition(Proposition):
     right: Proposition
     arity = 2
     symb = None
+    word = None
 
     def __str__(self):
         return f'({str(self[0])} {self.symb} {str(self[1])})'
+
+    @property
+    def long_string(self) -> str:
+        return f'({self[0].long_string} {self.word} {self[1].long_string})'
 
     @property
     def content(self) -> tuple[Proposition, Proposition]:
@@ -209,9 +227,14 @@ class Atom(UnaryProposition):
     prop: str
     arity = 1
     symb = ''
+    word = ''
 
     def __str__(self) -> str:
         return f'{self[0]}'
+
+    @property
+    def long_string(self) -> str:
+        return str(self)
 
     @property
     def complexity(self) -> int:
@@ -283,6 +306,7 @@ class Universal(Quantifier):
     prop: Proposition
     arity = 1
     symb = '∀'
+    word = 'forall'
 
 
 @dataclass(slots=True, frozen=True, order=True)
@@ -294,6 +318,7 @@ class Existential(Quantifier):
     prop: Proposition
     arity = 1
     symb = '∃'
+    word = 'exists'
 
 
 @dataclass(slots=True, frozen=True, order=True)
@@ -303,6 +328,7 @@ class Negation(UnaryProposition):
     """
     prop: Proposition
     symb = '~'
+    word = 'not'
     arity = 1
 
 
@@ -312,6 +338,7 @@ class Conjunction(BinaryProposition):
     Binary proposition signifying logical '... and ...'.
     """
     symb = '&'
+    word = 'and'
 
 
 @dataclass(slots=True, frozen=True, order=True)
@@ -320,6 +347,7 @@ class Conditional(BinaryProposition):
     Binary proposition signifying logical 'if ... then ...'
     """
     symb = '->'
+    word = 'implies'
 
 
 @dataclass(slots=True, frozen=True, order=True)
@@ -328,3 +356,5 @@ class Disjunction(BinaryProposition):
     Binary proposition signifying logical '... or ...'
     """
     symb = 'v'
+    word = 'or'
+

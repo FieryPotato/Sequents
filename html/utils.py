@@ -25,6 +25,16 @@ TAG_VALS = {
     1: 'r',
 }
 
+CSS_KEY_MAP = {
+    ' ': '_',
+    '(': '1',
+    ')': '2',
+    '<': '3',
+    '>': '4',
+    ',': '5',
+    ';': '6'
+}
+
 
 def get_array(tree: Tree, dtype=None) -> list[list[str]]:
     """
@@ -57,8 +67,8 @@ def gridify(tree: Tree) -> tuple[list, list]:
     for i in range(len(css[0]) - 1):
         css[0][i] = 'f'
         css[1][i] = 'f'
-        objects[0][i] = str(root)
-        objects[1][i] = str(root)
+        objects[0][i] = root.long_string
+        objects[1][i] = root.long_string
 
     if branches is not None:
         css, objects = gridify_branch(
@@ -112,8 +122,8 @@ def gridify_two_parent_branch(branch, css, objects, tag, x_start, x_end, y):
             css[y][j] = new_tag
             css[y + 1][j] = new_tag
             # Place strings in objects.
-            objects[y][j] = str(sequent)
-            objects[y + 1][j] = str(sequent)
+            objects[y][j] = sequent.long_string
+            objects[y + 1][j] = sequent.long_string
 
         # Place new_tags
         # Place css grid template items in css.
@@ -140,8 +150,8 @@ def gridify_one_parent_branch(branch, css, objects, tag, x_start, x_end, y):
     for i in range(x_start, array_end):
         css[y][i] = new_tag
         css[y + 1][i] = new_tag
-        objects[y][i] = str(sequent)
-        objects[y + 1][i] = str(sequent)
+        objects[y][i] = sequent.long_string
+        objects[y + 1][i] = sequent.long_string
 
     # place tags
     css[y + 1][array_end] = new_tag + 't'
@@ -156,6 +166,22 @@ def gridify_one_parent_branch(branch, css, objects, tag, x_start, x_end, y):
     )
 
 
-def grid_to_tree(css: list[str], objects) -> dict[str, str]:
-    pass
+def make_css_key(sequent: str) -> str:
+    chars = (CSS_KEY_MAP[c] if c in CSS_KEY_MAP else c for c in sequent)
+    return ''.join(chars)
 
+
+def grid_to_dict(css: list[str], objects: list[str | None]) -> dict[str, str]:
+    grid_height: int = len(css)
+    grid_width: int = len(css[0])
+    output: dict = {}
+    root: str = objects[-1][0]  # Bottom left cell is guaranteed to be the root.
+    for y in range(grid_height):
+        for x in range(grid_width):
+            css_class = css[y][x]
+            if css_class == '.':
+                continue
+            key = f'._{make_css_key(root)}-{css_class}'
+            value = objects[y][x]
+            output[key] = value
+    return output

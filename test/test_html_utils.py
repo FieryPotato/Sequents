@@ -1,7 +1,7 @@
 import unittest
 
 from convert import string_to_tree, string_to_sequent, sequent_to_tree
-from html.utils import get_array, gridify
+from html.utils import get_array, gridify, grid_to_dict
 
 STR_ATOM = 'A; B'
 STR_1C_1P = '; A -> B'
@@ -165,23 +165,32 @@ class TestHTMLArrayCreation(unittest.TestCase):
         self.assertEqual(e, a)
 
 
-class TestGridification(unittest.TestCase):
-    def test_atomic_gridify(self) -> None:
-        string = STR_ATOM  # A; B
-        seq = string_to_sequent(string)
+class TestHTMLification(unittest.TestCase):
+    def test_atom(self) -> None:
+        seq = string_to_sequent(STR_ATOM)  # A; B
         tree = sequent_to_tree(seq)
         expected_css = CSS_ATOM
         expected_objects = [
             [None, seq.tag()],
-            [str(seq),  seq.tag()],
-            [str(seq),  None]
+            [seq.long_string,  seq.tag()],
+            [seq.long_string,  None]
         ]
         expected = expected_css, expected_objects
+
+        # Test gridification 
         sub_test_strings = 'css', 'objects'
         actual = gridify(tree)
         for e, a, s in zip(expected, actual, sub_test_strings):
-            with self.subTest(i=s):
+            with self.subTest(i=f'grid: {s}'):
                 self.assertEqual(e, a)
+
+        # Test output dict
+        with self.subTest(i='output dict'):
+            e = {
+                '._A6_B-f': seq.long_string,
+                '._A6_B-ft': seq.tag()
+            }
+            self.assertEqual(e, grid_to_dict(*expected))
 
     def test_c1_1p(self) -> None:
         string = STR_1C_1P  # ; A -> B
@@ -191,17 +200,29 @@ class TestGridification(unittest.TestCase):
         expected_css = CSS_1C_1P
         expected_objects = [
             [None,    fm.tag()],
-            [str(fm), fm.tag()],
-            [str(fm), f.tag()],
-            [str(f),  f.tag()],
-            [str(f),  None]
+            [fm.long_string, fm.tag()],
+            [fm.long_string, f.tag()],
+            [f.long_string,  f.tag()],
+            [f.long_string,  None]
         ]
         expected = expected_css, expected_objects
+
+        # Test gridification
         sub_test_strings = 'css', 'objects'
         actual = gridify(tree)
         for e, a, s in zip(expected, actual, sub_test_strings):
-            with self.subTest(i=s):
+            with self.subTest(i=f'grid: {s}'):
                 self.assertEqual(e, a)
+
+        # Test output dict
+        with self.subTest(i='output dict'):
+            e = {
+                '._6_A_implies_B-f': f.long_string,
+                '._6_A_implies_B-ft': f.tag(),
+                '._6_A_implies_B-fm': fm.long_string,
+                '._6_A_implies_B-fmt': fm.tag()
+            }
+            self.assertEqual(e, grid_to_dict(*expected))
 
     def test_c1_2p(self) -> None:
         string = STR_1C_2P  # A -> B;
@@ -212,16 +233,16 @@ class TestGridification(unittest.TestCase):
         expected_css = CSS_1C_2P
         expected_objects = [
             [None, fl.tag(), None, fr.tag()],
-            [str(fl),   fl.tag(),      str(fr),   fr.tag()],
-            [str(fl),   None,          str(fr),   f.tag()],
-            [str(f),    str(f),        str(f),    f.tag()],
-            [str(f),    str(f),        str(f),    None]
+            [fl.long_string, fl.tag(),      fr.long_string, fr.tag()],
+            [fl.long_string, None,          fr.long_string, f.tag()],
+            [f.long_string,  f.long_string, f.long_string,  f.tag()],
+            [f.long_string,  f.long_string, f.long_string,  None]
         ]
         expected = expected_css, expected_objects
         actual = gridify(tree)
         sub_test_strings = 'css', 'objects'
         for e, a, s in zip(expected, actual, sub_test_strings):
-            with self.subTest(i=s):
+            with self.subTest(i=f'grid: {s}'):
                 self.assertEqual(e, a)
 
     def test_c2_1_1(self) -> None:
@@ -233,18 +254,18 @@ class TestGridification(unittest.TestCase):
         expected_css = CSS_2C_1P_1P
         expected_objects = [
             [None, fmm.tag()],
-            [str(fmm), fmm.tag()],
-            [str(fmm), fm.tag()],
-            [str(fm), fm.tag()],
-            [str(fm), f.tag()],
-            [str(f), f.tag()],
-            [str(f), None]
+            [fmm.long_string, fmm.tag()],
+            [fmm.long_string, fm.tag()],
+            [fm.long_string, fm.tag()],
+            [fm.long_string, f.tag()],
+            [f.long_string, f.tag()],
+            [f.long_string, None]
         ]
         expected = expected_css, expected_objects
         actual = gridify(tree)
         sub_test_strings = 'css', 'objects'
         for e, a, s in zip(expected, actual, sub_test_strings):
-            with self.subTest(i=s):
+            with self.subTest(i=f'grid: {s}'):
                 self.assertEqual(e, a)
 
     def test_c2_2_1(self) -> None:
@@ -258,18 +279,18 @@ class TestGridification(unittest.TestCase):
         expected_css = CSS_2C_2P_1P
         expected_objects = [
             [None, flm.tag(), None, frm.tag()],
-            [str(flm), flm.tag(), str(frm), frm.tag()],
-            [str(flm), fl.tag(), str(frm), fr.tag()],
-            [str(fl), fl.tag(), str(fr), fr.tag()],
-            [str(fl), None, str(fr), f.tag()],
-            [str(f), str(f), str(f), f.tag()],
-            [str(f), str(f), str(f), None]
+            [flm.long_string, flm.tag(), frm.long_string, frm.tag()],
+            [flm.long_string, fl.tag(), frm.long_string, fr.tag()],
+            [fl.long_string, fl.tag(), fr.long_string, fr.tag()],
+            [fl.long_string, None, fr.long_string, f.tag()],
+            [f.long_string, f.long_string, f.long_string, f.tag()],
+            [f.long_string, f.long_string, f.long_string, None]
         ]
         expected = expected_css, expected_objects
         actual = gridify(tree)
         sub_test_strings = 'css', 'objects'
         for e, a, s in zip(expected, actual, sub_test_strings):
-            with self.subTest(i=s):
+            with self.subTest(i=f'grid: {s}'):
                 self.assertEqual(e, a)
 
     def test_c2_1_2(self) -> None:
@@ -282,18 +303,18 @@ class TestGridification(unittest.TestCase):
         expected_css = CSS_2C_1P_2P
         expected_objects = [
             [None, fml.tag(), None, fmr.tag()],
-            [str(fml), fml.tag(), str(fmr), fmr.tag()],
-            [str(fml), None, str(fmr), fm.tag()],
-            [str(fm), str(fm), str(fm), fm.tag()],
-            [str(fm), str(fm), str(fm), f.tag()],
-            [str(f), str(f), str(f), f.tag()],
-            [str(f), str(f), str(f), None]
+            [fml.long_string, fml.tag(), fmr.long_string, fmr.tag()],
+            [fml.long_string, None, fmr.long_string, fm.tag()],
+            [fm.long_string, fm.long_string, fm.long_string, fm.tag()],
+            [fm.long_string, fm.long_string, fm.long_string, f.tag()],
+            [f.long_string, f.long_string, f.long_string, f.tag()],
+            [f.long_string, f.long_string, f.long_string, None]
         ]
         expected = expected_css, expected_objects
         actual = gridify(tree)
         sub_test_strings = 'css', 'objects'
         for e, a, s in zip(expected, actual, sub_test_strings):
-            with self.subTest(i=s):
+            with self.subTest(i=f'grid: {s}'):
                 self.assertEqual(e, a)
 
     def test_c2_2_2(self) -> None:
@@ -309,22 +330,22 @@ class TestGridification(unittest.TestCase):
         expected_css = CSS_2C_2P_2P
         expected_objects = [
             [None,     fll.tag(), None,     flr.tag(), None,     frl.tag(), None,     frr.tag()],
-            [str(fll), fll.tag(), str(flr), flr.tag(), str(frl), frl.tag(), str(frr), frr.tag()],
-            [str(fll), None,      str(flr), fl.tag(),  str(frl), None,      str(frr), fr.tag()],
-            [str(fl),  str(fl),   str(fl),  fl.tag(),  str(fr),  str(fr),   str(fr),  fr.tag()], 
-            [str(fl),  str(fl),   str(fl),  None,      str(fr),  str(fr),   str(fr),  f.tag()],
-            [str(f),   str(f),    str(f),   str(f),    str(f),   str(f),    str(f),   f.tag()], 
-            [str(f),   str(f),    str(f),   str(f),    str(f),   str(f),    str(f),   None], 
+            [fll.long_string, fll.tag(), flr.long_string, flr.tag(), frl.long_string, frl.tag(), frr.long_string, frr.tag()],
+            [fll.long_string, None,      flr.long_string, fl.tag(),  frl.long_string, None,      frr.long_string, fr.tag()],
+            [fl.long_string,  fl.long_string,   fl.long_string,  fl.tag(),  fr.long_string,  fr.long_string,   fr.long_string,  fr.tag()], 
+            [fl.long_string,  fl.long_string,   fl.long_string,  None,      fr.long_string,  fr.long_string,   fr.long_string,  f.tag()],
+            [f.long_string,   f.long_string,    f.long_string,   f.long_string,    f.long_string,   f.long_string,    f.long_string,   f.tag()], 
+            [f.long_string,   f.long_string,    f.long_string,   f.long_string,    f.long_string,   f.long_string,    f.long_string,   None], 
         ]
         expected = expected_css, expected_objects
         actual = gridify(tree)
         sub_test_strings = 'css', 'objects'
         for e, a, s in zip(expected, actual, sub_test_strings):
-            with self.subTest(i=s):
+            with self.subTest(i=f'grid: {s}'):
                 self.assertEqual(e, a)
 
 
-    def test_lopsided_left_tree(self) -> None:
+    def test_lopsided_tree(self) -> None:
         string = '(A v B) v C;'
         f = string_to_sequent(string)
         fl = string_to_sequent('A v B;')
@@ -343,60 +364,19 @@ class TestGridification(unittest.TestCase):
         ]
         expected_objects = [
             [None, fll.tag(), None, flr.tag(), None, None],
-            [str(fll), fll.tag(), str(flr), flr.tag(), None, None],
-            [str(fll), None, str(flr), fl.tag(), None, fr.tag()],
-            [str(fl), str(fl), str(fl), fl.tag(), str(fr), fr.tag()],
-            [str(fl), str(fl), str(fl), None, str(fr), f.tag()],
-            [str(f), str(f), str(f), str(f), str(f), f.tag()],
-            [str(f), str(f), str(f), str(f), str(f), None]
+            [fll.long_string, fll.tag(), flr.long_string, flr.tag(), None, None],
+            [fll.long_string, None, flr.long_string, fl.tag(), None, fr.tag()],
+            [fl.long_string, fl.long_string, fl.long_string, fl.tag(), fr.long_string, fr.tag()],
+            [fl.long_string, fl.long_string, fl.long_string, None, fr.long_string, f.tag()],
+            [f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, f.tag()],
+            [f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, None]
         ]
         expected = expected_css, expected_objects
         actual = gridify(tree)
         sub_test_strings = 'css', 'objects'
         for e, a, s in zip(expected, actual, sub_test_strings):
-            with self.subTest(i=s):
+            with self.subTest(i=f'grid: {s}'):
                 self.assertEqual(e, a)
-
-
-    def test_lopsided_right_tree(self) -> None:
-        string = '; A & (B & C)'
-        f = string_to_sequent(string)
-        fl = string_to_sequent('; A')
-        fr = string_to_sequent('; (B & C)')
-        frl = string_to_sequent('; B')
-        frr = string_to_sequent('; C')
-        tree = string_to_tree(string)
-        expected_css = [
-            ['.',   '.',   '.',   'frlt', '.',    'frrt'],
-            ['.',   '.',   'frl', 'frlt', 'frr',  'frrt'],
-            ['.',   'flt', 'frl', '.' ,   'frr',  'frt'],
-            ['fl',  'flt', 'fr',  'fr',   'fr',   'frt'],
-            ['fl',  '.',   'fr',  'fr',   'fr',   'ft'],
-            ['f',   'f',   'f',   'f',    'f',    'ft'],
-            ['f',   'f',   'f',   'f',    'f',    '.']
-        ]
-        expected_objects = [
-            [None,     None,     None,     frl.tag(), None,      frr.tag()],
-            [None,     None,     str(frl), frl.tag(), str(frr),  frr.tag()],
-            [None,     fl.tag(), str(frl), None ,     str(frr),  fr.tag()],
-            [str(fl),  fl.tag(), str(fr),  str(fr),   str(fr),   fr.tag()],
-            [str(fl),  None,     str(fr),  str(fr),   str(fr),   f.tag()],
-            [str(f),   str(f),   str(f),   str(f),    str(f),    f.tag()],
-            [str(f),   str(f),   str(f),   str(f),    str(f),    None]
-        ]
-        expected = expected_css, expected_objects
-        actual = gridify(tree)
-        sub_test_strings = 'css', 'objects'
-        for e, a, s in zip(expected, actual, sub_test_strings):
-            with self.subTest(i=s):
-                self.assertEqual(e, a)
-
-
-class TestGridToTree(unittest.TestCase):
-    def test_atomic_tree(self) -> None:
-        string = STR_ATOM
-        tree = string_to_tree(string)
-        
 
 
 if __name__ == '__main__':

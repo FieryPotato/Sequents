@@ -94,6 +94,12 @@ class Sequent:
         con_complexity = sum(prop.complexity for prop in self.con)
         return ant_complexity + con_complexity
 
+    @property
+    def long_string(self) -> str:
+        ant_str = ', '.join([prop.long_string for prop in self.ant])
+        con_str = ', '.join([prop.long_string for prop in self.con])
+        return f'{ant_str}; {con_str}'
+
     def remove_proposition_at(self, side: str, index: int) -> Self:
         """
         Return a new sequent object identical to this one but with the
