@@ -2,12 +2,11 @@ import os
 import unittest
 import pickle
 
-from convert import sequent_to_tree, dict_to_tree
+from convert import dict_to_tree
 from export_file import PickleExporter
 from proposition import Atom, Negation, Conditional, Conjunction,\
     Disjunction
 from sequent import Sequent
-from tree import Tree
 
 
 class TestExportFile(unittest.TestCase):

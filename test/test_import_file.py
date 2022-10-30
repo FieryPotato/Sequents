@@ -3,7 +3,6 @@ import os
 import unittest
 
 from import_file import TextImporter, JSONImporter, ByteImporter, get_importer
-from proposition import Atom, Negation, Conjunction, Disjunction, Conditional
 
 text_content = 'a bird in hand is worth two in the bush; a bird in hand is worth two in the bush'
 
@@ -83,7 +82,7 @@ class TestImportText(unittest.TestCase):
 
     def test_importing_incorrect_file_extension_causes_exception(self) -> None:
         with self.assertRaises(KeyError):
-            importer = get_importer('test.tar.gz')
+            get_importer('test.tar.gz')
 
 
 class TestImportJson(unittest.TestCase):

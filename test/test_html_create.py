@@ -1,8 +1,6 @@
 import os
 import unittest
 
-from pathlib import Path
-
 from html.HTML import HTML
 
 

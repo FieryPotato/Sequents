@@ -1,47 +1,47 @@
 """
-Module containing proposition classes. 
+Module containing proposition classes.
 
-Propositions are immutable hashable objects with the following 
+Propositions are immutable hashable objects with the following
 properties:
 
-- 'arity': a measure of how many subpropositions the proposition 
-contains.  Atoms and negations are unary (arity=1), while conjunctions, 
+- 'arity': a measure of how many subpropositions the proposition
+contains.  Atoms and negations are unary (arity=1), while conjunctions,
 disjunctions, and conditionals are binary (arity=2).
 
 - 'symb': the string symbolizing the logical content of the proposition.
-The following correspond to propositions in the expected way: &, v, ~, 
-->. (Atoms have no logical content and are therefore associated with the 
+The following correspond to propositions in the expected way: &, v, ~,
+->. (Atoms have no logical content and are therefore associated with the
 empty string ('').)
 
 - 'word': the string which corresponds to self.symb in natural language.
 
-- 'complexity': a measure of how deeply nested the most-nested 
+- 'complexity': a measure of how deeply nested the most-nested
 subproposition is. This is measured recursively for each proposition and
 subproposition, with Atoms having complexity 0.
 
-- Binary propositions have a 'left' and 'right' property, corresponding 
+- Binary propositions have a 'left' and 'right' property, corresponding
 to the subproposition on that side of their main connective. Negations
-meanwhile have the 'negatum' property and Atoms, 'prop'. These can be 
+meanwhile have the 'negatum' property and Atoms, 'prop'. These can be
 accessed class-agnostically by accessing the object's .content property.
 
 - names: a tuple of strings containing each name in the proposition and
 subpropositions. Names are always two or more lowercase letters.
 
 - unbound_variables: a tuple of strings containing each unbound variable
-in the proposition. Unbound variables are single lowercase letters not 
+in the proposition. Unbound variables are single lowercase letters not
 bound by a quantifier.
 
 - instantiate: return this proposition with all instances of a variable
-replaced with a name. If the proposition is a quantifier and the 
-variable, is the variable it binds, instead return the subproposition 
+replaced with a name. If the proposition is a quantifier and the
+variable, is the variable it binds, instead return the subproposition
 (i.e. remove the quantifier).
 
 Notably, Atoms have strings as their propositional content, while all
-other propositions have Propositions (atoms or otherwise) as their 
+other propositions have Propositions (atoms or otherwise) as their
 content.
 
-Note that for most uses, you should prefer creating the classes in this 
-module by using the functions in the convert module (e.g., 
+Note that for most uses, you should prefer creating the classes in this
+module by using the functions in the convert module (e.g.,
 string_to_proposition) over creating these classes directly.
 """
 

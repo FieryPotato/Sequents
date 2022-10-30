@@ -167,7 +167,7 @@ def gridify_one_parent_branch(branch, css, objects, tag, x_start, x_end, y):
 
 
 def make_css_key(sequent: str) -> str:
-    chars = (CSS_KEY_MAP[c] if c in CSS_KEY_MAP else c for c in sequent)
+    chars = (CSS_KEY_MAP[c] if c in CSS_KEY_MAP else c for c in sequent.strip(' '))
     return ''.join(chars)
 
 

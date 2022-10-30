@@ -217,10 +217,10 @@ class TestHTMLification(unittest.TestCase):
         # Test output dict
         with self.subTest(i='output dict'):
             e = {
-                '._6_A_implies_B-f': f.long_string,
-                '._6_A_implies_B-ft': f.tag(),
-                '._6_A_implies_B-fm': fm.long_string,
-                '._6_A_implies_B-fmt': fm.tag()
+                '._6_1A_implies_B2-f': f.long_string,
+                '._6_1A_implies_B2-ft': f.tag(),
+                '._6_1A_implies_B2-fm': fm.long_string,
+                '._6_1A_implies_B2-fmt': fm.tag()
             }
             self.assertEqual(e, grid_to_dict(*expected))
 
@@ -239,11 +239,25 @@ class TestHTMLification(unittest.TestCase):
             [f.long_string,  f.long_string, f.long_string,  None]
         ]
         expected = expected_css, expected_objects
+
+        # Test gridification
         actual = gridify(tree)
         sub_test_strings = 'css', 'objects'
         for e, a, s in zip(expected, actual, sub_test_strings):
             with self.subTest(i=f'grid: {s}'):
                 self.assertEqual(e, a)
+
+        # Test output dict
+        with self.subTest(i='output dict'):
+            e = {
+                '._1A_implies_B26-f': f.long_string,
+                '._1A_implies_B26-ft': f.tag(),
+                '._1A_implies_B26-fl': fl.long_string,
+                '._1A_implies_B26-flt': fl.tag(),
+                '._1A_implies_B26-fr': fr.long_string,
+                '._1A_implies_B26-frt': fr.tag()
+            }
+            self.assertEqual(e, grid_to_dict(*expected))
 
     def test_c2_1_1(self) -> None:
         string = STR_2C_1P_1P  # A & B; A v B
@@ -262,11 +276,25 @@ class TestHTMLification(unittest.TestCase):
             [f.long_string, None]
         ]
         expected = expected_css, expected_objects
+
+        # Test gridification 
         actual = gridify(tree)
         sub_test_strings = 'css', 'objects'
         for e, a, s in zip(expected, actual, sub_test_strings):
             with self.subTest(i=f'grid: {s}'):
                 self.assertEqual(e, a)
+
+        # Test output dict
+        with self.subTest(i='output dict'):
+            e = {
+                '._1A_and_B26_1A_or_B2-f': f.long_string, 
+                '._1A_and_B26_1A_or_B2-ft': f.tag(),
+                '._1A_and_B26_1A_or_B2-fm': fm.long_string, 
+                '._1A_and_B26_1A_or_B2-fmt': fm.tag(),
+                '._1A_and_B26_1A_or_B2-fmm': fmm.long_string, 
+                '._1A_and_B26_1A_or_B2-fmmt': fmm.tag()
+            }
+            self.assertEqual(e, grid_to_dict(*expected))
 
     def test_c2_2_1(self) -> None:
         string = STR_2C_2P_1P  # A v B; A v B
@@ -287,11 +315,29 @@ class TestHTMLification(unittest.TestCase):
             [f.long_string, f.long_string, f.long_string, None]
         ]
         expected = expected_css, expected_objects
+
+        # Test gridification
         actual = gridify(tree)
         sub_test_strings = 'css', 'objects'
         for e, a, s in zip(expected, actual, sub_test_strings):
             with self.subTest(i=f'grid: {s}'):
                 self.assertEqual(e, a)
+
+        # Test output dict
+        with self.subTest(i='output dict'):
+            e = {
+                '._1A_or_B26_1A_or_B2-f': f.long_string,
+                '._1A_or_B26_1A_or_B2-ft': f.tag(),
+                '._1A_or_B26_1A_or_B2-fl': fl.long_string,
+                '._1A_or_B26_1A_or_B2-flt': fl.tag(),
+                '._1A_or_B26_1A_or_B2-fr': fr.long_string,
+                '._1A_or_B26_1A_or_B2-frt': fr.tag(),
+                '._1A_or_B26_1A_or_B2-flm': flm.long_string,
+                '._1A_or_B26_1A_or_B2-flmt': flm.tag(),
+                '._1A_or_B26_1A_or_B2-frm': frm.long_string,
+                '._1A_or_B26_1A_or_B2-frmt': frm.tag(),
+            }
+            self.assertEqual(e, grid_to_dict(*expected))
 
     def test_c2_1_2(self) -> None:
         string = STR_2C_1P_2P  # 'A & B; A & B'
@@ -311,11 +357,27 @@ class TestHTMLification(unittest.TestCase):
             [f.long_string, f.long_string, f.long_string, None]
         ]
         expected = expected_css, expected_objects
+
+        # Test gridification
         actual = gridify(tree)
         sub_test_strings = 'css', 'objects'
         for e, a, s in zip(expected, actual, sub_test_strings):
             with self.subTest(i=f'grid: {s}'):
                 self.assertEqual(e, a)
+
+        # Test output dict
+        with self.subTest(i='output dict'):
+            e = {
+                '._1A_and_B26_1A_and_B2-f': f.long_string,
+                '._1A_and_B26_1A_and_B2-ft': f.tag(),
+                '._1A_and_B26_1A_and_B2-fm': fm.long_string,
+                '._1A_and_B26_1A_and_B2-fmt': fm.tag(),
+                '._1A_and_B26_1A_and_B2-fml': fml.long_string,
+                '._1A_and_B26_1A_and_B2-fmlt': fml.tag(),
+                '._1A_and_B26_1A_and_B2-fmr': fmr.long_string,
+                '._1A_and_B26_1A_and_B2-fmrt': fmr.tag(),
+            }
+            self.assertEqual(e, grid_to_dict(*expected))
 
     def test_c2_2_2(self) -> None:
         string = STR_2C_2P_2P  # 'A v B; C & D'
@@ -338,11 +400,33 @@ class TestHTMLification(unittest.TestCase):
             [f.long_string,   f.long_string,    f.long_string,   f.long_string,    f.long_string,   f.long_string,    f.long_string,   None], 
         ]
         expected = expected_css, expected_objects
+
+        # Test gridification
         actual = gridify(tree)
         sub_test_strings = 'css', 'objects'
         for e, a, s in zip(expected, actual, sub_test_strings):
             with self.subTest(i=f'grid: {s}'):
                 self.assertEqual(e, a)
+
+        # Test output dict
+        with self.subTest(i='output_dict'):
+            e = {
+                '._1A_or_B26_1C_and_D2-f': f.long_string,
+                '._1A_or_B26_1C_and_D2-ft': f.tag(),
+                '._1A_or_B26_1C_and_D2-fl': fl.long_string,
+                '._1A_or_B26_1C_and_D2-flt': fl.tag(),
+                '._1A_or_B26_1C_and_D2-fll': fll.long_string,
+                '._1A_or_B26_1C_and_D2-fllt': fll.tag(),
+                '._1A_or_B26_1C_and_D2-flr': flr.long_string,
+                '._1A_or_B26_1C_and_D2-flrt': flr.tag(),
+                '._1A_or_B26_1C_and_D2-fr': fr.long_string,
+                '._1A_or_B26_1C_and_D2-frt': fr.tag(),
+                '._1A_or_B26_1C_and_D2-frl': frl.long_string,
+                '._1A_or_B26_1C_and_D2-frlt': frl.tag(),
+                '._1A_or_B26_1C_and_D2-frr': frr.long_string,
+                '._1A_or_B26_1C_and_D2-frrt': frr.tag(),
+            }
+            self.assertEqual(e, grid_to_dict(*expected))
 
 
     def test_lopsided_tree(self) -> None:
@@ -372,11 +456,29 @@ class TestHTMLification(unittest.TestCase):
             [f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, None]
         ]
         expected = expected_css, expected_objects
+
+        # Test gridification
         actual = gridify(tree)
         sub_test_strings = 'css', 'objects'
         for e, a, s in zip(expected, actual, sub_test_strings):
             with self.subTest(i=f'grid: {s}'):
                 self.assertEqual(e, a)
+
+        # Test output dict
+        with self.subTest(i='output dict'):
+            e = {
+                '._11A_or_B2_or_C26_-f': f.long_string,
+                '._11A_or_B2_or_C26_-ft': f.tag(),
+                '._11A_or_B2_or_C26_-fl': fl.long_string,
+                '._11A_or_B2_or_C26_-flt': fl.tag(),
+                '._11A_or_B2_or_C26_-fll': fll.long_string,
+                '._11A_or_B2_or_C26_-fllt': fll.tag(),
+                '._11A_or_B2_or_C26_-flr': flr.long_string,
+                '._11A_or_B2_or_C26_-flrt': flr.tag(),
+                '._11A_or_B2_or_C26_-fr': fr.long_string,
+                '._11A_or_B2_or_C26_-frt': fr.tag(),
+            }
+            self.assertEqual(e, grid_to_dict(*expected))
 
 
 if __name__ == '__main__':

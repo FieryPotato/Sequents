@@ -127,7 +127,7 @@ class TestNegation(unittest.TestCase):
         self.assertEqual(expected_0, str(self.n1))
         self.assertEqual(expected_1, str(self.n2))
 
-    def test_string(self) -> None:
+    def test_long_string(self) -> None:
         expected_0 = 'not p1'
         expected_1 = 'not not p1'
         self.assertEqual(expected_0, self.n1.long_string)
@@ -365,11 +365,6 @@ class TestBinary(unittest.TestCase):
         self.disjunctions = [
             self.dj1, self.dj2_0_1, self.dj2_1_1
         ]
-
-    def test_arity_is_2(self) -> None:
-        for prop in (self.cj1, self.cd1, self.dj1):
-            with self.subTest(i=prop):
-                self.assertEqual(2, prop.arity)
 
     def test_creating_connective_with_improper_number_of_values_raises_value_error(self) -> None:
         for t in Conjunction, Disjunction, Conditional:
