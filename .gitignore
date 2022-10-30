@@ -167,3 +167,4 @@ cython_debug/
 *.pyc
 /profile.json
 /my_profiler.py
+needs_profiling.prof

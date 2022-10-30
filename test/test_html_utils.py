@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 from convert import string_to_tree, string_to_sequent, sequent_to_tree
 from HTML.utils import get_array, gridify, grid_to_dict
@@ -70,7 +71,7 @@ CSS_2C_2P_2P = [
 
 class TestHTMLArrayCreation(unittest.TestCase):
     def test_atom(self) -> None:
-        t = string_to_tree(STR_ATOM)
+        t = string_to_tree(STR_ATOM)  # A; B
         a = get_array(t, dtype=str)
         e = [
             ['', ''],
@@ -79,8 +80,9 @@ class TestHTMLArrayCreation(unittest.TestCase):
         ]
         self.assertEqual(e, a)
 
+    @patch('settings.CONFIG_PATH', 'test/mocks/config_invertible_connective_types.json')
     def test_1c_1p(self) -> None:
-        t = string_to_tree(STR_1C_1P)
+        t = string_to_tree(STR_1C_1P)  # ; A -> B
         a = get_array(t, dtype=str)
         e = [
             ['', ''],
@@ -92,7 +94,7 @@ class TestHTMLArrayCreation(unittest.TestCase):
         self.assertEqual(e, a)
 
     def test_1c_2p(self) -> None:
-        t = string_to_tree(STR_1C_2P)
+        t = string_to_tree(STR_1C_2P)  # A -> B;
         a = get_array(t, dtype=str)
 
         e = [
@@ -105,7 +107,7 @@ class TestHTMLArrayCreation(unittest.TestCase):
         self.assertEqual(e, a)
 
     def test_c2_1_1(self) -> None:
-        t = string_to_tree(STR_2C_1P_1P)
+        t = string_to_tree(STR_2C_1P_1P)  # A & B; A v B
         a = get_array(t, dtype=str)
 
         e = [
@@ -120,7 +122,7 @@ class TestHTMLArrayCreation(unittest.TestCase):
         self.assertEqual(e, a)
 
     def test_c2_2_1(self) -> None:
-        t = string_to_tree(STR_2C_2P_1P)
+        t = string_to_tree(STR_2C_2P_1P)  # A v B; A v B
         a = get_array(t, dtype=str)
 
         e = [
@@ -135,7 +137,7 @@ class TestHTMLArrayCreation(unittest.TestCase):
         self.assertEqual(e, a)
 
     def test_c2_1_2(self) -> None:
-        t = string_to_tree(STR_2C_1P_2P)
+        t = string_to_tree(STR_2C_1P_2P)  # A & B; A & B
         a = get_array(t, dtype=str)
 
         e = [
@@ -150,7 +152,7 @@ class TestHTMLArrayCreation(unittest.TestCase):
         self.assertEqual(e, a)
 
     def test_c2_2_2(self) -> None:
-        t = string_to_tree('A v B; C & D')
+        t = string_to_tree('A v B; C & D')  # A v B; C & D
         a = get_array(t, dtype=str)
 
         e = [

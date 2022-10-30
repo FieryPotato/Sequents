@@ -32,7 +32,7 @@ test_config = {
 settings_singleton = __Settings
 
 class TestSettings(unittest.TestCase): 
-    @patch('settings.config_path', test_config_path)
+    @patch('settings.CONFIG_PATH', test_config_path)
     def setUp(self) -> None:
         self.s = settings_singleton()
 

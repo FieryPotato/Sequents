@@ -49,6 +49,7 @@ class TestTreeMethods(unittest.TestCase):
             t_1_ = string_to_tree('A & B; C')
             self.assertEqual(1, t_1_.width())
 
+
 class TestTreeGrowth(unittest.TestCase):
     p = Atom('p')
     q = Atom('q')

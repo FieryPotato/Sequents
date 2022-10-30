@@ -9,7 +9,7 @@ from typing import Any
 # Absolute path to the Sequents package.
 sequent_package_dir = Path(__file__).parents[0]
 
-config_path = os.path.join(sequent_package_dir, 'config.json')
+CONFIG_PATH: str = os.path.join(sequent_package_dir, 'config.json')
 
 
 class __Settings(MutableMapping):
@@ -20,7 +20,7 @@ class __Settings(MutableMapping):
     """
     def __init__(self) -> None:
         super().__init__()
-        self.path = config_path
+        self.path = CONFIG_PATH
         self.dict = {}
         with open(self.path, 'r', encoding='utf-8') as cfg:
             self.update(json.load(cfg))
