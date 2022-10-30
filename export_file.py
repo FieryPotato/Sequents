@@ -10,6 +10,7 @@ cases, data should be an iterable container of Tree objects.
 __all__ = ['get_exporter']
 
 import json
+import os
 import pickle
 from pathlib import Path
 from typing import Protocol
@@ -26,7 +27,15 @@ class Exporter(Protocol):
 class PickleExporter:
     """Class for exporting data using pickle.""" 
     def __init__(self, file) -> None:
-        self.file = file
+        path = Path(file)
+        if not (parent := path.parent).exists():
+            os.makedirs(parent)
+        if path.suffix == '.sequents':
+            self.file = path
+        else:
+            if not path.exists():
+                os.makedirs(path)
+            self.file = path / 'results.sequents'
 
     def export(self, data) -> None:
         """Process data and save to self.file."""
@@ -63,10 +72,10 @@ class HTMLExporter:
         raise NotImplementedError
 
 
-
 def get_exporter(dst: str) -> Exporter:
     """Return the exporter object matching dst's suffix."""
     exporters = {
+        '.sequents': PickleExporter,
         '': PickleExporter,
         '.json': JSONExporter,
         '.html': HTMLExporter

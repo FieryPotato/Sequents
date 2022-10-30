@@ -68,7 +68,7 @@ class JSONImporter:
         """
         Ensure names, sequents, and forest keys are present in data.
         """
-        # names comes in as a list, but we want it as a set.
+        # 'names' comes in as a list, but we want it as a set.
         if 'names' in data:
             data['names'] = set(data['names'])
         else:
@@ -105,7 +105,7 @@ def get_importer(src: str) -> Importer:
     importers = {
         '.txt': TextImporter,
         '.json': JSONImporter,
-        '': ByteImporter
+        '.sequents': ByteImporter
     }
 
     suffix = Path(src).suffix  # the file extension

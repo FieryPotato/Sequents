@@ -111,6 +111,8 @@ class Sequent:
         elif side == 'con':
             ant = self.ant
             con = self.con[:index] + self.con[1 + index:]
+        else:
+            raise ValueError(f'Parameter side must be "ant" or "con", not {side}.')
         return Sequent(ant, con)
 
     @staticmethod

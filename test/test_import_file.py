@@ -122,7 +122,7 @@ class TestImportJson(unittest.TestCase):
 
 
 class TestImportBytes(unittest.TestCase):
-    file_path = 'test/io_testing/byte_test'
+    file_path = 'test/io_testing/byte_test.sequents'
 
     def test_import_bytes_trees(self) -> None:
         importer = ByteImporter(self.file_path)

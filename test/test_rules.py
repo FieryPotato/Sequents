@@ -146,7 +146,7 @@ class TestRules(unittest.TestCase):
             Sequent((self.ex,), ()),  # LExi
             Sequent((), (self.ex,)),  # RExi
         ]
-        expected = [
+        expected: list[list[Sequent]] = [
             [
                 Sequent((Atom('P<alpha>'),), ()),
                 Sequent((Atom('P<beta>'),), ()),
@@ -167,7 +167,7 @@ class TestRules(unittest.TestCase):
 
     def test_runi_instantiates_only_nonpresent_names(self):
         s1 = Sequent((Atom('T<beta>'),), (self.un,))
-        expected = [
+        expected: list[Sequent] = [
             Sequent((Atom('T<beta>'),), (Atom('P<alpha>'),)),
             Sequent((Atom('T<beta>'),), (Atom('P<gamma>'),))
         ]
@@ -177,7 +177,7 @@ class TestRules(unittest.TestCase):
 
     def test_lexi_instantiates_only_nonpresent_names(self):
         s1 = Sequent((self.ex,), (Atom('T<gamma>'),))
-        expected = [
+        expected: list[Sequent] = [
             Sequent((Atom('P<alpha>'),), (Atom('T<gamma>'),)),
             Sequent((Atom('P<beta>'),), (Atom('T<gamma>'),))
         ]

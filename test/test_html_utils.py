@@ -1,7 +1,7 @@
 import unittest
 
 from convert import string_to_tree, string_to_sequent, sequent_to_tree
-from html.utils import get_array, gridify, grid_to_dict
+from HTML.utils import get_array, gridify, grid_to_dict
 
 STR_ATOM = 'A; B'
 STR_1C_1P = '; A -> B'
@@ -12,23 +12,23 @@ STR_2C_1P_2P = 'A & B; A & B'
 STR_2C_2P_2P = 'A v B; C & D'
 
 CSS_ATOM = [
-     ['.', 'ft'],
-     ['f', 'ft'],
-     ['f', '.' ],
+    ['.', 'ft'],
+    ['f', 'ft'],
+    ['f', '.'],
 ]
 CSS_1C_1P = [
-    ['.',  'fmt'],
+    ['.', 'fmt'],
     ['fm', 'fmt'],
     ['fm', 'ft'],
-    ['f',  'ft'],
-    ['f',  '.']
+    ['f', 'ft'],
+    ['f', '.']
 ]
 CSS_1C_2P = [
-    ['.',  'flt', '.',  'frt'],
+    ['.', 'flt', '.', 'frt'],
     ['fl', 'flt', 'fr', 'frt'],
-    ['fl', '.',   'fr', 'ft'],
-    ['f',  'f',   'f',  'ft'],
-    ['f',  'f',   'f',  '.']
+    ['fl', '.', 'fr', 'ft'],
+    ['f', 'f', 'f', 'ft'],
+    ['f', 'f', 'f', '.']
 ]
 CSS_2C_1P_1P = [
     ['.', 'fmmt'],
@@ -43,7 +43,7 @@ CSS_2C_2P_1P = [
     ['.', 'flmt', '.', 'frmt'],
     ['flm', 'flmt', 'frm', 'frmt'],
     ['flm', 'flt', 'frm', 'frt'],
-    ['fl' , 'flt', 'fr', 'frt'],
+    ['fl', 'flt', 'fr', 'frt'],
     ['fl', '.', 'fr', 'ft'],
     ['f', 'f', 'f', 'ft'],
     ['f', 'f', 'f', '.'],
@@ -51,20 +51,20 @@ CSS_2C_2P_1P = [
 CSS_2C_1P_2P = [
     ['.', 'fmlt', '.', 'fmrt'],
     ['fml', 'fmlt', 'fmr', 'fmrt'],
-    ['fml', '.', 'fmr','fmt'],
+    ['fml', '.', 'fmr', 'fmt'],
     ['fm', 'fm', 'fm', 'fmt'],
     ['fm', 'fm', 'fm', 'ft'],
     ['f', 'f', 'f', 'ft'],
     ['f', 'f', 'f', '.'],
 ]
 CSS_2C_2P_2P = [
-    ['.',   'fllt', '.',   'flrt', '.',   'frlt', '.',   'frrt'],
+    ['.', 'fllt', '.', 'flrt', '.', 'frlt', '.', 'frrt'],
     ['fll', 'fllt', 'flr', 'flrt', 'frl', 'frlt', 'frr', 'frrt'],
-    ['fll', '.',    'flr', 'flt',  'frl', '.',    'frr', 'frt'],
-    ['fl',  'fl',   'fl',  'flt',  'fr',  'fr',   'fr',  'frt'],
-    ['fl',  'fl',   'fl',  '.',    'fr',  'fr',   'fr',  'ft'],
-    ['f',   'f',    'f',   'f',    'f',   'f',    'f',   'ft'],
-    ['f',   'f',    'f',   'f',    'f',   'f',    'f',   '.'],
+    ['fll', '.', 'flr', 'flt', 'frl', '.', 'frr', 'frt'],
+    ['fl', 'fl', 'fl', 'flt', 'fr', 'fr', 'fr', 'frt'],
+    ['fl', 'fl', 'fl', '.', 'fr', 'fr', 'fr', 'ft'],
+    ['f', 'f', 'f', 'f', 'f', 'f', 'f', 'ft'],
+    ['f', 'f', 'f', 'f', 'f', 'f', 'f', '.'],
 ]
 
 
@@ -80,7 +80,7 @@ class TestHTMLArrayCreation(unittest.TestCase):
         self.assertEqual(e, a)
 
     def test_1c_1p(self) -> None:
-        t = string_to_tree(STR_1C_1P) 
+        t = string_to_tree(STR_1C_1P)
         a = get_array(t, dtype=str)
         e = [
             ['', ''],
@@ -172,8 +172,8 @@ class TestHTMLification(unittest.TestCase):
         expected_css = CSS_ATOM
         expected_objects = [
             [None, seq.tag()],
-            [seq.long_string,  seq.tag()],
-            [seq.long_string,  None]
+            [seq.long_string, seq.tag()],
+            [seq.long_string, None]
         ]
         expected = expected_css, expected_objects
 
@@ -199,11 +199,11 @@ class TestHTMLification(unittest.TestCase):
         tree = sequent_to_tree(f)
         expected_css = CSS_1C_1P
         expected_objects = [
-            [None,    fm.tag()],
+            [None, fm.tag()],
             [fm.long_string, fm.tag()],
             [fm.long_string, f.tag()],
-            [f.long_string,  f.tag()],
-            [f.long_string,  None]
+            [f.long_string, f.tag()],
+            [f.long_string, None]
         ]
         expected = expected_css, expected_objects
 
@@ -233,10 +233,10 @@ class TestHTMLification(unittest.TestCase):
         expected_css = CSS_1C_2P
         expected_objects = [
             [None, fl.tag(), None, fr.tag()],
-            [fl.long_string, fl.tag(),      fr.long_string, fr.tag()],
-            [fl.long_string, None,          fr.long_string, f.tag()],
-            [f.long_string,  f.long_string, f.long_string,  f.tag()],
-            [f.long_string,  f.long_string, f.long_string,  None]
+            [fl.long_string, fl.tag(), fr.long_string, fr.tag()],
+            [fl.long_string, None, fr.long_string, f.tag()],
+            [f.long_string, f.long_string, f.long_string, f.tag()],
+            [f.long_string, f.long_string, f.long_string, None]
         ]
         expected = expected_css, expected_objects
 
@@ -287,11 +287,11 @@ class TestHTMLification(unittest.TestCase):
         # Test output dict
         with self.subTest(i='output dict'):
             e = {
-                '._1A_and_B26_1A_or_B2-f': f.long_string, 
+                '._1A_and_B26_1A_or_B2-f': f.long_string,
                 '._1A_and_B26_1A_or_B2-ft': f.tag(),
-                '._1A_and_B26_1A_or_B2-fm': fm.long_string, 
+                '._1A_and_B26_1A_or_B2-fm': fm.long_string,
                 '._1A_and_B26_1A_or_B2-fmt': fm.tag(),
-                '._1A_and_B26_1A_or_B2-fmm': fmm.long_string, 
+                '._1A_and_B26_1A_or_B2-fmm': fmm.long_string,
                 '._1A_and_B26_1A_or_B2-fmmt': fmm.tag()
             }
             self.assertEqual(e, grid_to_dict(*expected))
@@ -391,13 +391,18 @@ class TestHTMLification(unittest.TestCase):
         tree = string_to_tree(string)
         expected_css = CSS_2C_2P_2P
         expected_objects = [
-            [None,     fll.tag(), None,     flr.tag(), None,     frl.tag(), None,     frr.tag()],
-            [fll.long_string, fll.tag(), flr.long_string, flr.tag(), frl.long_string, frl.tag(), frr.long_string, frr.tag()],
-            [fll.long_string, None,      flr.long_string, fl.tag(),  frl.long_string, None,      frr.long_string, fr.tag()],
-            [fl.long_string,  fl.long_string,   fl.long_string,  fl.tag(),  fr.long_string,  fr.long_string,   fr.long_string,  fr.tag()], 
-            [fl.long_string,  fl.long_string,   fl.long_string,  None,      fr.long_string,  fr.long_string,   fr.long_string,  f.tag()],
-            [f.long_string,   f.long_string,    f.long_string,   f.long_string,    f.long_string,   f.long_string,    f.long_string,   f.tag()], 
-            [f.long_string,   f.long_string,    f.long_string,   f.long_string,    f.long_string,   f.long_string,    f.long_string,   None], 
+            [None, fll.tag(), None, flr.tag(), None, frl.tag(), None, frr.tag()],
+            [fll.long_string, fll.tag(), flr.long_string, flr.tag(), frl.long_string, frl.tag(), frr.long_string,
+             frr.tag()],
+            [fll.long_string, None, flr.long_string, fl.tag(), frl.long_string, None, frr.long_string, fr.tag()],
+            [fl.long_string, fl.long_string, fl.long_string, fl.tag(), fr.long_string, fr.long_string, fr.long_string,
+             fr.tag()],
+            [fl.long_string, fl.long_string, fl.long_string, None, fr.long_string, fr.long_string, fr.long_string,
+             f.tag()],
+            [f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, f.long_string,
+             f.tag()],
+            [f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, f.long_string,
+             None],
         ]
         expected = expected_css, expected_objects
 
@@ -428,8 +433,8 @@ class TestHTMLification(unittest.TestCase):
             }
             self.assertEqual(e, grid_to_dict(*expected))
 
-
     def test_lopsided_tree(self) -> None:
+        self.maxDiff = None
         string = '(A v B) v C;'
         f = string_to_sequent(string)
         fl = string_to_sequent('A v B;')
@@ -438,13 +443,13 @@ class TestHTMLification(unittest.TestCase):
         flr = string_to_sequent('B;')
         tree = string_to_tree(string)
         expected_css = [
-            ['.',   'fllt', '.',   'flrt', '.',  '.'],
-            ['fll', 'fllt', 'flr', 'flrt', '.',  '.'],
-            ['fll', '.',    'flr', 'flt',  '.',  'frt'],
-            ['fl',  'fl',   'fl',  'flt',  'fr', 'frt'],
-            ['fl',  'fl',   'fl',  '.',    'fr', 'ft'],
-            ['f',   'f',    'f',   'f',    'f',  'ft'],
-            ['f',   'f',    'f',   'f',    'f',  '.']
+            ['.', 'fllt', '.', 'flrt', '.', '.'],
+            ['fll', 'fllt', 'flr', 'flrt', '.', '.'],
+            ['fll', '.', 'flr', 'flt', '.', 'frt'],
+            ['fl', 'fl', 'fl', 'flt', 'fr', 'frt'],
+            ['fl', 'fl', 'fl', '.', 'fr', 'ft'],
+            ['f', 'f', 'f', 'f', 'f', 'ft'],
+            ['f', 'f', 'f', 'f', 'f', '.']
         ]
         expected_objects = [
             [None, fll.tag(), None, flr.tag(), None, None],
@@ -467,16 +472,16 @@ class TestHTMLification(unittest.TestCase):
         # Test output dict
         with self.subTest(i='output dict'):
             e = {
-                '._11A_or_B2_or_C26_-f': f.long_string,
-                '._11A_or_B2_or_C26_-ft': f.tag(),
-                '._11A_or_B2_or_C26_-fl': fl.long_string,
-                '._11A_or_B2_or_C26_-flt': fl.tag(),
-                '._11A_or_B2_or_C26_-fll': fll.long_string,
-                '._11A_or_B2_or_C26_-fllt': fll.tag(),
-                '._11A_or_B2_or_C26_-flr': flr.long_string,
-                '._11A_or_B2_or_C26_-flrt': flr.tag(),
-                '._11A_or_B2_or_C26_-fr': fr.long_string,
-                '._11A_or_B2_or_C26_-frt': fr.tag(),
+                '._11A_or_B2_or_C26-f': f.long_string,
+                '._11A_or_B2_or_C26-ft': f.tag(),
+                '._11A_or_B2_or_C26-fl': fl.long_string,
+                '._11A_or_B2_or_C26-flt': fl.tag(),
+                '._11A_or_B2_or_C26-fll': fll.long_string,
+                '._11A_or_B2_or_C26-fllt': fll.tag(),
+                '._11A_or_B2_or_C26-flr': flr.long_string,
+                '._11A_or_B2_or_C26-flrt': flr.tag(),
+                '._11A_or_B2_or_C26-fr': fr.long_string,
+                '._11A_or_B2_or_C26-frt': fr.tag(),
             }
             self.assertEqual(e, grid_to_dict(*expected))
 

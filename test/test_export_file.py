@@ -1,52 +1,56 @@
-import os
 import unittest
 import pickle
+from pathlib import Path
 
-from convert import dict_to_tree
+from convert import string_to_tree
 from export_file import PickleExporter
-from proposition import Atom, Negation, Conditional, Conjunction,\
-    Disjunction
-from sequent import Sequent
 
 
 class TestExportFile(unittest.TestCase):
-    file = 'test/io_testing/export'
-    p = Atom('p')
-    q = Atom('q')
-    n = Negation(p)
-    cd = Conditional(p, q)
-    cj = Conjunction(p, q)
-    dj = Disjunction(p, q)
+    dir: str = 'test/io_testing/export/'
+    bytes_out_w_dir: str = 'test/io_testing/export/results.sequents'
+    bytes_out_w_file: str = 'test/io_testing/export/export.sequents'
 
     def tearDown(self) -> None:
-        if os.path.exists(self.file):
-            os.remove(self.file)
-        
-    def test_saving_tree_to_file(self) -> None:
-        d_0 = {
-            Sequent((),(self.cd,)):
-                {Sequent((self.p,),(self.q,)): None}
-        }
-        t_0 = dict_to_tree(d_0)
+        test_dir = Path(self.dir)
+        if not test_dir.exists():
+            return
+        for file in test_dir.iterdir():
+            if file.is_dir():
+                for f in file.iterdir():
+                    f.unlink(missing_ok=True)
+                file.rmdir()
+            elif file.exists():
+                file.unlink()
+        test_dir.rmdir()
 
-        d_1 = {
-            Sequent((self.cd,),()):
-                {
-                    Sequent((),(self.p,)): None,
-                    Sequent((self.q,),()): None
-                }
-        }
-        t_1 = dict_to_tree(d_1)
+    def test_saving_tree_to_dir_bytes(self) -> None:
+        t_0 = string_to_tree('A; B -> C')
+
+        t_1 = string_to_tree('A v B; C & (D v E)')
         tree_list = [t_0, t_1]
                         
-        exporter = PickleExporter(self.file)
+        exporter = PickleExporter(self.dir)
         exporter.export(tree_list)
 
-        with open(self.file, 'rb') as f:
+        with open(self.bytes_out_w_dir, 'rb') as f:
             actual = pickle.load(f)
         
         self.assertEqual(tree_list, actual)
 
+    def test_saving_tree_to_file_bytes(self) -> None:
+        t_0 = string_to_tree('A; B -> C')
+
+        t_1 = string_to_tree('A v B; C & (D v E)')
+        tree_list = [t_0, t_1]
+
+        exporter = PickleExporter(self.dir + 'export.sequents')
+        exporter.export(tree_list)
+
+        with open(self.bytes_out_w_file, 'rb') as f:
+            actual = pickle.load(f)
+
+        self.assertEqual(tree_list, actual)
 
 
 if __name__ == '__main__':

@@ -89,6 +89,14 @@ class Proposition(ABC):
 
     @property
     @abstractmethod
+    def long_string(self) -> str:
+        """
+        Return this proposition's string with connective symbols
+        expanded to their whole words.
+        """
+
+    @property
+    @abstractmethod
     def content(self) -> tuple:
         """Return this object's propositional content."""
 
@@ -191,7 +199,7 @@ class Quantifier(Proposition):
         sub_prop = self.prop.instantiate(variable, name)
         return self.__class__(self.variable, sub_prop)
 
-    def instantiate_with(self, name) -> 'Quantifier':
+    def instantiate_with(self, name) -> Self:
         """Return self.prop instantiated with self.variable."""
         return self.prop.instantiate(self.variable, name)
 
@@ -277,7 +285,7 @@ class Atom(UnaryProposition):
         variables = [o for o in objects if len(o) == 1]
         return tuple(sorted(variables))
 
-    def instantiate(self, variable: str, name: str) -> 'Atom':
+    def instantiate(self, variable: str, name: str) -> Self:
         """
         Return an atom whose instances of variable are replaced with
         name.
