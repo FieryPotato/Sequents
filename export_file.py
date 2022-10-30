@@ -46,8 +46,16 @@ class PickleExporter:
 class JSONExporter:
     """Class for exporting data to a .json file."""
     def __init__(self, file) -> None:
-        self.file = file
-    
+        path = Path(file)
+        if not (parent := path.parent).exists():
+            os.makedirs(parent)
+        if path.suffix == '.json':
+            self.file = path
+        else:
+            if not path.exists():
+                os.makedirs(path)
+            self.file = path / 'results.json'
+
     def export(self, data) -> None:
         """Process data and save to self.file."""
         
