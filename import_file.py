@@ -42,7 +42,7 @@ class TextImporter:
     def import_(self) -> dict:
         """Return a list of self.path's lines."""
         with open(self.path, 'r') as file:
-            lines = [line.strip('\n') for line in file.readlines()]
+            lines = [line.strip('\n') for line in file]
         return {
             'names': set(),
             'sequents': lines,

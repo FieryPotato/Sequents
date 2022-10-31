@@ -30,7 +30,7 @@ class PickleExporter:
         path = Path(file)
         if not (parent := path.parent).exists():
             os.makedirs(parent)
-        if path.suffix == '.sequents':
+        if path.suffix.lower() == '.sequents':
             self.file = path
         else:
             if not path.exists():
@@ -49,7 +49,7 @@ class JSONExporter:
         path = Path(file)
         if not (parent := path.parent).exists():
             os.makedirs(parent)
-        if path.suffix == '.json':
+        if path.suffix.lower() == '.json':
             self.file = path
         else:
             if not path.exists():
@@ -74,7 +74,15 @@ class HTMLExporter:
     file that can be opened in any web browser.
     """
     def __init__(self, file) -> None:
-        self.file = file
+        path = Path(file)
+        if not (parent := path.parent).exists():
+            os.makedirs(parent)
+        if path.suffix.lower() == '.html':
+            self.file = path
+        else:
+            if not path.exists():
+                os.makedirs(path)
+            self.file = path / 'results.json'
 
     def export(self, data) -> None:
         raise NotImplementedError

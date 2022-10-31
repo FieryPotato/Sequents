@@ -123,7 +123,7 @@ class Proposition(ABC):
         """Return a tuple of unbound variables in self.content."""
         variables = set()
         for prop in self.content:
-            variables.update({v for v in prop.unbound_variables})
+            variables.update(set(prop.unbound_variables))
         return tuple(sorted(variables))
 
     def instantiate(self, variable, name) -> Self:
@@ -184,7 +184,7 @@ class Quantifier(Proposition):
     def unbound_variables(self) -> tuple[str]:
         variables = set()
         for prop in self.content:
-            variables.update({v for v in prop.unbound_variables})
+            variables.update(set(prop.unbound_variables))
         unbound = [v for v in variables if v != self.variable]
         return tuple(sorted(unbound))
 
@@ -290,14 +290,10 @@ class Atom(UnaryProposition):
         Return an atom whose instances of variable are replaced with
         name.
         """
-        objects: list[str] = self.objects
-
         # Replace variable instances with name
-        new_objects = []
-        for o in objects:
-            if o == variable:
-                o = name
-            new_objects.append(o)
+        new_objects = [
+            name if o == variable else o for o in self.objects
+        ]
 
         # Put new objects into a new string for Atom creation
         new_content = f"{self.predicates[0]}<{', '.join(new_objects)}>"
