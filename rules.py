@@ -49,7 +49,7 @@ class Decomposer(Protocol):
 
     def get_parents(self) -> dict | list | None:
         ...
-        
+
     def decompose(self) -> Sequent | None:
         ...
 
@@ -65,7 +65,7 @@ class AtomDecomposer:
 
     def get_parents(self) -> None:
         return None
-    
+
     def decompose(self) -> None:
         raise AttributeError('Atomic sequents cannot be decomposed.')
 
@@ -164,23 +164,23 @@ class NonInvertibleTwoParentDecomposer:
     def decompose(self) -> list[tuple[Sequent, Sequent]]:
         rule_result = self.rule.apply()
 
-        decomp_results = []
-        for left, right in self.removed_main_prop.possible_mix_parents():
-            l_result = Sequent.mix(left, rule_result[0])
-            r_result = Sequent.mix(right, rule_result[1])
-            decomp_results.append((l_result, r_result))
-        return decomp_results
+        return [
+            (
+                Sequent.mix(parent[0], rule_result[0]),
+                Sequent.mix(parent[1], rule_result[1])
+            )
+            for parent in self.removed_main_prop.possible_mix_parents()
+        ]
 
     def get_parents(self) -> list:
         decomp_results = self.decompose()
-        parents = []
-        for left, right in decomp_results:
-            sub_dict = {
+        return [
+            {
                 left: None,
                 right: None
             }
-            parents.append(sub_dict)
-        return parents
+            for left, right in decomp_results
+        ]
 
 
 class Rule(Protocol):
@@ -243,8 +243,10 @@ class AddLAnd:
 
     def apply(self, **kwargs) -> tuple[Sequent, Sequent]:
         """Apply additive left conjunction rule to self.sequent."""
-        return (Sequent((self.proposition.left,), ()),
-                Sequent((self.proposition.right,), ()))
+        return (
+            Sequent((self.proposition.left,), ()),
+            Sequent((self.proposition.right,), ())
+        )
 
 
 class MultRAnd:
@@ -403,8 +405,10 @@ class LUni:
 
     def apply(self, **kwargs) -> tuple[Sequent, ...]:
         """Apply left universal rule to self.sequent"""
-        instantiated = [self.instantiate(name) for name in self.names]
-        return tuple(Sequent((prop,), ()) for prop in instantiated)
+        return tuple(
+            Sequent((prop,), ())
+            for prop in map(self.instantiate, self.names)
+        )
 
     def instantiate(self, name) -> Proposition:
         """
@@ -427,8 +431,10 @@ class RUni:
     def apply(self, sequent=None, **kwargs) -> tuple[Sequent, ...]:
         """Apply right universal rule to self.sequent"""
         legal_names = self.names - sequent.names
-        instantiated = [self.instantiate(name) for name in legal_names]
-        return tuple(Sequent((), (prop,)) for prop in instantiated)
+        return tuple(
+            Sequent((), (prop,))
+            for prop in map(self.instantiate, legal_names)
+        )
 
     def instantiate(self, name) -> Proposition:
         """
@@ -451,8 +457,10 @@ class LExi:
     def apply(self, sequent=None, **kwargs) -> tuple[Sequent, ...]:
         """Apply left existential rule to self.sequent"""
         legal_names = self.names - sequent.names
-        instantiated = [self.instantiate(name) for name in legal_names]
-        return tuple(Sequent((prop,), ()) for prop in instantiated)
+        return tuple(
+            Sequent((prop,), ())
+            for prop in map(self.instantiate, legal_names)
+        )
 
     def instantiate(self, name) -> Proposition:
         """
@@ -474,8 +482,10 @@ class RExi:
 
     def apply(self, **kwargs) -> tuple[Sequent, ...]:
         """Apply right existential rule to self.sequent"""
-        instantiated = [self.instantiate(name) for name in self.names]
-        return tuple(Sequent((), (prop,)) for prop in instantiated)
+        return tuple(
+            Sequent((), (prop,))
+            for prop in map(self.instantiate, self.names)
+        )
 
     def instantiate(self, name) -> Proposition:
         """
@@ -484,9 +494,8 @@ class RExi:
         var = self.proposition.variable
         return self.proposition.instantiate(var, name)
 
-    # Dictionary mapping connectives, sides, and types to their rule class.
 
-
+# Dictionary mapping connectives, sides, and types to their rule class.
 rules = {
     '~': {'ant': {
         'add': LNeg,

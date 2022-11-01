@@ -124,6 +124,7 @@ class Proposition(ABC):
         variables = set()
         for prop in self.content:
             variables.update(set(prop.unbound_variables))
+
         return tuple(sorted(variables))
 
     def instantiate(self, variable, name) -> Self:
@@ -275,14 +276,12 @@ class Atom(UnaryProposition):
     @property
     def names(self) -> set[str]:
         """Return a tuple of names in self.content."""
-        objects: list[str] = self.objects
-        return {o for o in objects if len(o) > 1}
+        return {o for o in self.objects if len(o) > 1}
 
     @property
     def unbound_variables(self) -> tuple[str]:
         """Return a tuple of unbound variables in self.content."""
-        objects: list[str] = list(set(self.objects))
-        variables = [o for o in objects if len(o) == 1]
+        variables = [o for o in set(self.objects) if len(o) == 1]
         return tuple(sorted(variables))
 
     def instantiate(self, variable: str, name: str) -> Self:
