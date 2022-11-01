@@ -1,7 +1,7 @@
 import unittest
 
 from sequent import Sequent
-from proposition import *
+from proposition import Atom, Negation, Conjunction, Disjunction, Conditional
 
 
 class TestSequent(unittest.TestCase):

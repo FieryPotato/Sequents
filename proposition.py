@@ -1,45 +1,47 @@
 """
-Module containing proposition classes. 
+Module containing proposition classes.
 
-Propositions are immutable hashable objects with the following 
+Propositions are immutable hashable objects with the following
 properties:
 
-- 'arity': a measure of how many subpropositions the proposition 
-contains.  Atoms and negations are unary (arity=1), while conjunctions, 
+- 'arity': a measure of how many subpropositions the proposition
+contains.  Atoms and negations are unary (arity=1), while conjunctions,
 disjunctions, and conditionals are binary (arity=2).
 
 - 'symb': the string symbolizing the logical content of the proposition.
-The following correspond to propositions in the expected way: &, v, ~, 
-->. (Atoms have no logical content and are therefore associated with the 
+The following correspond to propositions in the expected way: &, v, ~,
+->. (Atoms have no logical content and are therefore associated with the
 empty string ('').)
 
-- 'complexity': a measure of how deeply nested the most-nested 
+- 'word': the string which corresponds to self.symb in natural language.
+
+- 'complexity': a measure of how deeply nested the most-nested
 subproposition is. This is measured recursively for each proposition and
 subproposition, with Atoms having complexity 0.
 
-- Binary propositions have a 'left' and 'right' property, corresponding 
+- Binary propositions have a 'left' and 'right' property, corresponding
 to the subproposition on that side of their main connective. Negations
-meanwhile have the 'negatum' property and Atoms, 'prop'. These can be 
+meanwhile have the 'negatum' property and Atoms, 'prop'. These can be
 accessed class-agnostically by accessing the object's .content property.
 
 - names: a tuple of strings containing each name in the proposition and
 subpropositions. Names are always two or more lowercase letters.
 
 - unbound_variables: a tuple of strings containing each unbound variable
-in the proposition. Unbound variables are single lowercase letters not 
+in the proposition. Unbound variables are single lowercase letters not
 bound by a quantifier.
 
 - instantiate: return this proposition with all instances of a variable
-replaced with a name. If the proposition is a quantifier and the 
-variable, is the variable it binds, instead return the subproposition 
+replaced with a name. If the proposition is a quantifier and the
+variable, is the variable it binds, instead return the subproposition
 (i.e. remove the quantifier).
 
 Notably, Atoms have strings as their propositional content, while all
-other propositions have Propositions (atoms or otherwise) as their 
+other propositions have Propositions (atoms or otherwise) as their
 content.
 
-Note that for most uses, you should prefer creating the classes in this 
-module by using the functions in the convert module (e.g., 
+Note that for most uses, you should prefer creating the classes in this
+module by using the functions in the convert module (e.g.,
 string_to_proposition) over creating these classes directly.
 """
 
@@ -50,6 +52,7 @@ import re
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Self
 
 SIDES: set[str] = {'ant', 'con'}
 
@@ -67,6 +70,7 @@ class Proposition(ABC):
     """
     arity = None  # How many propositions this object contains.
     symb = None  # The logical symbol this object assumes.
+    word = None  # The english language word representing self.symb.
 
     def __post_init__(self) -> None:
         self.validate_content()
@@ -82,6 +86,14 @@ class Proposition(ABC):
         True
         """
         return self.content[index]
+
+    @property
+    @abstractmethod
+    def long_string(self) -> str:
+        """
+        Return this proposition's string with connective symbols
+        expanded to their whole words.
+        """
 
     @property
     @abstractmethod
@@ -111,10 +123,11 @@ class Proposition(ABC):
         """Return a tuple of unbound variables in self.content."""
         variables = set()
         for prop in self.content:
-            variables.update({v for v in prop.unbound_variables})
+            variables.update(set(prop.unbound_variables))
+
         return tuple(sorted(variables))
 
-    def instantiate(self, variable, name) -> 'cls':
+    def instantiate(self, variable, name) -> Self:
         """
         Return an instance of this class whose instances of variable
         are replaced with name.
@@ -131,10 +144,15 @@ class UnaryProposition(Proposition):
     prop: Proposition
     arity = 1
     symb = None
+    word = None
     variable = ''
 
     def __str__(self) -> str:
         return f'{self.symb} {self.prop}'
+
+    @property
+    def long_string(self) -> str:
+        return f'{self.word} {self.prop.long_string}'
 
     @property
     def content(self) -> tuple[Proposition | str]:
@@ -150,9 +168,14 @@ class Quantifier(Proposition):
     prop: Proposition
     arity = 1
     symb = None
+    word = None
 
     def __str__(self) -> str:
         return f'{self.symb}{self.variable} {self.prop}'
+
+    @property
+    def long_string(self) -> str:
+        return f'{self.word}{self.variable} {self.prop.long_string}'
 
     @property
     def content(self) -> tuple[Proposition]:
@@ -162,7 +185,7 @@ class Quantifier(Proposition):
     def unbound_variables(self) -> tuple[str]:
         variables = set()
         for prop in self.content:
-            variables.update({v for v in prop.unbound_variables})
+            variables.update(set(prop.unbound_variables))
         unbound = [v for v in variables if v != self.variable]
         return tuple(sorted(unbound))
 
@@ -177,7 +200,7 @@ class Quantifier(Proposition):
         sub_prop = self.prop.instantiate(variable, name)
         return self.__class__(self.variable, sub_prop)
 
-    def instantiate_with(self, name) -> 'Quantifier':
+    def instantiate_with(self, name) -> Self:
         """Return self.prop instantiated with self.variable."""
         return self.prop.instantiate(self.variable, name)
 
@@ -191,9 +214,14 @@ class BinaryProposition(Proposition):
     right: Proposition
     arity = 2
     symb = None
+    word = None
 
     def __str__(self):
         return f'({str(self[0])} {self.symb} {str(self[1])})'
+
+    @property
+    def long_string(self) -> str:
+        return f'({self[0].long_string} {self.word} {self[1].long_string})'
 
     @property
     def content(self) -> tuple[Proposition, Proposition]:
@@ -208,9 +236,14 @@ class Atom(UnaryProposition):
     prop: str
     arity = 1
     symb = ''
+    word = ''
 
     def __str__(self) -> str:
         return f'{self[0]}'
+
+    @property
+    def long_string(self) -> str:
+        return str(self)
 
     @property
     def complexity(self) -> int:
@@ -243,29 +276,23 @@ class Atom(UnaryProposition):
     @property
     def names(self) -> set[str]:
         """Return a tuple of names in self.content."""
-        objects: list[str] = self.objects
-        return {o for o in objects if len(o) > 1}
+        return {o for o in self.objects if len(o) > 1}
 
     @property
     def unbound_variables(self) -> tuple[str]:
         """Return a tuple of unbound variables in self.content."""
-        objects: list[str] = list(set(self.objects))
-        variables = [o for o in objects if len(o) == 1]
+        variables = [o for o in set(self.objects) if len(o) == 1]
         return tuple(sorted(variables))
 
-    def instantiate(self, variable: str, name: str) -> 'Atom':
+    def instantiate(self, variable: str, name: str) -> Self:
         """
         Return an atom whose instances of variable are replaced with
         name.
         """
-        objects: list[str] = self.objects
-
         # Replace variable instances with name
-        new_objects = []
-        for o in objects:
-            if o == variable:
-                o = name
-            new_objects.append(o)
+        new_objects = [
+            name if o == variable else o for o in self.objects
+        ]
 
         # Put new objects into a new string for Atom creation
         new_content = f"{self.predicates[0]}<{', '.join(new_objects)}>"
@@ -282,6 +309,7 @@ class Universal(Quantifier):
     prop: Proposition
     arity = 1
     symb = '∀'
+    word = 'forall'
 
 
 @dataclass(slots=True, frozen=True, order=True)
@@ -293,6 +321,7 @@ class Existential(Quantifier):
     prop: Proposition
     arity = 1
     symb = '∃'
+    word = 'exists'
 
 
 @dataclass(slots=True, frozen=True, order=True)
@@ -302,6 +331,7 @@ class Negation(UnaryProposition):
     """
     prop: Proposition
     symb = '~'
+    word = 'not'
     arity = 1
 
 
@@ -311,6 +341,7 @@ class Conjunction(BinaryProposition):
     Binary proposition signifying logical '... and ...'.
     """
     symb = '&'
+    word = 'and'
 
 
 @dataclass(slots=True, frozen=True, order=True)
@@ -319,6 +350,7 @@ class Conditional(BinaryProposition):
     Binary proposition signifying logical 'if ... then ...'
     """
     symb = '->'
+    word = 'implies'
 
 
 @dataclass(slots=True, frozen=True, order=True)
@@ -327,3 +359,5 @@ class Disjunction(BinaryProposition):
     Binary proposition signifying logical '... or ...'
     """
     symb = 'v'
+    word = 'or'
+

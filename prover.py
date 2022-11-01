@@ -61,9 +61,9 @@ class Prover:
         # of parallelism start to outweigh the costs of pool creation.
         if len(self.roots) > 10:
             with Pool() as pool:
-                results = pool.starmap(sequent_to_tree, [(root, self.names) for root in self.roots])
+                results = pool.starmap(sequent_to_tree, ((root, self.names) for root in self.roots))
         else:
-            results = itertools.starmap(sequent_to_tree, [(root, self.names) for root in self.roots])
+            results = itertools.starmap(sequent_to_tree, ((root, self.names) for root in self.roots))
         self.forest.extend(results)
 
     def export(self) -> dict:

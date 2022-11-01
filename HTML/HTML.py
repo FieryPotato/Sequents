@@ -17,4 +17,3 @@ class HTML:
     def save(self) -> None:
         with open(self.path, 'w') as f:
             f.write(self.file.render())
-

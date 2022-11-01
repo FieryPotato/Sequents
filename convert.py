@@ -34,17 +34,17 @@ def string_to_proposition(string) -> Proposition:
 
     fac: Type[PropositionFactory]
     match split_string:
-        case [left, '&' | 'and', right]:
+        case [_, '&' | 'and', _]:
             fac = ConjunctionFactory
-        case [left, '->' | 'implies', right]:
+        case [_, '->' | 'implies', _]:
             fac = ConditionalFactory
-        case [left, 'v' | 'or', right]:
+        case [_, 'v' | 'or', _]:
             fac = DisjunctionFactory
-        case ['~' | 'not', negatum]:
+        case ['~' | 'not', _]:
             fac = NegationFactory
-        case ['∀' | 'forall', var, prop]:
+        case ['∀' | 'forall', _, _]:
             fac = UniversalFactory
-        case ['∃' | 'exists', var, prop]:
+        case ['∃' | 'exists', _, _]:
             fac = ExistentialFactory
         case '':
             raise ValueError('Cannot convert empty string to proposition.')
@@ -127,22 +127,21 @@ def string_to_sequent(string: str) -> Sequent:
     # the extremities. If there's nothing but whitespace, then that 
     # was empty. Otherwise, we turn each string into the proposition
     # it represents
-
     ant_list: list[str] = [s.strip(' ') for s in ant_string.split(',')]
     if ant_list == ['']:  
-        antecedents = []  # Empty list for empty antecedents
+        antecedents = ()
     else:
-        antecedents = [string_to_proposition(ant) for ant in ant_list]
+        antecedents = tuple(map(string_to_proposition, ant_list))
 
     con_list: list[str] = [s.strip(' ') for s in con_string.split(',')]
     if con_list == ['']:
-        consequents = []  # Empty list for empty consequents
+        consequents = ()
     else:
-        consequents = [string_to_proposition(con) for con in con_list]
+        consequents = tuple(map(string_to_proposition, con_list))
 
     return Sequent(
-        tuple(antecedents),
-        tuple(consequents)
+        antecedents,
+        consequents
     )
 
 

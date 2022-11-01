@@ -1,9 +1,7 @@
 import os
 import unittest
 
-from pathlib import Path
-
-from html.HTML import HTML
+from HTML.HTML import HTML
 
 
 def cleanup(filename) -> None:

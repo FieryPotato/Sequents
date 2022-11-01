@@ -29,6 +29,11 @@ class TestAtom(unittest.TestCase):
         actual = str(self.a1)
         self.assertEqual(expected, actual)
 
+    def test_long_string(self) -> None:
+        expected = 'p1'
+        actual = self.a1.long_string
+        self.assertEqual(expected, actual)
+
     def test_putting_more_than_one_prop_in_atom_raises_value_error(self) -> None:
         with self.assertRaises(TypeError):
             Atom('p1', 'p2')
@@ -121,6 +126,12 @@ class TestNegation(unittest.TestCase):
         expected_1 = '~ ~ p1'
         self.assertEqual(expected_0, str(self.n1))
         self.assertEqual(expected_1, str(self.n2))
+
+    def test_long_string(self) -> None:
+        expected_0 = 'not p1'
+        expected_1 = 'not not p1'
+        self.assertEqual(expected_0, self.n1.long_string)
+        self.assertEqual(expected_1, self.n2.long_string)
 
     def test_creating_prop_with_string_raises_error(self) -> None:
         with self.assertRaises(TypeError):
@@ -247,6 +258,25 @@ class TestQuantifiers(unittest.TestCase):
                 with self.subTest(i=(cls, t)):
                     self.assertEqual(e, str(t))
 
+    def test_long_string(self) -> None:
+        words = 'forall', 'exists'
+        for cls, word in zip(self.classes, words):
+            test = [
+                cls('a', Atom('P<a>')),
+                cls('b', Atom('P<alice, b>')),
+                cls('a', cls('b', Atom('P<a, b>'))),
+                cls('x', Conditional(Atom('P<x>'), Atom('Q<x>')))
+            ]
+            expected = [
+                f'{word}a P<a>',
+                f'{word}b P<alice, b>',
+                f'{word}a {word}b P<a, b>',
+                f'{word}x (P<x> implies Q<x>)'
+            ]
+            for t, e in zip(test, expected):
+                with self.subTest(i=(cls, t)):
+                    self.assertEqual(e, t.long_string)
+
     def test_names(self) -> None:
         tests = [
             ('x', Atom('P<x>')),
@@ -335,11 +365,6 @@ class TestBinary(unittest.TestCase):
         self.disjunctions = [
             self.dj1, self.dj2_0_1, self.dj2_1_1
         ]
-
-    def test_arity_is_2(self) -> None:
-        for prop in (self.cj1, self.cd1, self.dj1):
-            with self.subTest(i=prop):
-                self.assertEqual(2, prop.arity)
 
     def test_creating_connective_with_improper_number_of_values_raises_value_error(self) -> None:
         for t in Conjunction, Disjunction, Conditional:
@@ -430,6 +455,54 @@ class TestBinary(unittest.TestCase):
         for e, a in tests:
             with self.subTest(i=a):
                 self.assertEqual(e, str(a))
+
+    def test_conjunction_long_string(self) -> None:
+        expecteds = [
+            '(p1 and p2)',
+            '(p1 and (p1 and p2))',
+            '((p1 and p2) and (p1 and p2))'
+        ]
+        actuals = [
+            self.cj1,
+            self.cj2_0_1,
+            self.cj2_1_1
+        ]
+        tests = zip(expecteds, actuals)
+        for e, a in tests:
+            with self.subTest(i=a):
+                self.assertEqual(e, a.long_string)
+
+    def test_disjunction_long_string(self) -> None:
+        expecteds = [
+            '(p1 or p2)',
+            '(p1 or (p1 or p2))',
+            '((p1 or p2) or (p1 or p2))'
+        ]
+        actuals = [
+            self.dj1,
+            self.dj2_0_1,
+            self.dj2_1_1
+        ]
+        tests = zip(expecteds, actuals)
+        for e, a in tests:
+            with self.subTest(i=a):
+                self.assertEqual(e, a.long_string)
+
+    def test_conditional_long_string(self) -> None:
+        expecteds = [
+            '(p1 implies p2)',
+            '(p1 implies (p1 implies p2))',
+            '((p1 implies p2) implies (p1 implies p2))'
+        ]
+        actuals = [
+            self.cd1,
+            self.cd2_0_1,
+            self.cd2_1_1
+        ]
+        tests = zip(expecteds, actuals)
+        for e, a in tests:
+            with self.subTest(i=a):
+                self.assertEqual(e, a.long_string)
 
     def test_binary_names(self) -> None:
         classes = Conditional, Conjunction, Disjunction

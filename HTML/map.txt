@@ -46,23 +46,20 @@ The HTML spec for sequents is as follows:
     parent and single-parent sequents have only an m parent. These are 
     placed in the grid-template-areas property of the tree class.
 
-    To clean things up a bit, all trees have two classes, the general
-    tree class which defines general formatting for the grid, and the
-    sequent specific class which defines only grid-template-areas. 
-    Likewise, each cell is made of two classes, one for cell formatting
-    and one for the cell's location. Labels have only the class that 
-    defines their location in the parent grid.
-
-    Quantifiers are not fully implemented and having more than one name
-    instantiated in a tree will cause collisions. I will wait to 
-    implement these properly until I have a better handle on how 
-    quantifiers should be decomposed.
-
-Thoughts after a bit of testing:
-    - The width of a grid should be 2 * the tree's width
-        -> one column for each leaf node, and another for its label
-    - The height of a grid should be 1 + (2 * the tree's height)
-        -> Two rows for each node, plus one for the top label
-
-
+WIP html creation flow:
+    1. Use my HTML class which is an adapter for dominate as a context 
+    manager.
+    2. For each tree in whatever input iterable we end up using (maybe
+    Prover, maybe something else): 
+        i. Gridify the tree, yielding two lists (css and objects)
+        ii. Add the css list to the style tag in the document's head.
+        iii. Create a title header (h3?) in the document's body whose 
+        content is the tree's root sequent.
+        iv. Convert the objects list into a dictionary with css classes
+        as keys and the objects' string representations (i.e. str(f) 
+        and f.tag()) as values.
+        v. Create a tree div and fill it with each key-value pair in
+        the natural way. (Ensure here that cells subclass the HTML cell
+        class in boilerplate.json.)
+        vi. Close the tag and add a break.
 

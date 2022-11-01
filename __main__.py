@@ -8,19 +8,18 @@ from import_file import get_importer
 from prover import Prover
 from settings import Settings
 
-
-solve_help = 'decompose sequents in infile and export the results to '\
+solve_help = 'decompose sequents in infile and export the results to ' \
              'outfile (if given) or infile_results'
 
-side_help = '\'ant\', \'antecedent\', \'left\' '\
+side_help = '\'ant\', \'antecedent\', \'left\' ' \
             'or \'con\', \'consequent\', \'right\''
 
-add_mul_help = '\'add\', \'additive\', \'+\' '\
+add_mul_help = '\'add\', \'additive\', \'+\' ' \
                'or \'mul\', \'multiplicative\', \'*\', \'x\''
 
-connective_help = '\'->\', \'implies\', \'if\',\'conditional\' '\
-                  'or \'v\', \'or\', \'disjunction\' '\
-                  'or \'&\', \'and\', \'conjunction\' '\
+connective_help = '\'->\', \'implies\', \'if\',\'conditional\' ' \
+                  'or \'v\', \'or\', \'disjunction\' ' \
+                  'or \'&\', \'and\', \'conjunction\' ' \
                   'or \'~\', \'not\', \'negation\''
 
 rule_help = 'display current rule settings'
@@ -58,7 +57,7 @@ def solve(infile, outfile, filetype) -> None:
 
 
 def apply_filetype(outfile: str, filetype: str) -> str:
-    """Ensure outfile has the desired extension.""" 
+    """Ensure outfile has the desired extension."""
     o_f = Path(outfile)
     if o_f.suffix == filetype:
         return outfile
@@ -75,19 +74,19 @@ def normalize_rule_args(args) -> list[str, str, str]:
     cd = {'implies', 'conditional', '->', 'if'}
     n = {'not', 'negation', '~'}
     connectives = {
-        '&': cj, 
-        'v': dj, 
-        '->': cd, 
+        '&': cj,
+        'v': dj,
+        '->': cd,
         '~': n
     }
 
     ant = {'ant', 'antecedent', 'left'}
     con = {'con', 'consequent', 'right'}
     sides = {
-        'ant': ant, 
+        'ant': ant,
         'con': con
     }
-    
+
     add = {'add', 'additive', '+'}
     mul = {'mul', 'multiplicative', '*', 'x'}
     values = {
@@ -95,9 +94,9 @@ def normalize_rule_args(args) -> list[str, str, str]:
         'mul': mul
     }
 
-    def get_item(arg, d) -> str:
+    def get_item(_arg, d) -> str:
         for key, _set in d.items():
-            if arg in _set:
+            if _arg in _set:
                 return key
         raise KeyError
 
@@ -125,13 +124,15 @@ def main():
 
     # Add file-type optional argument
     file_type = solver.add_mutually_exclusive_group()
-    file_type.add_argument('--json', help='save results in a .json file.', action='store_true')
-    file_type.add_argument('--html', help='save results in an .html file.', action='store_true')
+    file_type.add_argument('--json', help='save results in a .json file.',
+                           action='store_true')
+    file_type.add_argument('--html', help='save results in an .html file.',
+                           action='store_true')
 
     # Add solver main arguments.
     solver.add_argument('infile', help='file to be imported')
-    solver.add_argument('outfile', default=None, 
-            nargs='?', help='destination for results file')
+    solver.add_argument('outfile', default=None,
+                        nargs='?', help='destination for results file')
 
     # Create subparser for setting rules
     set_rule = subparsers.add_parser('set', help='edit rule settings')
@@ -140,11 +141,11 @@ def main():
     set_rule.add_argument('value', help=add_mul_help)
 
     # Create subparser for viewing rules
-    rules = subparsers.add_parser('rules', help=rule_help)
+    subparsers.add_parser('rules', help=rule_help)
 
     # Parse arguments
     args = parser.parse_args()
-    
+
     match args.subcommand:
         case 'solve':
             # Get file type option
@@ -166,6 +167,7 @@ def main():
         case 'rules':
             # Display currently selected rules
             Settings().print_rules()
+
 
 if __name__ == '__main__':
     main()

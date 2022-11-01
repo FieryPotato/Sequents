@@ -38,8 +38,9 @@ other data types into sequents, I'll add one there.
 
 __all__ = ['Sequent']
 
+import itertools
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Protocol, Self
 
 import utils
 
@@ -65,8 +66,8 @@ class Sequent:
         yield from (self.ant, self.con)
 
     def __str__(self) -> str:
-        ant_str = ', '.join([str(prop) for prop in self.ant])
-        con_str = ', '.join([str(prop) for prop in self.con])
+        ant_str = ', '.join(map(str, self.ant))
+        con_str = ', '.join(map(str, self.con))
         return f'{ant_str}; {con_str}'
 
     @property
@@ -94,7 +95,13 @@ class Sequent:
         con_complexity = sum(prop.complexity for prop in self.con)
         return ant_complexity + con_complexity
 
-    def remove_proposition_at(self, side: str, index: int) -> 'Sequent':
+    @property
+    def long_string(self) -> str:
+        ant_str = ', '.join(prop.long_string for prop in self.ant)
+        con_str = ', '.join(prop.long_string for prop in self.con)
+        return f'{ant_str}; {con_str}'
+
+    def remove_proposition_at(self, side: str, index: int) -> Self:
         """
         Return a new sequent object identical to this one but with the
         proposition at side, index removed.
@@ -105,10 +112,12 @@ class Sequent:
         elif side == 'con':
             ant = self.ant
             con = self.con[:index] + self.con[1 + index:]
+        else:
+            raise ValueError(f'Parameter side must be "ant" or "con", not {side}.')
         return Sequent(ant, con)
 
     @staticmethod
-    def mix(*args) -> 'Sequent':
+    def mix(*args) -> Self:
         """
         Return a sequent whose antecedent is the combined antecedents
         of all sequents in args, and likewise for consequents.
@@ -146,16 +155,20 @@ class Sequent:
                     return prop, side, i
         return None
 
-    def possible_mix_parents(self) -> list[tuple['Sequent', 'Sequent']]:
+    def possible_mix_parents(self) -> list[tuple[Self, Self]]:
         """
         Return a list of all possible parents this sequent may have had
         from an application of mix or another non-invertible rule.
         """
-        results = []
-        for antecedents in utils.binary_combinations(self.ant):
-            for consequents in utils.binary_combinations(self.con):
-                left_parent = Sequent(antecedents[0], consequents[0])
-                right_parent = Sequent(antecedents[1], consequents[1])
-                results.append((left_parent, right_parent))
-        return results
+        combinations = itertools.product(
+            utils.binary_combinations(self.ant),
+            utils.binary_combinations(self.con)
+        )
+        return [
+            (
+                Sequent(antecedents[0], consequents[0]),
+                Sequent(antecedents[1], consequents[1])
+            )
+            for antecedents, consequents in combinations
+        ]
 

@@ -1,4 +1,3 @@
-import json
 import unittest
 
 from unittest.mock import patch
@@ -49,6 +48,7 @@ class TestTreeMethods(unittest.TestCase):
         with patch('rules.get_rule_setting', return_value='mul'):
             t_1_ = string_to_tree('A & B; C')
             self.assertEqual(1, t_1_.width())
+
 
 class TestTreeGrowth(unittest.TestCase):
     p = Atom('p')
