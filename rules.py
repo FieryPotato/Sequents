@@ -169,7 +169,7 @@ class NonInvertibleTwoParentDecomposer:
                 Sequent.mix(parent[0], rule_result[0]),
                 Sequent.mix(parent[1], rule_result[1])
             )
-            for parent in self.removed_main_prop.possible_mix_parents()
+            for parent in self.removed_main_prop.possible_mix_parents
         ]
 
     def get_parents(self) -> list:

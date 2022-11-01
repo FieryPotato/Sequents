@@ -38,6 +38,7 @@ other data types into sequents, I'll add one there.
 
 __all__ = ['Sequent']
 
+import itertools
 from dataclasses import dataclass
 from typing import Protocol, Self
 
@@ -65,8 +66,8 @@ class Sequent:
         yield from (self.ant, self.con)
 
     def __str__(self) -> str:
-        ant_str = ', '.join([str(prop) for prop in self.ant])
-        con_str = ', '.join([str(prop) for prop in self.con])
+        ant_str = ', '.join(map(str, self.ant))
+        con_str = ', '.join(map(str, self.con))
         return f'{ant_str}; {con_str}'
 
     @property
@@ -96,8 +97,8 @@ class Sequent:
 
     @property
     def long_string(self) -> str:
-        ant_str = ', '.join([prop.long_string for prop in self.ant])
-        con_str = ', '.join([prop.long_string for prop in self.con])
+        ant_str = ', '.join(prop.long_string for prop in self.ant)
+        con_str = ', '.join(prop.long_string for prop in self.con)
         return f'{ant_str}; {con_str}'
 
     def remove_proposition_at(self, side: str, index: int) -> Self:
@@ -159,11 +160,15 @@ class Sequent:
         Return a list of all possible parents this sequent may have had
         from an application of mix or another non-invertible rule.
         """
-        results = []
-        for antecedents in utils.binary_combinations(self.ant):
-            for consequents in utils.binary_combinations(self.con):
-                left_parent = Sequent(antecedents[0], consequents[0])
-                right_parent = Sequent(antecedents[1], consequents[1])
-                results.append((left_parent, right_parent))
-        return results
+        combinations = itertools.product(
+            utils.binary_combinations(self.ant),
+            utils.binary_combinations(self.con)
+        )
+        return [
+            (
+                Sequent(antecedents[0], consequents[0]),
+                Sequent(antecedents[1], consequents[1])
+            )
+            for antecedents, consequents in combinations
+        ]
 
