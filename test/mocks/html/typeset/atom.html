@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <style>
+      /* A; B */
+      ._A6_B { grid-template-areas:
+        ". ft"
+        "f ft"
+        "f .";
+      }
+      ._A6_B-f { grid-area f; }
+      ._A6_B-ft { grid-area ft; }
+    </style>
+  </head>
+  <body>
+    <h3>A &vdash; B</h3>
+    <div class="tree _A6_B">
+      <div class="cell _A6_B-f">A &vdash; B</div>
+      <div class="_A6_B-ft">Ax</div>
+    </div>
+  </body>
+</html>

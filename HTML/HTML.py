@@ -1,6 +1,12 @@
+from typing import Iterable, Protocol
+
 import dominate
 
 from dominate import tags
+
+
+class Tree(Protocol):
+    ...
 
 
 class HTML:
@@ -46,5 +52,5 @@ class HTML:
             # typeset stylesheet
             tags.style(stylesheet)
 
-    def create_table_of_contents(self) -> None:
+    def typeset(self, trees: Iterable[Tree]):
         pass
