@@ -194,6 +194,7 @@ class TestHTMLification(unittest.TestCase):
             }
             self.assertEqual(e, grid_to_dict(*expected))
 
+
     def test_c1_1p(self) -> None:
         string = STR_1C_1P  # ; A -> B
         f = string_to_sequent(string)

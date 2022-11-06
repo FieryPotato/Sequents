@@ -35,6 +35,7 @@ from utils import count_dict_branches, split_branch
 class Sequent(Protocol):
     names: set
     complexity: int
+    long_string: str
 
 
 @dataclass(slots=True)
