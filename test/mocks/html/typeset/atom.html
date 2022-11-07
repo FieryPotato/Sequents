@@ -3,21 +3,34 @@
   <head>
     <title></title>
     <style>
+      .tree {
+        display: grid;
+        justify-content: center;
+        align-items: center;
+        margin: 10px;
+        padding: 10px;
+      }
+      .cell {
+        text-align: center;
+        border-top: 2px solid black;
+        padding: 0px 0px 0px 10px;
+        margin: 0px 4px 0px 16px;
+      }
       /* A; B */
       ._A6_B { grid-template-areas:
-        ". ft"
-        "f ft"
-        "f ."
+        '. ft'
+        'f ft'
+        'f .';
       }
-      ._A6_B-f { grid-area f; }
-      ._A6_B-ft { grid-area ft; }
+      ._A6_B-f { grid-area: f; }
+      ._A6_B-ft { grid-area: ft; }
     </style>
   </head>
   <body>
     <h3>A &vdash; B</h3>
-    <div class="tree _A6_B">
-      <div class="cell _A6_B-f">A &vdash; B</div>
-      <div class="_A6_B-ft">Ax</div>
+    <div class='tree _A6_B'>
+      <div class='cell _A6_B-f'>A &vdash; B</div>
+      <div class='_A6_B-ft'>Ax</div>
     </div>
   </body>
 </html>

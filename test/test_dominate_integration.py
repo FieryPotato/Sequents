@@ -21,7 +21,8 @@ class TestDominateIntegration(unittest.TestCase):
         self.out_file.unlink(missing_ok=True)
 
     def test_head_is_created(self):
-        self.doc.create_head()
+        style = self.doc.generate_stylesheet(self.doc.boilerplate)
+        self.doc.create_head(style=style)
         self.doc.save()
 
         with open(self.mocks / 'create_head.html') as f:
@@ -38,28 +39,32 @@ class TestDominateIntegration(unittest.TestCase):
         grid_dict = grid_to_dict(css_grid, objects_grid)
         
         e_title = '/* A; B */'
-        e_template_areas = '_A6_B { grid-template-areas: \n'\
-                           '  \'. ft\'\n'\
-                           '  \'f ft\'\n'\
-                           '  \'f .\'\n'\
-                           '}'
-        e_grid_area = [
+        e_template_areas = (
+            '._A6_B { grid-template-areas:',
+            '  \'. ft\'',
+            '  \'f ft\'',
+            '  \'f .\';',
+            '}'
+        )
+        e_grid_area = ( 
             '._A6_B-f { grid-area: f; }',
-            '._A6_B-ft { grid-area: ft; }',
-        ]
+            '._A6_B-ft { grid-area: ft; }'
+        )
 
-        actual = self.doc.generate_tree_css(tree)
-        expected = e_title, e_template_areas, e_grid_area
+        tree_css = self.doc.generate_tree_css(tree)
 
-        # self.doc.save()
+        style = self.doc.generate_stylesheet(self.doc.boilerplate, (tree_css,))
+        self.doc.create_head(style=style)
+        self.doc.save()
 
-        # with open(self.mocks / 'typeset' / 'atom.html') as f:
-        #     expected = f.readlines()
+        with open(self.mocks / 'typeset' / 'atom.html') as f: 
+            expected = f.readlines() 
 
-        # with open(self.out_file) as f:
-        #     actual = f.readlines()
+        with open(self.out_file) as f: 
+            actual = f.readlines()
     
-        self.assertEqual(expected, actual)
+        with self.subTest(i='file creation'):
+            self.assertEqual(expected, actual)
 
 
 if __name__ == '__main__':
