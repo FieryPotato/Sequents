@@ -1,11 +1,12 @@
-from typing import Iterable, Protocol, Generator, Tuple, List
+from typing import Generator
 
 import dominate
 
-import HTML.utils as utils
-
 from dominate import tags
+from dominate.util import raw
 
+
+from HTML import utils
 from tree import Tree
 
 
@@ -27,7 +28,12 @@ class HTML:
         "  margin: 0px 4px 0px 16px;",
         "}"
     ]
-    boilerplate = tree_class, cell_class
+    tag_class = [
+        ".tag {",
+        "  text-align: center;",
+        "}"
+    ]
+    boilerplate = tree_class, cell_class, tag_class
 
     def __init__(self, out_path, title='', trees: list[Tree] | None = None) -> None:
         if trees is None:
@@ -69,22 +75,16 @@ class HTML:
             
         grid_areas = []
         for area in grid_dict.keys():
+            if area == 'root':
+                continue
             tag_index = len(root) + 3
             template_area = area + ' { grid-area: ' + f'{area[tag_index:]}' + '; }'
             grid_areas.append(template_area)
 
         return title, template_area_lines, grid_areas
             
-
     def generate_stylesheet(self, *args) -> list[str]:
-        def unnest(obj):
-            if hasattr(obj, '__iter__') and not isinstance(obj, str):
-                for sub_obj in obj:
-                    yield from unnest(sub_obj)
-            else:
-                yield obj
-
-        lines = [obj for obj in unnest(args)]
+        lines = [obj for obj in utils.unnest(args)]
 
         # start stylesheet formatting
         stylesheet = ['\n']
@@ -97,4 +97,20 @@ class HTML:
         # end stylesheet formatting
         stylesheet.append(' ' * 4)
         return stylesheet
+
+    def generate_body(self, *args) -> list[str]:
+        with self.file.body as body:
+            for grid in args:
+                root = grid.pop('root')
+                body.add(tags.h3(raw(root)))
+                
+                tree_cls = next(iter(grid.keys()))[1:-2]
+
+                with tags.div(cls=f'tree {tree_cls}') as tree:
+                    for key, value in grid.items():
+                        cls = key[1:]
+                        cell_class = 'tag' if key[-1] == 't' else 'cell'
+                        div_cls = f'{cell_class} {cls}'
+                        text = utils.replace_with_entities(value)
+                        tree.add(tags.div(raw(text), cls=div_cls))
 

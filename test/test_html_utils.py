@@ -189,6 +189,7 @@ class TestHTMLification(unittest.TestCase):
         # Test output dict
         with self.subTest(i='output dict'):
             e = {
+                'root': 'A &vdash; B',
                 '._A6_B-f': seq.long_string,
                 '._A6_B-ft': seq.tag()
             }
@@ -220,6 +221,7 @@ class TestHTMLification(unittest.TestCase):
         # Test output dict
         with self.subTest(i='output dict'):
             e = {
+                'root': ' &vdash; (A &rarr; B)',
                 '._6_1A_implies_B2-f': f.long_string,
                 '._6_1A_implies_B2-ft': f.tag(),
                 '._6_1A_implies_B2-fm': fm.long_string,
@@ -253,6 +255,7 @@ class TestHTMLification(unittest.TestCase):
         # Test output dict
         with self.subTest(i='output dict'):
             e = {
+                'root': '(A &rarr; B) &vdash; ',
                 '._1A_implies_B26-f': f.long_string,
                 '._1A_implies_B26-ft': f.tag(),
                 '._1A_implies_B26-fl': fl.long_string,
@@ -290,6 +293,7 @@ class TestHTMLification(unittest.TestCase):
         # Test output dict
         with self.subTest(i='output dict'):
             e = {
+                'root': '(A &and; B) &vdash; (A &or; B)',
                 '._1A_and_B26_1A_or_B2-f': f.long_string,
                 '._1A_and_B26_1A_or_B2-ft': f.tag(),
                 '._1A_and_B26_1A_or_B2-fm': fm.long_string,
@@ -329,6 +333,7 @@ class TestHTMLification(unittest.TestCase):
         # Test output dict
         with self.subTest(i='output dict'):
             e = {
+                'root': '(A &or; B) &vdash; (A &or; B)',
                 '._1A_or_B26_1A_or_B2-f': f.long_string,
                 '._1A_or_B26_1A_or_B2-ft': f.tag(),
                 '._1A_or_B26_1A_or_B2-fl': fl.long_string,
@@ -371,6 +376,7 @@ class TestHTMLification(unittest.TestCase):
         # Test output dict
         with self.subTest(i='output dict'):
             e = {
+                'root': '(A &and; B) &vdash; (A &and; B)',
                 '._1A_and_B26_1A_and_B2-f': f.long_string,
                 '._1A_and_B26_1A_and_B2-ft': f.tag(),
                 '._1A_and_B26_1A_and_B2-fm': fm.long_string,
@@ -419,6 +425,7 @@ class TestHTMLification(unittest.TestCase):
         # Test output dict
         with self.subTest(i='output_dict'):
             e = {
+                'root': '(A &or; B) &vdash; (C &and; D)',
                 '._1A_or_B26_1C_and_D2-f': f.long_string,
                 '._1A_or_B26_1C_and_D2-ft': f.tag(),
                 '._1A_or_B26_1C_and_D2-fl': fl.long_string,
@@ -475,6 +482,7 @@ class TestHTMLification(unittest.TestCase):
         # Test output dict
         with self.subTest(i='output dict'):
             e = {
+                'root': '((A &or; B) &or; C) &vdash; ',
                 '._11A_or_B2_or_C26-f': f.long_string,
                 '._11A_or_B2_or_C26-ft': f.tag(),
                 '._11A_or_B2_or_C26-fl': fl.long_string,

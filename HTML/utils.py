@@ -1,5 +1,7 @@
 import itertools
-from typing import Protocol, Any
+import re
+
+from typing import Protocol, Any, Generator
 
 from utils import count_dict_branches
 
@@ -31,6 +33,32 @@ CSS_KEY_MAP = {
     ',': '5',
     ';': '6'
 }
+
+
+ENTITY_CHAR_MAP = {
+    ';': ' &vdash;',
+    '<': '&lt;',
+    '>': '&gt;',
+}
+ENTITY_WORD_MAP = {
+    'implies': '&rarr;',
+    'and': '&and;',
+    'or': '&or;',
+    'not': '&not;',
+    'forall': '&forall;',
+    'exists': '&exists;'
+}
+
+
+def replace_with_entities(string: str) -> str:
+    string = re.sub(r'\;', ' &vdash;', string)
+    string = re.sub(r'\<', '&lt;', string)
+    string = re.sub(r'\>', '&gt;', string)
+
+    for word, entity in ENTITY_WORD_MAP.items():
+        string = re.sub(f'({word})', entity, string)
+
+    return string
 
 
 def get_array(tree: Tree, dtype=None) -> list[list[Any]]:
@@ -190,9 +218,26 @@ def grid_to_dict(css: list[str], objects: list[str | None]) -> dict[str, str]:
     """
     grid_height: int = len(css)
     grid_width: int = len(css[0])
-    root: str = make_css_key(objects[-1][0])
-    return {
-        f'._{root}-{css[y][x]}': objects[y][x]
+    css_root: str = make_css_key(objects[-1][0])
+    html_root: str = replace_with_entities(objects[-1][0])
+    result = {'root': html_root}
+    grid_dict = {
+        f'._{css_root}-{css[y][x]}': objects[y][x]
         for x, y in itertools.product(range(grid_width), range(grid_height))
         if css[y][x] != '.'
     }
+    result.update(grid_dict)
+    return result
+
+
+def unnest(iterable, iterable_type=str) -> Generator[str, None, None]:
+    """
+    Unpacks input nested iterable to whatever it contains. Supports
+    setting a type to stop on (defaults to str).
+    """
+    if hasattr(iterable, '__iter__') and not isinstance(iterable, iterable_type):
+        for sub_iterable in iterable:
+            yield from unnest(sub_iterable)
+    else:
+        yield iterable
+

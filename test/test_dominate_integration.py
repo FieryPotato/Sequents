@@ -55,6 +55,8 @@ class TestDominateIntegration(unittest.TestCase):
 
         style = self.doc.generate_stylesheet(self.doc.boilerplate, (tree_css,))
         self.doc.create_head(style=style)
+
+        self.doc.generate_body(grid_dict,)
         self.doc.save()
 
         with open(self.mocks / 'typeset' / 'atom.html') as f: 
@@ -65,6 +67,7 @@ class TestDominateIntegration(unittest.TestCase):
     
         with self.subTest(i='file creation'):
             self.assertEqual(expected, actual)
+
 
 
 if __name__ == '__main__':
