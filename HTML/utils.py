@@ -197,7 +197,7 @@ def fill_grids(sequent, css, objects, tag, x_start, x_end, y):
     objects[y + 2][x_end] = sequent.tag()
 
 
-def make_css_key(sequent: str) -> str:
+def css_class_name(sequent: str) -> str:
     """
     Replace protected css class characters with their numeric
     substitutes as defined in CSS_KEY_MAP.
@@ -218,7 +218,7 @@ def grid_to_dict(css: list[str], objects: list[str | None]) -> dict[str, str]:
     """
     grid_height: int = len(css)
     grid_width: int = len(css[0])
-    css_root: str = make_css_key(objects[-1][0])
+    css_root: str = css_class_name(objects[-1][0])
     html_root: str = replace_with_entities(objects[-1][0])
     result = {'root': html_root}
     grid_dict = {

@@ -171,13 +171,13 @@ class TestHTMLification(unittest.TestCase):
     def test_atom(self) -> None:
         seq = string_to_sequent(STR_ATOM)  # A; B
         tree = sequent_to_tree(seq)
-        expected_css = CSS_ATOM
+        expected_grid_template_areas = CSS_ATOM
         expected_objects = [
             [None, seq.tag()],
             [seq.long_string, seq.tag()],
             [seq.long_string, None]
         ]
-        expected = expected_css, expected_objects
+        expected = expected_grid_template_areas, expected_objects
 
         # Test gridification 
         sub_test_strings = 'css', 'objects'
@@ -201,7 +201,7 @@ class TestHTMLification(unittest.TestCase):
         f = string_to_sequent(string)
         fm = string_to_sequent(STR_ATOM)
         tree = sequent_to_tree(f)
-        expected_css = CSS_1C_1P
+        expected_grid_template_areas = CSS_1C_1P
         expected_objects = [
             [None, fm.tag()],
             [fm.long_string, fm.tag()],
@@ -209,7 +209,7 @@ class TestHTMLification(unittest.TestCase):
             [f.long_string, f.tag()],
             [f.long_string, None]
         ]
-        expected = expected_css, expected_objects
+        expected = expected_grid_template_areas, expected_objects
 
         # Test gridification
         sub_test_strings = 'css', 'objects'
@@ -235,7 +235,7 @@ class TestHTMLification(unittest.TestCase):
         fl = string_to_sequent('; A')
         fr = string_to_sequent('B; ')
         tree = sequent_to_tree(f)
-        expected_css = CSS_1C_2P
+        expected_grid_template_areas = CSS_1C_2P
         expected_objects = [
             [None, fl.tag(), None, fr.tag()],
             [fl.long_string, fl.tag(), fr.long_string, fr.tag()],
@@ -243,7 +243,7 @@ class TestHTMLification(unittest.TestCase):
             [f.long_string, f.long_string, f.long_string, f.tag()],
             [f.long_string, f.long_string, f.long_string, None]
         ]
-        expected = expected_css, expected_objects
+        expected = expected_grid_template_areas, expected_objects
 
         # Test gridification
         actual = gridify(tree)
@@ -271,7 +271,7 @@ class TestHTMLification(unittest.TestCase):
         fm = string_to_sequent('A, B; A v B')
         fmm = string_to_sequent('A, B; A, B')
         tree = sequent_to_tree(f)
-        expected_css = CSS_2C_1P_1P
+        expected_grid_template_areas = CSS_2C_1P_1P
         expected_objects = [
             [None, fmm.tag()],
             [fmm.long_string, fmm.tag()],
@@ -281,7 +281,7 @@ class TestHTMLification(unittest.TestCase):
             [f.long_string, f.tag()],
             [f.long_string, None]
         ]
-        expected = expected_css, expected_objects
+        expected = expected_grid_template_areas, expected_objects
 
         # Test gridification 
         actual = gridify(tree)
@@ -311,7 +311,7 @@ class TestHTMLification(unittest.TestCase):
         flm = string_to_sequent('A; A, B')
         frm = string_to_sequent('B; A, B')
         tree = sequent_to_tree(f)
-        expected_css = CSS_2C_2P_1P
+        expected_grid_template_areas = CSS_2C_2P_1P
         expected_objects = [
             [None, flm.tag(), None, frm.tag()],
             [flm.long_string, flm.tag(), frm.long_string, frm.tag()],
@@ -321,7 +321,7 @@ class TestHTMLification(unittest.TestCase):
             [f.long_string, f.long_string, f.long_string, f.tag()],
             [f.long_string, f.long_string, f.long_string, None]
         ]
-        expected = expected_css, expected_objects
+        expected = expected_grid_template_areas, expected_objects
 
         # Test gridification
         actual = gridify(tree)
@@ -354,7 +354,7 @@ class TestHTMLification(unittest.TestCase):
         fml = string_to_sequent('A, B; A')
         fmr = string_to_sequent('A, B; B')
         tree = sequent_to_tree(f)
-        expected_css = CSS_2C_1P_2P
+        expected_grid_template_areas = CSS_2C_1P_2P
         expected_objects = [
             [None, fml.tag(), None, fmr.tag()],
             [fml.long_string, fml.tag(), fmr.long_string, fmr.tag()],
@@ -364,7 +364,7 @@ class TestHTMLification(unittest.TestCase):
             [f.long_string, f.long_string, f.long_string, f.tag()],
             [f.long_string, f.long_string, f.long_string, None]
         ]
-        expected = expected_css, expected_objects
+        expected = expected_grid_template_areas, expected_objects
 
         # Test gridification
         actual = gridify(tree)
@@ -398,7 +398,7 @@ class TestHTMLification(unittest.TestCase):
         frl = string_to_sequent('B; C')
         frr = string_to_sequent('B; D')
         tree = string_to_tree(string)
-        expected_css = CSS_2C_2P_2P
+        expected_grid_template_areas = CSS_2C_2P_2P
         expected_objects = [
             [None, fll.tag(), None, flr.tag(), None, frl.tag(), None, frr.tag()],
             [fll.long_string, fll.tag(), flr.long_string, flr.tag(), frl.long_string, frl.tag(), frr.long_string,
@@ -413,7 +413,7 @@ class TestHTMLification(unittest.TestCase):
             [f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, f.long_string,
              None],
         ]
-        expected = expected_css, expected_objects
+        expected = expected_grid_template_areas, expected_objects
 
         # Test gridification
         actual = gridify(tree)
@@ -452,7 +452,7 @@ class TestHTMLification(unittest.TestCase):
         fll = string_to_sequent('A;')
         flr = string_to_sequent('B;')
         tree = string_to_tree(string)
-        expected_css = [
+        expected_grid_template_areas = [
             ['.', 'fllt', '.', 'flrt', '.', '.'],
             ['fll', 'fllt', 'flr', 'flrt', '.', '.'],
             ['fll', '.', 'flr', 'flt', '.', 'frt'],
@@ -470,7 +470,7 @@ class TestHTMLification(unittest.TestCase):
             [f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, f.tag()],
             [f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, None]
         ]
-        expected = expected_css, expected_objects
+        expected = expected_grid_template_areas, expected_objects
 
         # Test gridification
         actual = gridify(tree)
