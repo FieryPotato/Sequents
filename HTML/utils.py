@@ -35,29 +35,28 @@ CSS_KEY_MAP = {
 }
 
 
-ENTITY_CHAR_MAP = {
-    ';': ' &vdash;',
-    '<': '&lt;',
-    '>': '&gt;',
-}
-ENTITY_WORD_MAP = {
-    'implies': '&rarr;',
-    'and': '&and;',
-    'or': '&or;',
-    'not': '&not;',
-    'forall': '&forall;',
-    'exists': '&exists;'
+ENTITY_MAP = {
+    r';': ' &vdash;',
+    r'\<': '&lt;',
+    r'\>': '&gt;',
+    r'\s&\s': ' &and; ',
+    r'\sand\s': ' &and; ',
+    r'\s->\s': ' &rarr ',
+    r'\simplies\s': ' &rarr; ',
+    r'\sv\s': ' &or; ',
+    r'\sor\s': ' &or; ',
+    r'~\s': '&not; ',
+    r'not\s': '&not; ',
+    r'∀': '&forall;',
+    r'forall': '&forall;',
+    r'∃': '&exists;',
+    r'exists': '&exists;'
 }
 
 
 def replace_with_entities(string: str) -> str:
-    string = re.sub(r'\;', ' &vdash;', string)
-    string = re.sub(r'\<', '&lt;', string)
-    string = re.sub(r'\>', '&gt;', string)
-
-    for word, entity in ENTITY_WORD_MAP.items():
-        string = re.sub(f'({word})', entity, string)
-
+    for pattern, replacement in ENTITY_MAP.items():
+        string = re.sub(pattern, replacement, string)
     return string
 
 
@@ -193,8 +192,10 @@ def fill_grids(sequent, css, objects, tag, x_start, x_end, y):
         objects[y + 1][j] = sequent.long_string
     css[y + 1][x_end] = tag + 't'
     css[y + 2][x_end] = tag + 't'
-    objects[y + 1][x_end] = sequent.tag()
-    objects[y + 2][x_end] = sequent.tag()
+    
+    rule = replace_with_entities(sequent.tag())
+    objects[y + 1][x_end] = rule
+    objects[y + 2][x_end] = rule
 
 
 def css_class_name(sequent: str) -> str:
