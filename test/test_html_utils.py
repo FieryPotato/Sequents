@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 
 from convert import string_to_tree, string_to_sequent, sequent_to_tree
-from HTML.utils import get_array, gridify, grid_to_dict
+from HTML.utils import get_array, gridify, grid_to_dict, replace_with_entities
 
 STR_ATOM = 'A; B'
 STR_1C_1P = '; A -> B'
@@ -275,10 +275,10 @@ class TestHTMLification(unittest.TestCase):
         expected_objects = [
             [None, fmm.tag()],
             [fmm.long_string, fmm.tag()],
-            [fmm.long_string, fm.tag()],
-            [fm.long_string, fm.tag()],
-            [fm.long_string, f.tag()],
-            [f.long_string, f.tag()],
+            [fmm.long_string, 'R&or;'],
+            [fm.long_string, 'R&or;'],
+            [fm.long_string, 'L&and;'],
+            [f.long_string, 'L&and;'],
             [f.long_string, None]
         ]
         expected = expected_grid_template_areas, expected_objects
@@ -295,9 +295,9 @@ class TestHTMLification(unittest.TestCase):
             e = {
                 'root': '(A &and; B) &vdash; (A &or; B)',
                 '._1A_and_B26_1A_or_B2-f': f.long_string,
-                '._1A_and_B26_1A_or_B2-ft': f.tag(),
+                '._1A_and_B26_1A_or_B2-ft': 'L&and;',
                 '._1A_and_B26_1A_or_B2-fm': fm.long_string,
-                '._1A_and_B26_1A_or_B2-fmt': fm.tag(),
+                '._1A_and_B26_1A_or_B2-fmt': 'R&or;',
                 '._1A_and_B26_1A_or_B2-fmm': fmm.long_string,
                 '._1A_and_B26_1A_or_B2-fmmt': fmm.tag()
             }
@@ -315,10 +315,10 @@ class TestHTMLification(unittest.TestCase):
         expected_objects = [
             [None, flm.tag(), None, frm.tag()],
             [flm.long_string, flm.tag(), frm.long_string, frm.tag()],
-            [flm.long_string, fl.tag(), frm.long_string, fr.tag()],
-            [fl.long_string, fl.tag(), fr.long_string, fr.tag()],
-            [fl.long_string, None, fr.long_string, f.tag()],
-            [f.long_string, f.long_string, f.long_string, f.tag()],
+            [flm.long_string, 'R&or;', frm.long_string, 'R&or;'],
+            [fl.long_string, 'R&or;', fr.long_string, 'R&or;'],
+            [fl.long_string, None, fr.long_string, 'L&or;'],
+            [f.long_string, f.long_string, f.long_string, 'L&or;'],
             [f.long_string, f.long_string, f.long_string, None]
         ]
         expected = expected_grid_template_areas, expected_objects
@@ -335,11 +335,11 @@ class TestHTMLification(unittest.TestCase):
             e = {
                 'root': '(A &or; B) &vdash; (A &or; B)',
                 '._1A_or_B26_1A_or_B2-f': f.long_string,
-                '._1A_or_B26_1A_or_B2-ft': f.tag(),
+                '._1A_or_B26_1A_or_B2-ft': 'L&or;',
                 '._1A_or_B26_1A_or_B2-fl': fl.long_string,
-                '._1A_or_B26_1A_or_B2-flt': fl.tag(),
+                '._1A_or_B26_1A_or_B2-flt': 'R&or;',
                 '._1A_or_B26_1A_or_B2-fr': fr.long_string,
-                '._1A_or_B26_1A_or_B2-frt': fr.tag(),
+                '._1A_or_B26_1A_or_B2-frt': 'R&or;',
                 '._1A_or_B26_1A_or_B2-flm': flm.long_string,
                 '._1A_or_B26_1A_or_B2-flmt': flm.tag(),
                 '._1A_or_B26_1A_or_B2-frm': frm.long_string,
@@ -358,10 +358,10 @@ class TestHTMLification(unittest.TestCase):
         expected_objects = [
             [None, fml.tag(), None, fmr.tag()],
             [fml.long_string, fml.tag(), fmr.long_string, fmr.tag()],
-            [fml.long_string, None, fmr.long_string, fm.tag()],
-            [fm.long_string, fm.long_string, fm.long_string, fm.tag()],
-            [fm.long_string, fm.long_string, fm.long_string, f.tag()],
-            [f.long_string, f.long_string, f.long_string, f.tag()],
+            [fml.long_string, None, fmr.long_string, 'R&and;'],
+            [fm.long_string, fm.long_string, fm.long_string, 'R&and;'],
+            [fm.long_string, fm.long_string, fm.long_string, 'L&and;'],
+            [f.long_string, f.long_string, f.long_string, 'L&and;'],
             [f.long_string, f.long_string, f.long_string, None]
         ]
         expected = expected_grid_template_areas, expected_objects
@@ -378,9 +378,9 @@ class TestHTMLification(unittest.TestCase):
             e = {
                 'root': '(A &and; B) &vdash; (A &and; B)',
                 '._1A_and_B26_1A_and_B2-f': f.long_string,
-                '._1A_and_B26_1A_and_B2-ft': f.tag(),
+                '._1A_and_B26_1A_and_B2-ft': 'L&and;',
                 '._1A_and_B26_1A_and_B2-fm': fm.long_string,
-                '._1A_and_B26_1A_and_B2-fmt': fm.tag(),
+                '._1A_and_B26_1A_and_B2-fmt': 'R&and;',
                 '._1A_and_B26_1A_and_B2-fml': fml.long_string,
                 '._1A_and_B26_1A_and_B2-fmlt': fml.tag(),
                 '._1A_and_B26_1A_and_B2-fmr': fmr.long_string,
@@ -401,17 +401,12 @@ class TestHTMLification(unittest.TestCase):
         expected_grid_template_areas = CSS_2C_2P_2P
         expected_objects = [
             [None, fll.tag(), None, flr.tag(), None, frl.tag(), None, frr.tag()],
-            [fll.long_string, fll.tag(), flr.long_string, flr.tag(), frl.long_string, frl.tag(), frr.long_string,
-             frr.tag()],
-            [fll.long_string, None, flr.long_string, fl.tag(), frl.long_string, None, frr.long_string, fr.tag()],
-            [fl.long_string, fl.long_string, fl.long_string, fl.tag(), fr.long_string, fr.long_string, fr.long_string,
-             fr.tag()],
-            [fl.long_string, fl.long_string, fl.long_string, None, fr.long_string, fr.long_string, fr.long_string,
-             f.tag()],
-            [f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, f.long_string,
-             f.tag()],
-            [f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, f.long_string,
-             None],
+            [fll.long_string, fll.tag(), flr.long_string, flr.tag(), frl.long_string, frl.tag(), frr.long_string, frr.tag()],
+            [fll.long_string, None, flr.long_string, 'R&and;', frl.long_string, None, frr.long_string, 'R&and;'],
+            [fl.long_string, fl.long_string, fl.long_string, 'R&and;', fr.long_string, fr.long_string, fr.long_string, 'R&and;'],
+            [fl.long_string, fl.long_string, fl.long_string, None, fr.long_string, fr.long_string, fr.long_string, 'L&or;'],
+            [f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, 'L&or;'],
+            [f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, None],
         ]
         expected = expected_grid_template_areas, expected_objects
 
@@ -427,15 +422,15 @@ class TestHTMLification(unittest.TestCase):
             e = {
                 'root': '(A &or; B) &vdash; (C &and; D)',
                 '._1A_or_B26_1C_and_D2-f': f.long_string,
-                '._1A_or_B26_1C_and_D2-ft': f.tag(),
+                '._1A_or_B26_1C_and_D2-ft': 'L&or;',
                 '._1A_or_B26_1C_and_D2-fl': fl.long_string,
-                '._1A_or_B26_1C_and_D2-flt': fl.tag(),
+                '._1A_or_B26_1C_and_D2-flt': 'R&and;',
                 '._1A_or_B26_1C_and_D2-fll': fll.long_string,
                 '._1A_or_B26_1C_and_D2-fllt': fll.tag(),
                 '._1A_or_B26_1C_and_D2-flr': flr.long_string,
                 '._1A_or_B26_1C_and_D2-flrt': flr.tag(),
                 '._1A_or_B26_1C_and_D2-fr': fr.long_string,
-                '._1A_or_B26_1C_and_D2-frt': fr.tag(),
+                '._1A_or_B26_1C_and_D2-frt': 'R&and;',
                 '._1A_or_B26_1C_and_D2-frl': frl.long_string,
                 '._1A_or_B26_1C_and_D2-frlt': frl.tag(),
                 '._1A_or_B26_1C_and_D2-frr': frr.long_string,
@@ -464,10 +459,10 @@ class TestHTMLification(unittest.TestCase):
         expected_objects = [
             [None, fll.tag(), None, flr.tag(), None, None],
             [fll.long_string, fll.tag(), flr.long_string, flr.tag(), None, None],
-            [fll.long_string, None, flr.long_string, fl.tag(), None, fr.tag()],
-            [fl.long_string, fl.long_string, fl.long_string, fl.tag(), fr.long_string, fr.tag()],
-            [fl.long_string, fl.long_string, fl.long_string, None, fr.long_string, f.tag()],
-            [f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, f.tag()],
+            [fll.long_string, None, flr.long_string, 'L&or;', None, fr.tag()],
+            [fl.long_string, fl.long_string, fl.long_string, 'L&or;', fr.long_string, fr.tag()],
+            [fl.long_string, fl.long_string, fl.long_string, None, fr.long_string, 'L&or;'],
+            [f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, 'L&or;'],
             [f.long_string, f.long_string, f.long_string, f.long_string, f.long_string, None]
         ]
         expected = expected_grid_template_areas, expected_objects
@@ -484,9 +479,9 @@ class TestHTMLification(unittest.TestCase):
             e = {
                 'root': '((A &or; B) &or; C) &vdash; ',
                 '._11A_or_B2_or_C26-f': f.long_string,
-                '._11A_or_B2_or_C26-ft': f.tag(),
+                '._11A_or_B2_or_C26-ft': 'L&or;',
                 '._11A_or_B2_or_C26-fl': fl.long_string,
-                '._11A_or_B2_or_C26-flt': fl.tag(),
+                '._11A_or_B2_or_C26-flt': 'L&or;',
                 '._11A_or_B2_or_C26-fll': fll.long_string,
                 '._11A_or_B2_or_C26-fllt': fll.tag(),
                 '._11A_or_B2_or_C26-flr': flr.long_string,
@@ -496,10 +491,6 @@ class TestHTMLification(unittest.TestCase):
             }
             self.assertEqual(e, grid_to_dict(*expected))
 
-
-class TestReplaceWithEntities(unittest.TestCase):
-    def test_something(self):
-        self.assertEqual('entity test cases', None)
 
 if __name__ == '__main__':
     unittest.main()

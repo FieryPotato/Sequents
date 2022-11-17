@@ -36,21 +36,24 @@ CSS_KEY_MAP = {
 
 
 ENTITY_MAP = {
-    r';': ' &vdash;',
-    r'\<': '&lt;',
-    r'\>': '&gt;',
+    r'&': 'ampersand',
+    r';': 'semicolon',
     r'\s&\s': ' &and; ',
     r'\sand\s': ' &and; ',
-    r'\s->\s': ' &rarr ',
+    r'->': '&rarr;',
     r'\simplies\s': ' &rarr; ',
-    r'\sv\s': ' &or; ',
+    r'\<': '&lt;',
+    r'\>': '&gt;',
+    r'v': '&or;',
     r'\sor\s': ' &or; ',
     r'~\s': '&not; ',
     r'not\s': '&not; ',
     r'∀': '&forall;',
     r'forall': '&forall;',
     r'∃': '&exists;',
-    r'exists': '&exists;'
+    r'exists': '&exists;',
+    'ampersand': '&and;',
+    'semicolon': ' &vdash;'
 }
 
 
@@ -85,8 +88,9 @@ def gridify(tree: Tree) -> tuple[list, list]:
 
     css[1][-1] = 'ft'
     css[2][-1] = 'ft'
-    objects[1][-1] = root.tag()
-    objects[2][-1] = root.tag()
+    root_tag = replace_with_entities(root.tag())
+    objects[1][-1] = root_tag
+    objects[2][-1] = root_tag
 
     for i in range(len(css[0]) - 1):
         css[0][i] = 'f'
