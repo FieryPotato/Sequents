@@ -205,8 +205,8 @@ class TestHTMLification(unittest.TestCase):
         expected_objects = [
             [None, fm.tag()],
             [fm.long_string, fm.tag()],
-            [fm.long_string, f.tag()],
-            [f.long_string, f.tag()],
+            [fm.long_string, 'R&rarr;'],
+            [f.long_string, 'R&rarr;'],
             [f.long_string, None]
         ]
         expected = expected_grid_template_areas, expected_objects
@@ -223,7 +223,7 @@ class TestHTMLification(unittest.TestCase):
             e = {
                 'root': ' &vdash; (A &rarr; B)',
                 '._6_1A_implies_B2-f': f.long_string,
-                '._6_1A_implies_B2-ft': f.tag(),
+                '._6_1A_implies_B2-ft': 'R&rarr;',
                 '._6_1A_implies_B2-fm': fm.long_string,
                 '._6_1A_implies_B2-fmt': fm.tag()
             }
@@ -239,8 +239,8 @@ class TestHTMLification(unittest.TestCase):
         expected_objects = [
             [None, fl.tag(), None, fr.tag()],
             [fl.long_string, fl.tag(), fr.long_string, fr.tag()],
-            [fl.long_string, None, fr.long_string, f.tag()],
-            [f.long_string, f.long_string, f.long_string, f.tag()],
+            [fl.long_string, None, fr.long_string, 'L&rarr;'],
+            [f.long_string, f.long_string, f.long_string, 'L&rarr;'],
             [f.long_string, f.long_string, f.long_string, None]
         ]
         expected = expected_grid_template_areas, expected_objects
@@ -257,7 +257,7 @@ class TestHTMLification(unittest.TestCase):
             e = {
                 'root': '(A &rarr; B) &vdash; ',
                 '._1A_implies_B26-f': f.long_string,
-                '._1A_implies_B26-ft': f.tag(),
+                '._1A_implies_B26-ft': 'L&rarr;',
                 '._1A_implies_B26-fl': fl.long_string,
                 '._1A_implies_B26-flt': fl.tag(),
                 '._1A_implies_B26-fr': fr.long_string,

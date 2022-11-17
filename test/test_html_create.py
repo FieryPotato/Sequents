@@ -82,11 +82,11 @@ class TestBuilderMethods(unittest.TestCase):
             '<div class="tree _1A_and_B26_1A_and_B2">',
             '  <div class="cell _1A_and_B26_1A_and_B2-f">A &and; B &vdash; A &and; B</div>',
             '  <div class="tag _1A_and_B26_1A_and_B2-ft">L&and;</div>',
-            '  <div class="cell _1A_and_B26_1A_and_B2-fm">A, B &vdash; (A &and; B)</div>',
+            '  <div class="cell _1A_and_B26_1A_and_B2-fm">A, B &vdash; A &and; B</div>',
             '  <div class="tag _1A_and_B26_1A_and_B2-fmt">R&and;</div>',
             '  <div class="cell _1A_and_B26_1A_and_B2-fml">A, B &vdash; A</div>',
             '  <div class="tag _1A_and_B26_1A_and_B2-fmlt">Ax</div>',
-            '  <div class="cell _1A_and_B26_1A_and_B2-fmr">A, B &vdash; B </div>',
+            '  <div class="cell _1A_and_B26_1A_and_B2-fmr">A, B &vdash; B</div>',
             '  <div class="tag _1A_and_B26_1A_and_B2-fmrt">Ax</div>',
             '</div>'            
         ]
