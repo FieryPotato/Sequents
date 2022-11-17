@@ -52,7 +52,8 @@ import re
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Self
+# from typing import Self
+from typing import TypeVar
 
 SIDES: set[str] = {'ant', 'con'}
 
@@ -62,6 +63,8 @@ objects_re = re.compile(r'<(.*)>')
 # Match anything before an opening angle bracket ('<')
 predicate_re = re.compile(r'(.+)<')
 
+
+Self = TypeVar('Self')
 
 @dataclass(frozen=True, slots=True, order=True)
 class Proposition(ABC):

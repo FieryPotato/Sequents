@@ -497,5 +497,9 @@ class TestHTMLification(unittest.TestCase):
             self.assertEqual(e, grid_to_dict(*expected))
 
 
+class TestReplaceWithEntities(unittest.TestCase):
+    def test_something(self):
+        self.assertEqual('entity test cases', None)
+
 if __name__ == '__main__':
     unittest.main()

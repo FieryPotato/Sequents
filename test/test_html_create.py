@@ -63,7 +63,7 @@ class TestBuilderMethods(unittest.TestCase):
         fmt = 'R&'
         fml = 'A, B; A'
         fmlt = 'Ax'
-        fmrt = 'A, B; B'
+        fmr = 'A, B; B'
         fmrt = 'Ax'
         
         class_name = '_1A_and_B26_1A_and_B2'
@@ -80,17 +80,17 @@ class TestBuilderMethods(unittest.TestCase):
 
         expected = [
             '<div class="tree _1A_and_B26_1A_and_B2">',
-            '    <div class="cell _1A_and_B26_1A_and_B2-f">(A &and; B) &vdash; (A &and; B)</div>',
-            '    <div class="tag _1A_and_B26_1A_and_B2-ft">L&and;</div>',
-            '    <div class="cell _1A_and_B26_1A_and_B2-fm">A, B &vdash; (A &and; B)</div>',
-            '    <div class="tag _1A_and_B26_1A_and_B2-fmt">R&and;</div>',
-            '    <div class="cell _1A_and_B26_1A_and_B2-fml">A, B &vdash; A</div>',
-            '    <div class="tag _1A_and_B26_1A_and_B2-fmlt">Ax</div>',
-            '    <div class="cell _1A_and_B26_1A_and_B2-fmr">A, B &vdash; B </div>',
-            '    <div class="tag _1A_and_B26_1A_and_B2-fmrt">Ax</div>',
+            '  <div class="cell _1A_and_B26_1A_and_B2-f">A &and; B &vdash; A &and; B</div>',
+            '  <div class="tag _1A_and_B26_1A_and_B2-ft">L&and;</div>',
+            '  <div class="cell _1A_and_B26_1A_and_B2-fm">A, B &vdash; (A &and; B)</div>',
+            '  <div class="tag _1A_and_B26_1A_and_B2-fmt">R&and;</div>',
+            '  <div class="cell _1A_and_B26_1A_and_B2-fml">A, B &vdash; A</div>',
+            '  <div class="tag _1A_and_B26_1A_and_B2-fmlt">Ax</div>',
+            '  <div class="cell _1A_and_B26_1A_and_B2-fmr">A, B &vdash; B </div>',
+            '  <div class="tag _1A_and_B26_1A_and_B2-fmrt">Ax</div>',
             '</div>'            
         ]
-        actual = Builder().make_body_tree(grid_dict)
+        actual = Builder().make_body_tree(grid_dict, class_name)
 
         self.assertEqual(expected, actual)
                             

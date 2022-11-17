@@ -46,9 +46,8 @@ class Builder:
         for tree in trees:
             template_areas, objects = utils.gridify(tree)
             grid_dict = utils.grid_to_dict(template_areas, objects)
-            class_name = utils.css_class_name(tree.root.long_string)
-            tree_title = grid_dict.pop('root')
-
+            class_name = utils.css_class_name(grid_dict.pop('root'))
+            
             # Add grid-template-areas to style.
             style.extend(self.grid_template_areas(template_areas, class_name=class_name))
             
@@ -59,12 +58,12 @@ class Builder:
     def grid_template_areas(self, template_areas: list[list[str]], class_name: str) -> list[str]:
         """
         Coerce grid-template-areas into the following format:
-            ._{root's long string} \{ grid-template-areas:\n
-                {lines from template_areas}\n
-                {...}\n
-                {last line};\n
-            \}\n
-        Where non-escaped curly braces format like pseudo-code f-strings
+            ._<root's long string> { grid-template-areas:\n
+                <lines from template_areas>\n
+                <...>\n
+                <last line>;\n
+            }\n
+        Where angle brackets format like pseudo-code f-strings
         and escaped curly braces are literal.
         """
         result = [f'._{class_name} {"{"} grid-template-areas:']
@@ -79,18 +78,27 @@ class Builder:
         """Coerce grid-dict keys into grid-area classes for css."""
         result = []
         for id in grid_dict:
+            if id =='root':
+                continue
             cls, area = id.split('-')
-
             result.append(f'{cls}-{area}' + ' { grid-area: ' + f'{area};' + ' }')
         return result 
 
-    def make_body_tree(grid_dict: dict[str, str], class_name: str) -> list[str]:
+    def make_body_tree(self, grid_dict: dict[str, str], class_name: str) -> list[str]:
         """
         Return the contents of grid_dict as a list of strings which 
         will be joined with newlines to form the tree object in HTML.
         """
-        
-
+        body = [f'<div class="tree {class_name}">']
+        template = '  <div class="{line_type} {line_id}">{content}</div>'
+        for line_id, content in grid_dict.items():
+            line_type = 'tag' if line_id.endswith('t') else 'cell'
+            content = utils.replace_with_entities(content)
+            body.append(
+                template.format(line_type=line_type, line_id=line_id[1:], content=content)
+            )
+        body.append('</div>')
+        return body
 
     @staticmethod
     def reformat_for_style_tag(s: str) -> str:

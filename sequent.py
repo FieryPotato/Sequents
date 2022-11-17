@@ -40,9 +40,12 @@ __all__ = ['Sequent']
 
 import itertools
 from dataclasses import dataclass
-from typing import Protocol, Self
+from typing import Protocol, TypeVar# , Self
 
 import utils
+
+
+Self = TypeVar('Self')
 
 
 class Proposition(Protocol):
