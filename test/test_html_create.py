@@ -21,13 +21,13 @@ class TestBuilderMethods(unittest.TestCase):
 
         actual = Builder().grid_template_areas(template_areas, class_name)
         expected = [
-            '._1A_or_B25_ { grid-template-areas:',
-            '. flt . frt',
-            'fl flt fr frt',
-            'fl . fr ft',
-            'f f f ft',
-            'f f f .;',
-            '}'
+            '      ._1A_or_B25_ { grid-template-areas:\n',
+            '        ". flt . frt"\n',
+            '        "fl flt fr frt"\n',
+            '        "fl . fr ft"\n',
+            '        "f f f ft"\n',
+            '        "f f f .";\n',
+            '      }\n'
         ]
 
         self.assertEqual(expected, actual)
@@ -103,7 +103,6 @@ class TestCreate(unittest.TestCase):
     def tearDown(self) -> None:
         self.outfile.unlink(missing_ok=True)
 
-    @unittest.skip('I need to rework utils first.')
     def test_create_atomic(self) -> None:
         tree = convert.string_to_tree('A; B')
         document = Builder()

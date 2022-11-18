@@ -36,14 +36,14 @@ CSS_KEY_MAP = {
 
 
 ENTITY_MAP = {
-    r'&': 'ampersand',
     r';': 'semicolon',
-    r'\s&\s': ' &and; ',
+    r'\s&\s': 'ampersand',
+    r'&': '&and;',
     r'\sand\s': ' &and; ',
-    r'->': '&rarr;',
+    r'-\>': '&rarr;',
+    r'\<': ' &lt; ',
+    r'\>': ' &gt; ',
     r'\simplies\s': ' &rarr; ',
-    r'\<': '&lt;',
-    r'\>': '&gt;',
     r'v': '&or;',
     r'\sor\s': ' &or; ',
     r'~\s': '&not; ',
@@ -53,7 +53,7 @@ ENTITY_MAP = {
     r'∃': '&exists;',
     r'exists': '&exists;',
     'ampersand': '&and;',
-    'semicolon': ' &vdash;'
+    'semicolon': ' &vdash;',
 }
 
 
