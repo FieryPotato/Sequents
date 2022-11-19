@@ -99,16 +99,16 @@ class Builder:
         Return the contents of grid_dict as a list of strings which
         will be joined with newlines to form the tree object in HTML.
         """
-        body = ['\n', raw(f'{" " * 4}<div class="tree {class_name}">\n')]
-        template = '      <div class="{line_type} {line_id}">{content}</div>\n'
-        for line_id, content in grid_dict.items():
-            line_type = 'tag' if line_id.endswith('t') else 'cell'
-            content = utils.replace_with_entities(content)
-            line = template.format(line_type=line_type, line_id=line_id[1:], content=content)
-            body.append(
-                raw(line)
-            )
-        body.append(raw(' ' * 4 + '</div>'))
+        body = tags.body()
+        with tags.div(cls=f'tree {class_name}') as tree:
+            for line_id, content in grid_dict.items():
+                line_type = 'tag' if line_id.endswith('t') else 'cell'
+                content = utils.replace_with_entities(content)
+                line_id = line_id.strip('.')
+                with tags.div(cls=f'{line_type} {line_id}') as line:
+                    line += raw(content)
+                tree += line
+        body += tree
         return body
 
     def tree_title(self, root: str) -> h3:
