@@ -45,13 +45,14 @@ class Builder:
             template_areas, objects = utils.gridify(tree)
             grid_dict = utils.grid_to_dict(template_areas, objects)
             root = grid_dict.pop('root')
-            class_name = next(iter(grid_dict))[2:-2]
+            class_name = next(iter(grid_dict))[1:-2]
 
             # Add grid-template-areas to style.
             style.add(self.grid_template_areas(template_areas, class_name=class_name))
 
             # Add grid-area classes to style.
             style.add(self.grid_area(grid_dict, class_name=class_name))
+            style.add(' ' * 4)
 
             # Add tree header to body.
             body.append(self.tree_title(root))
@@ -73,7 +74,7 @@ class Builder:
         Where angle brackets format like pseudo-code f-strings
         and escaped curly braces are literal.
         """
-        result = [f'{" " * 6}._{class_name} {"{"} grid-template-areas:\n']
+        result = [f'{" " * 6}.{class_name} {"{"} grid-template-areas:\n']
         for line in template_areas:
             bare_line = ' '.join(line)
             formatted_line = f'{" " * 8}"{raw(bare_line)}"\n'
@@ -98,20 +99,21 @@ class Builder:
         Return the contents of grid_dict as a list of strings which
         will be joined with newlines to form the tree object in HTML.
         """
-        body = [f'<div class="tree {class_name}">']
-        template = '  <div class="{line_type} {line_id}">{content}</div>'
+        body = ['\n', raw(f'{" " * 4}<div class="tree {class_name}">\n')]
+        template = '      <div class="{line_type} {line_id}">{content}</div>\n'
         for line_id, content in grid_dict.items():
             line_type = 'tag' if line_id.endswith('t') else 'cell'
             content = utils.replace_with_entities(content)
+            line = template.format(line_type=line_type, line_id=line_id[1:], content=content)
             body.append(
-                template.format(line_type=line_type, line_id=line_id[1:], content=content)
+                raw(line)
             )
-        body.append('</div>')
+        body.append(raw(' ' * 4 + '</div>'))
         return body
 
     def tree_title(self, root: str) -> h3:
         """Return root formatted as a header for the tree."""
-        return tags.h3(root)
+        return tags.h3(raw(root))
 
     @staticmethod
     def reformat_for_style_tag(s: str) -> str:

@@ -94,8 +94,6 @@ class TestBuilderMethods(unittest.TestCase):
 
         self.assertEqual(expected, actual)
                             
-                            
-
 
 class TestCreate(unittest.TestCase):
     outfile = Path('test/mocks/html_result.html')
