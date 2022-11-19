@@ -7,7 +7,6 @@ import convert
 from HTML.document import Builder
 
 
-
 class TestBuilderMethods(unittest.TestCase):
     def test_grid_template_areas(self) -> None:
         template_areas = [
@@ -16,10 +15,11 @@ class TestBuilderMethods(unittest.TestCase):
             ['fl', '.', 'fr', 'ft'],
             ['f', 'f', 'f', 'ft'],
             ['f', 'f', 'f', '.']
-        ]        
-        class_name = '1A_or_B25_'
+        ]
+        class_name = '_1A_or_B25_'
 
-        actual = Builder().grid_template_areas(template_areas, class_name)
+        grid_template_areas = Builder().grid_template_areas(template_areas, class_name)
+        actual = [str(area) for area in grid_template_areas]
         expected = [
             '      ._1A_or_B25_ { grid-template-areas:\n',
             '        ". flt . frt"\n',
@@ -43,18 +43,17 @@ class TestBuilderMethods(unittest.TestCase):
             '._1A_and_B26_1A_or_B2-fmmt': ''
         }
 
-        actual = Builder().grid_area(grid_dict, class_name)
         expected = [
-            '._1A_and_B26_1A_or_B2-f { grid-area: f; }',
-            '._1A_and_B26_1A_or_B2-ft { grid-area: ft; }',
-            '._1A_and_B26_1A_or_B2-fm { grid-area: fm; }',
-            '._1A_and_B26_1A_or_B2-fmt { grid-area: fmt; }',
-            '._1A_and_B26_1A_or_B2-fmm { grid-area: fmm; }', 
-            '._1A_and_B26_1A_or_B2-fmmt { grid-area: fmmt; }'
+            '      ._1A_and_B26_1A_or_B2-f { grid-area: f; }\n',
+            '      ._1A_and_B26_1A_or_B2-ft { grid-area: ft; }\n',
+            '      ._1A_and_B26_1A_or_B2-fm { grid-area: fm; }\n',
+            '      ._1A_and_B26_1A_or_B2-fmt { grid-area: fmt; }\n',
+            '      ._1A_and_B26_1A_or_B2-fmm { grid-area: fmm; }\n',
+            '      ._1A_and_B26_1A_or_B2-fmmt { grid-area: fmmt; }\n'
         ]
 
+        actual = Builder().grid_area(grid_dict, class_name)
         self.assertEqual(expected, actual)
-
 
     def test_body_tree(self) -> None:
         f = 'A and B; A and B'
@@ -65,7 +64,7 @@ class TestBuilderMethods(unittest.TestCase):
         fmlt = 'Ax'
         fmr = 'A, B; B'
         fmrt = 'Ax'
-        
+
         class_name = '_1A_and_B26_1A_and_B2'
         grid_dict = {
             '._1A_and_B26_1A_and_B2-f': f,
@@ -78,22 +77,23 @@ class TestBuilderMethods(unittest.TestCase):
             '._1A_and_B26_1A_and_B2-fmrt': fmrt
         }
 
-        expected = [
-            '<div class="tree _1A_and_B26_1A_and_B2">',
-            '  <div class="cell _1A_and_B26_1A_and_B2-f">A &and; B &vdash; A &and; B</div>',
-            '  <div class="tag _1A_and_B26_1A_and_B2-ft">L&and;</div>',
-            '  <div class="cell _1A_and_B26_1A_and_B2-fm">A, B &vdash; A &and; B</div>',
-            '  <div class="tag _1A_and_B26_1A_and_B2-fmt">R&and;</div>',
-            '  <div class="cell _1A_and_B26_1A_and_B2-fml">A, B &vdash; A</div>',
-            '  <div class="tag _1A_and_B26_1A_and_B2-fmlt">Ax</div>',
-            '  <div class="cell _1A_and_B26_1A_and_B2-fmr">A, B &vdash; B</div>',
-            '  <div class="tag _1A_and_B26_1A_and_B2-fmrt">Ax</div>',
-            '</div>'            
-        ]
-        actual = Builder().make_body_tree(grid_dict, class_name)
+        expected = \
+            '<div class="tree _1A_and_B26_1A_and_B2">\n' \
+            '  <div class="cell _1A_and_B26_1A_and_B2-f">A &and; B &vdash; A &and; B</div>\n' \
+            '  <div class="tag _1A_and_B26_1A_and_B2-ft">L&and;</div>\n' \
+            '  <div class="cell _1A_and_B26_1A_and_B2-fm">A, B &vdash; A &and; B</div>\n' \
+            '  <div class="tag _1A_and_B26_1A_and_B2-fmt">R&and;</div>\n' \
+            '  <div class="cell _1A_and_B26_1A_and_B2-fml">A, B &vdash; A</div>\n' \
+            '  <div class="tag _1A_and_B26_1A_and_B2-fmlt">Ax</div>\n' \
+            '  <div class="cell _1A_and_B26_1A_and_B2-fmr">A, B &vdash; B</div>\n' \
+            '  <div class="tag _1A_and_B26_1A_and_B2-fmrt">Ax</div>\n' \
+            '</div>'
+
+        body_tree = Builder().make_body_tree(grid_dict, class_name)
+        actual = str(body_tree)
 
         self.assertEqual(expected, actual)
-                            
+
 
 class TestCreate(unittest.TestCase):
     outfile = Path('test/mocks/html_result.html')

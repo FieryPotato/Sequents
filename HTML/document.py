@@ -11,20 +11,23 @@ from tree import Tree
 
 
 class Builder:
-    tree_class = "      .tree {\n"\
+    tree_class = \
+        "      .tree {\n"\
         "        display: grid;\n"\
         "        justify-content: center;\n"\
         "        align-items: center;\n"\
         "        margin: 10px;\n"\
         "        padding: 10px;\n"\
         "      }\n"
-    cell_class = "      .cell {\n"\
+    cell_class = \
+        "      .cell {\n"\
         "        text-align: center;\n"\
         "        border-top: 2px solid black;\n"\
         "        padding: 0px 0px 0px 10px;\n"\
         "        margin: 0px 4px 0px 16px;\n"\
         "      }\n"
-    tag_class = "      .tag {\n"\
+    tag_class = \
+        "      .tag {\n"\
         "        text-align: center;\n"\
         "      }\n"
     boilerplate = tree_class, cell_class, tag_class
@@ -36,7 +39,6 @@ class Builder:
         """Build the html document."""
         # style = [self.reformat_for_style_tag(line) for cls in self.boilerplate for line in cls]
         style = tags.style('\n')
-        body = []
 
         for cls in self.boilerplate:
             style.add(cls)
@@ -45,6 +47,9 @@ class Builder:
             template_areas, objects = utils.gridify(tree)
             grid_dict = utils.grid_to_dict(template_areas, objects)
             root = grid_dict.pop('root')
+
+            # class_name excludes trailing cell tag ('-f' in this case)
+            # and leading '.'
             class_name = next(iter(grid_dict))[1:-2]
 
             # Add grid-template-areas to style.
@@ -52,16 +57,17 @@ class Builder:
 
             # Add grid-area classes to style.
             style.add(self.grid_area(grid_dict, class_name=class_name))
+
+            # Add indent for closing style tag.
             style.add(' ' * 4)
 
             # Add tree header to body.
-            body.append(self.tree_title(root))
+            self.document.body.add(self.tree_title(root))
 
             # Add tree to body.
-            body.extend(self.make_body_tree(grid_dict, class_name=class_name))
+            self.document.body.add(self.make_body_tree(grid_dict, class_name=class_name))
 
         self.document.head.add(style)
-        self.document.body.add(body)
 
     def grid_template_areas(self, template_areas: list[list[str]], class_name: str) -> list[str]:
         """
@@ -99,7 +105,6 @@ class Builder:
         Return the contents of grid_dict as a list of strings which
         will be joined with newlines to form the tree object in HTML.
         """
-        body = tags.body()
         with tags.div(cls=f'tree {class_name}') as tree:
             for line_id, content in grid_dict.items():
                 line_type = 'tag' if line_id.endswith('t') else 'cell'
@@ -108,8 +113,7 @@ class Builder:
                 with tags.div(cls=f'{line_type} {line_id}') as line:
                     line += raw(content)
                 tree += line
-        body += tree
-        return body
+        return tree
 
     def tree_title(self, root: str) -> h3:
         """Return root formatted as a header for the tree."""
