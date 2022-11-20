@@ -9,7 +9,7 @@ from export_file import PickleExporter
 
 T_0 = string_to_tree('A; B -> C')
 T_1 = string_to_tree('A v B; C & (D v E)')
-TREE_LIST = [T_0, T_1]
+TREES = T_0, T_1
 
 
 class TestExportBytes(unittest.TestCase):
@@ -32,21 +32,21 @@ class TestExportBytes(unittest.TestCase):
 
     def test_saving_tree_to_dir_bytes(self) -> None:
         exporter = PickleExporter(self.dir)
-        exporter.export(TREE_LIST)
+        exporter.export(TREES)
 
         with open(self.bytes_out_w_dir, 'rb') as f:
             actual = pickle.load(f)
         
-        self.assertEqual(TREE_LIST, actual)
+        self.assertEqual(TREES, actual)
 
     def test_saving_tree_to_file_bytes(self) -> None:
         exporter = PickleExporter(self.dir + 'export.sequents')
-        exporter.export(TREE_LIST)
+        exporter.export(TREES)
 
         with open(self.bytes_out_w_file, 'rb') as f:
             actual = pickle.load(f)
 
-        self.assertEqual(TREE_LIST, actual)
+        self.assertEqual(TREES, actual)
 
     def test_handling_collisions(self) -> None:
         # Collisions are handled by overwriting previous data.
@@ -55,13 +55,13 @@ class TestExportBytes(unittest.TestCase):
         pre_existing.touch()
 
         exporter = PickleExporter(self.dir)
-        exporter.export(TREE_LIST)
+        exporter.export(TREES)
 
         new_path = parent / 'results.sequents'
         with open(new_path, 'rb') as f:
             actual = pickle.load(f)
 
-        self.assertEqual(TREE_LIST, actual)
+        self.assertEqual(TREES, actual)
 
 if __name__ == '__main__':
     unittest.main()

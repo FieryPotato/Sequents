@@ -1,7 +1,7 @@
 import unittest
 
-from convert import string_to_proposition, \
-    string_to_sequent
+import convert
+
 from utils import deparenthesize, find_connective
 from proposition import Atom, Conditional, Conjunction, \
     Disjunction, Negation, Universal, Existential
@@ -45,10 +45,10 @@ class TestConvertProposition(unittest.TestCase):
         return string.format(g=self.bin_test[0], b=self.bin_test[1], c=connective)
 
     def test_atom_creation(self) -> None:
-        strings = self.un_test, '(' + self.un_test + ')'
+        strings = 'The cat is on the mat', '(The cat is on the mat)'
         for string in strings:
             expected = self.atom
-            actual = string_to_proposition(string)
+            actual = convert.string_to_proposition(string)
             with self.subTest(i=string):
                 self.assertEqual(expected, actual)
 
@@ -58,7 +58,7 @@ class TestConvertProposition(unittest.TestCase):
         tests = zip(c_w_spaces, props)
         for connective, expected in tests:
             string = connective.join(self.bin_test)
-            actual = string_to_proposition(string)
+            actual = convert.string_to_proposition(string)
             with self.subTest(i=connective):
                 self.assertEqual(expected, actual)
 
@@ -68,7 +68,7 @@ class TestConvertProposition(unittest.TestCase):
         tests = zip(c_w_spaces, props)
         for connective, expected in tests:
             string = '(' + connective.join(self.bin_test) + ')'
-            actual = string_to_proposition(string)
+            actual = convert.string_to_proposition(string)
             with self.subTest(i=connective):
                 self.assertEqual(expected, actual)
 
@@ -77,7 +77,7 @@ class TestConvertProposition(unittest.TestCase):
         tests = zip(self.binary_connectives, props)
         for connective, expected in tests:
             string = self.__complex(connective)
-            actual = string_to_proposition(string)
+            actual = convert.string_to_proposition(string)
             with self.subTest(i=connective):
                 self.assertEqual(expected, actual)
 
@@ -85,7 +85,7 @@ class TestConvertProposition(unittest.TestCase):
         for connective in self.unary_connectives:
             string = connective + ' ' + self.un_test
             expected = self.negation
-            actual = string_to_proposition(string)
+            actual = convert.string_to_proposition(string)
             with self.subTest(i=connective):
                 self.assertEqual(expected, actual)
 
@@ -93,7 +93,7 @@ class TestConvertProposition(unittest.TestCase):
         for connective in self.unary_connectives:
             string = '(' + connective + ' ' + self.un_test + ')'
             expected = self.negation
-            actual = string_to_proposition(string)
+            actual = convert.string_to_proposition(string)
             with self.subTest(i=connective):
                 self.assertEqual(expected, actual)
 
@@ -101,7 +101,7 @@ class TestConvertProposition(unittest.TestCase):
         for connective in self.unary_connectives:
             string = f'{connective} ({connective} {self.un_test})'
             expected = self.comp_neg
-            actual = string_to_proposition(string)
+            actual = convert.string_to_proposition(string)
             with self.subTest(i=connective):
                 self.assertEqual(expected, actual)
     
@@ -109,7 +109,7 @@ class TestConvertProposition(unittest.TestCase):
         expected = [self.universal, self.existential] * 2
         for e, connective in zip(expected, self.quantified_connectives):
             string = f'{connective}x {self.quan_test_x}'
-            actual = string_to_proposition(string)
+            actual = convert.string_to_proposition(string)
             with self.subTest(i=connective):
                 self.assertEqual(e, actual)
 
@@ -117,7 +117,7 @@ class TestConvertProposition(unittest.TestCase):
         expected = [self.universal, self.existential] * 2
         for e, connective in zip(expected, self.quantified_connectives):
             string = f'({connective}x {self.quan_test_x})'
-            actual = string_to_proposition(string)
+            actual = convert.string_to_proposition(string)
             with self.subTest(i=connective):
                 self.assertEqual(e, actual)
 
@@ -125,7 +125,7 @@ class TestConvertProposition(unittest.TestCase):
         expected = [self.comp_uni, self.comp_exi] *2
         for e, connective in zip(expected, self.quantified_connectives):
             string = f'{connective}y {connective}x isABug<x, y>'
-            actual = string_to_proposition(string)
+            actual = convert.string_to_proposition(string)
             with self.subTest(i=connective):
                 self.assertEqual(e, actual)
 
@@ -205,17 +205,17 @@ class TestConvertSequent(unittest.TestCase):
             (Atom('antecedent one'),),
             (Atom('consequent one'),)
         )
-        self.assertEqual(expected, string_to_sequent(string))
+        self.assertEqual(expected, convert.string_to_sequent(string))
 
     def test_atomic_ant_sequent(self) -> None:
         string = 'proposition; '
         expected = Sequent((Atom('proposition'),), ())
-        self.assertEqual(expected, string_to_sequent(string))
+        self.assertEqual(expected, convert.string_to_sequent(string))
     
     def test_atomic_con_sequent(self) -> None:
         string = '; proposition'
         expected = Sequent((), (Atom('proposition'),))
-        self.assertEqual(expected, string_to_sequent(string))
+        self.assertEqual(expected, convert.string_to_sequent(string))
 
     def test_atomic_2_2_sequent(self) -> None:
         string = 'antecedent one, antecedent two; consequent one, consequent two'
@@ -223,12 +223,12 @@ class TestConvertSequent(unittest.TestCase):
             (Atom('antecedent one'), Atom('antecedent two')),
             (Atom('consequent one'), Atom('consequent two'))
         )
-        self.assertEqual(expected, string_to_sequent(string))
+        self.assertEqual(expected, convert.string_to_sequent(string))
 
     def test_negation_sequent(self) -> None:
         string = 'not one; ~ two'
         expected = Sequent((Negation(Atom('one')),), (Negation(Atom('two')),))
-        self.assertEqual(expected, string_to_sequent(string))
+        self.assertEqual(expected, convert.string_to_sequent(string))
 
     def test_binary_sequent(self) -> None:
         bare_string = 'left one {c} right one; left two {c} right two'
@@ -240,14 +240,14 @@ class TestConvertSequent(unittest.TestCase):
                     (prop_type(Atom('left one'), Atom('right one')),),
                     (prop_type(Atom('left two'), Atom('right two')),)
                 )
-                self.assertEqual(expected, string_to_sequent(string))
+                self.assertEqual(expected, convert.string_to_sequent(string))
 
     def test_convert_empty_antecedent(self) -> None:
         expected = Sequent((), (Atom('no antecedent'),))
         test_strings = '; no antecedent', ' ; no antecedent'
         for string in test_strings:
             with self.subTest(i=string):
-                actual = string_to_sequent(string)
+                actual = convert.string_to_sequent(string)
                 self.assertEqual(expected, actual)
 
     def test_convert_empty_consequent(self) -> None:
@@ -255,7 +255,7 @@ class TestConvertSequent(unittest.TestCase):
         test_strings = 'no consequent; ', 'no consequent;'
         for string in test_strings:
             with self.subTest(i=string):
-                actual = string_to_sequent(string)
+                actual = convert.string_to_sequent(string)
                 self.assertEqual(expected, actual)
 
 
