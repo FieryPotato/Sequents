@@ -88,7 +88,7 @@ def gridify(tree: Tree) -> tuple[list, list]:
 
     css[1][-1] = 'ft'
     css[2][-1] = 'ft'
-    root_tag = replace_with_entities(root.tag())
+    root_tag = root.tag()
     objects[1][-1] = root_tag
     objects[2][-1] = root_tag
 
@@ -197,7 +197,7 @@ def fill_grids(sequent, css, objects, tag, x_start, x_end, y):
     css[y + 1][x_end] = tag + 't'
     css[y + 2][x_end] = tag + 't'
     
-    rule = replace_with_entities(sequent.tag())
+    rule = sequent.tag()
     objects[y + 1][x_end] = rule
     objects[y + 2][x_end] = rule
 
@@ -224,7 +224,7 @@ def grid_to_dict(css: list[str], objects: list[str | None]) -> dict[str, str]:
     grid_height: int = len(css)
     grid_width: int = len(css[0])
     css_root: str = css_class_name(objects[-1][0])
-    html_root: str = replace_with_entities(objects[-1][0])
+    html_root: str = objects[-1][0]
     result = {'root': html_root}
     grid_dict = {
         f'._{css_root}-{css[y][x]}': objects[y][x]

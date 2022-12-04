@@ -48,9 +48,8 @@ class Builder:
             grid_dict = utils.grid_to_dict(template_areas, objects)
             root = grid_dict.pop('root')
 
-            # class_name excludes trailing cell tag ('-f' in this case)
-            # and leading '.'
-            class_name = next(iter(grid_dict))[1:-2]
+            # class_name excludes trailing cell tag and leading '.'
+            class_name = next(iter(grid_dict)).split('-')[0][1:]
 
             # Add grid-template-areas to style.
             style.add(self.grid_template_areas(template_areas, class_name=class_name))
@@ -83,7 +82,7 @@ class Builder:
         result = [f'{" " * 6}.{class_name} {"{"} grid-template-areas:\n']
         for line in template_areas:
             bare_line = ' '.join(line)
-            formatted_line = f'{" " * 8}"{raw(bare_line)}"\n'
+            formatted_line = f'{" " * 8}"{bare_line}"\n'
             result.append(formatted_line)
         result[-1] = result[-1][:-1]
         result[-1] += ';\n'
@@ -93,10 +92,8 @@ class Builder:
     def grid_area(self, grid_dict: dict[str, str], class_name: str) -> list[str]:
         """Coerce grid-dict keys into grid-area classes for css."""
         result = []
-        for id in grid_dict:
-            if id == 'root':
-                continue
-            cls, area = id.split('-')
+        for line_id in sorted(grid_dict):
+            cls, area = line_id.split('-')
             result.append(f'{" " * 6}{cls}-{area}' + ' { grid-area: ' + f'{area};' + ' }\n')
         return result
 
@@ -106,7 +103,7 @@ class Builder:
         will be joined with newlines to form the tree object in HTML.
         """
         with tags.div(cls=f'tree {class_name}') as tree:
-            for line_id, content in grid_dict.items():
+            for line_id, content in sorted(grid_dict.items(), key=lambda x: x[0]):
                 line_type = 'tag' if line_id.endswith('t') else 'cell'
                 content = utils.replace_with_entities(content)
                 line_id = line_id.strip('.')
@@ -117,7 +114,7 @@ class Builder:
 
     def tree_title(self, root: str) -> h3:
         """Return root formatted as a header for the tree."""
-        return tags.h3(raw(root))
+        return tags.h3(raw(utils.replace_with_entities(root)))
 
     @staticmethod
     def reformat_for_style_tag(s: str) -> str:

@@ -36,20 +36,20 @@ class TestBuilderMethods(unittest.TestCase):
         class_name = '1A_and_B26_1A_or_B2'
         grid_dict = {
             '._1A_and_B26_1A_or_B2-f': '',
-            '._1A_and_B26_1A_or_B2-ft': '',
             '._1A_and_B26_1A_or_B2-fm': '',
-            '._1A_and_B26_1A_or_B2-fmt': '',
             '._1A_and_B26_1A_or_B2-fmm': '',
-            '._1A_and_B26_1A_or_B2-fmmt': ''
+            '._1A_and_B26_1A_or_B2-fmmt': '',
+            '._1A_and_B26_1A_or_B2-fmt': '',
+            '._1A_and_B26_1A_or_B2-ft': '',
         }
 
         expected = [
             '      ._1A_and_B26_1A_or_B2-f { grid-area: f; }\n',
-            '      ._1A_and_B26_1A_or_B2-ft { grid-area: ft; }\n',
             '      ._1A_and_B26_1A_or_B2-fm { grid-area: fm; }\n',
-            '      ._1A_and_B26_1A_or_B2-fmt { grid-area: fmt; }\n',
             '      ._1A_and_B26_1A_or_B2-fmm { grid-area: fmm; }\n',
-            '      ._1A_and_B26_1A_or_B2-fmmt { grid-area: fmmt; }\n'
+            '      ._1A_and_B26_1A_or_B2-fmmt { grid-area: fmmt; }\n',
+            '      ._1A_and_B26_1A_or_B2-fmt { grid-area: fmt; }\n',
+            '      ._1A_and_B26_1A_or_B2-ft { grid-area: ft; }\n',
         ]
 
         actual = Builder().grid_area(grid_dict, class_name)
@@ -80,13 +80,13 @@ class TestBuilderMethods(unittest.TestCase):
         expected = \
             '<div class="tree _1A_and_B26_1A_and_B2">\n' \
             '  <div class="cell _1A_and_B26_1A_and_B2-f">A &and; B &vdash; A &and; B</div>\n' \
-            '  <div class="tag _1A_and_B26_1A_and_B2-ft">L&and;</div>\n' \
             '  <div class="cell _1A_and_B26_1A_and_B2-fm">A, B &vdash; A &and; B</div>\n' \
-            '  <div class="tag _1A_and_B26_1A_and_B2-fmt">R&and;</div>\n' \
             '  <div class="cell _1A_and_B26_1A_and_B2-fml">A, B &vdash; A</div>\n' \
             '  <div class="tag _1A_and_B26_1A_and_B2-fmlt">Ax</div>\n' \
             '  <div class="cell _1A_and_B26_1A_and_B2-fmr">A, B &vdash; B</div>\n' \
             '  <div class="tag _1A_and_B26_1A_and_B2-fmrt">Ax</div>\n' \
+            '  <div class="tag _1A_and_B26_1A_and_B2-fmt">R&and;</div>\n' \
+            '  <div class="tag _1A_and_B26_1A_and_B2-ft">L&and;</div>\n' \
             '</div>'
 
         body_tree = Builder().make_body_tree(grid_dict, class_name)
@@ -111,6 +111,20 @@ class TestCreate(unittest.TestCase):
             actual = f.readlines()
 
         with open('test/mocks/html/atom.html', 'r') as f:
+            expected = f.readlines()
+
+        self.assertEqual(expected, actual)
+
+    def test_create_2_2(self) -> None:
+        tree = convert.string_to_tree('A v B; C & D')
+        document = Builder()
+        document.build([tree])
+        document.save(self.outfile)
+
+        with open(self.outfile, 'r') as f: 
+            actual = f.readlines()
+
+        with open('test/mocks/html/c2_2_2_tree.html', 'r') as f:
             expected = f.readlines()
 
         self.assertEqual(expected, actual)
