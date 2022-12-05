@@ -57,14 +57,14 @@ class Builder:
             # Add grid-area classes to style.
             style.add(self.grid_area(grid_dict, class_name=class_name))
 
-            # Add indent for closing style tag.
-            style.add(' ' * 4)
-
             # Add tree header to body.
             self.document.body.add(self.tree_title(root))
 
             # Add tree to body.
             self.document.body.add(self.make_body_tree(grid_dict, class_name=class_name))
+
+        # Add indent for closing style tag.
+        style.add(' ' * 4)
 
         self.document.head.add(style)
 
