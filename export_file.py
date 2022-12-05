@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Protocol
 
 from convert import tree_to_dict
+from HTML.document import Builder
 
 
 class Exporter(Protocol):
@@ -85,8 +86,9 @@ class HTMLExporter:
             self.file = path / 'results.json'
 
     def export(self, data) -> None:
-        raise NotImplementedError
-
+        builder = Builder()
+        builder.build(data)
+        builder.save(self.file)
 
 
 def get_exporter(dst: str) -> Exporter:
