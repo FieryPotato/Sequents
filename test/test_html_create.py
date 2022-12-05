@@ -129,3 +129,22 @@ class TestCreate(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
+    def test_create_mulitple_trees(self) -> None:
+        one = convert.string_to_tree('A & B; C v D')
+        two = convert.string_to_tree('; A -> (B -> C)')
+        document = Builder()
+        document.build([one, two])
+        document.save(self.outfile)
+
+        with open(self.outfile, 'r') as f:
+            actual = f.readlines()
+
+        with open('test/mocks/html/two_trees.html', 'r') as f:
+            expected = f.readlines()
+
+        self.assertEqual(expected, actual)
+
+
+if __name__ == '__main__':
+    unittest.main()
+
