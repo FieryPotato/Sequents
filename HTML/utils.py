@@ -1,5 +1,7 @@
 import itertools
-from typing import Protocol, Any
+import re
+
+from typing import Protocol, Any, Generator
 
 from utils import count_dict_branches
 
@@ -33,6 +35,34 @@ CSS_KEY_MAP = {
 }
 
 
+ENTITY_MAP = {
+    r';': 'semicolon',
+    r'\s&\s': 'ampersand',
+    r'&': '&and;',
+    r'\sand\s': ' &and; ',
+    r'-\>': '&rarr;',
+    r'\<': ' &lt; ',
+    r'\>': ' &gt; ',
+    r'\simplies\s': ' &rarr; ',
+    r'v': '&or;',
+    r'\sor\s': ' &or; ',
+    r'~\s': '&not; ',
+    r'not\s': '&not; ',
+    r'∀': '&forall;',
+    r'forall': '&forall;',
+    r'∃': '&exists;',
+    r'exists': '&exists;',
+    'ampersand': '&and;',
+    'semicolon': ' &vdash;',
+}
+
+
+def replace_with_entities(string: str) -> str:
+    for pattern, replacement in ENTITY_MAP.items():
+        string = re.sub(pattern, replacement, string)
+    return string
+
+
 def get_array(tree: Tree, dtype=None) -> list[list[Any]]:
     """
     Return a 2d list of strings whose dimensions will fit tree. dtype
@@ -58,8 +88,9 @@ def gridify(tree: Tree) -> tuple[list, list]:
 
     css[1][-1] = 'ft'
     css[2][-1] = 'ft'
-    objects[1][-1] = root.tag()
-    objects[2][-1] = root.tag()
+    root_tag = root.tag()
+    objects[1][-1] = root_tag
+    objects[2][-1] = root_tag
 
     for i in range(len(css[0]) - 1):
         css[0][i] = 'f'
@@ -165,11 +196,13 @@ def fill_grids(sequent, css, objects, tag, x_start, x_end, y):
         objects[y + 1][j] = sequent.long_string
     css[y + 1][x_end] = tag + 't'
     css[y + 2][x_end] = tag + 't'
-    objects[y + 1][x_end] = sequent.tag()
-    objects[y + 2][x_end] = sequent.tag()
+    
+    rule = sequent.tag()
+    objects[y + 1][x_end] = rule
+    objects[y + 2][x_end] = rule
 
 
-def make_css_key(sequent: str) -> str:
+def css_class_name(sequent: str) -> str:
     """
     Replace protected css class characters with their numeric
     substitutes as defined in CSS_KEY_MAP.
@@ -190,9 +223,26 @@ def grid_to_dict(css: list[str], objects: list[str | None]) -> dict[str, str]:
     """
     grid_height: int = len(css)
     grid_width: int = len(css[0])
-    root: str = make_css_key(objects[-1][0])
-    return {
-        f'._{root}-{css[y][x]}': objects[y][x]
+    css_root: str = css_class_name(objects[-1][0])
+    html_root: str = objects[-1][0]
+    result = {'root': html_root}
+    grid_dict = {
+        f'._{css_root}-{css[y][x]}': objects[y][x]
         for x, y in itertools.product(range(grid_width), range(grid_height))
         if css[y][x] != '.'
     }
+    result.update(grid_dict)
+    return result
+
+
+def unnest(iterable, iterable_type=str) -> Generator[str, None, None]:
+    """
+    Unpacks input nested iterable to whatever it contains. Supports
+    setting a type to stop on (defaults to str).
+    """
+    if hasattr(iterable, '__iter__') and not isinstance(iterable, iterable_type):
+        for sub_iterable in iterable:
+            yield from unnest(sub_iterable)
+    else:
+        yield iterable
+
