@@ -5,7 +5,7 @@ builtin data types (dict, str, etc.). Most of these started out as
 inner functions that become more complex than just a line or two.
 """
 import itertools
-from typing import Generator
+from typing import Generator, Any
 
 NEST_MAP = {'(': 1, ')': -1}
 
@@ -181,3 +181,31 @@ def binary_combinations(data: tuple) -> Generator[tuple[tuple, tuple], None, Non
         x = [data[i] for i, v in enumerate(combination) if v]
         y = [data[i] for i, v in enumerate(combination) if not v]
         yield tuple(x), tuple(y)
+
+
+def nodes_in_dict(d: dict) -> Generator[Any, None, None]:
+    """Yields nodes in input dictionary and nested dictionaries."""
+    for key, value in d.items():
+        yield key
+        if isinstance(value, dict):
+            yield from nodes_in_dict(value)
+        elif isinstance(value, list):
+            yield from (nodes_in_dict(sub_dict) for sub_dict in value)
+        elif value is None:
+            pass
+
+
+def nested_dict_depth(d: dict) -> int:
+    """Return the depth of the most deeply nested subdict."""
+    count = 0
+    for sub_value in d.values():
+        if isinstance(sub_value, dict):
+            count = max(count, nested_dict_depth(sub_value))
+        elif isinstance(sub_value, list):
+            for sub_list in sub_value:
+                count = max(count, nested_dict_depth(sub_list))
+        elif sub_value is None:
+            pass
+
+    # count does not count the initial dict
+    return count + 1

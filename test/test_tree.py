@@ -29,13 +29,19 @@ class TestTreeMethods(unittest.TestCase):
         self.assertFalse(tree.is_grown)
 
     def test_tree_height(self) -> None:
-        strings = 'A; B', 'A v B; C', 'A v B; C v D'
-        expected = 1,      2,          3
-        with patch('rules.get_rule_setting', return_value='add'):
-            for s, e in zip(strings, expected):
-                with self.subTest(i=s):
-                    actual = string_to_tree(s).height()
-                    self.assertEqual(e, actual)
+        self.assertEqual(1, string_to_tree('A; B').height())
+        self.assertEqual(2, string_to_tree('A & B; C').height())
+        self.assertEqual(2, string_to_tree('A; B & C').height())
+        self.assertEqual(3, string_to_tree('A & B; C & D').height())
+        self.assertEqual(3, string_to_tree('A & B; C v D').height())
+        self.assertEqual(3, string_to_tree('A v B; C & D').height())
+        self.assertEqual(3, string_to_tree('A; (A & B) & (C & D)').height())
+        self.assertEqual(4, string_to_tree('(A & B) & (C & D); A').height())
+        self.assertEqual(3, string_to_tree('(A v B) v (C v D); A').height())
+        self.assertEqual(4, string_to_tree('A; (A v B) v (C v D)').height())
+        self.assertEqual(3, string_to_tree('(A -> B) -> (C -> D); A').height())
+        self.assertEqual(4, string_to_tree('A; (A -> B) -> (C -> D)').height())
+
 
     def test_tree_width(self) -> None:
         with patch('rules.get_rule_setting', return_value='add'):

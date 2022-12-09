@@ -87,7 +87,7 @@ class HTMLExporter:
 
     def export(self, data) -> None:
         builder = Builder()
-        builder.build(data)
+        builder.build(data['forest'])
         builder.save(self.file)
 
 

@@ -153,8 +153,7 @@ def main():
             if args.json:
                 filetype = '.json'
             elif args.html:
-                raise NotImplementedError('.html is not yet supported')
-                # filetype = '.html'
+                filetype = '.html'
 
             # Run solver
             solve(args.infile, args.outfile, filetype)

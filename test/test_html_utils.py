@@ -439,7 +439,6 @@ class TestHTMLification(unittest.TestCase):
             self.assertEqual(e, grid_to_dict(*expected))
 
     def test_lopsided_tree(self) -> None:
-        self.maxDiff = None
         string = '(A v B) v C;'
         f = string_to_sequent(string)
         fl = string_to_sequent('A v B;')
@@ -490,6 +489,72 @@ class TestHTMLification(unittest.TestCase):
                 '._11A_or_B2_or_C26-frt': fr.tag(),
             }
             self.assertEqual(e, grid_to_dict(*expected))
+
+
+class TestCases(unittest.TestCase):
+    maxDiff = None
+    def test_dionysus(self) -> None:
+        string = '~ (P v (~ P)); (((Dionysus eats bagels or Elephants like to crash Funerals) & (~ Dionysus eats bagels)) -> Elephants like to crash Funerals)'
+        f = string_to_sequent(string)
+        fm = string_to_sequent('; (((Dionysus eats bagels or Elephants like to crash Funerals) & (~ Dionysus eats bagels)) -> Elephants like to crash Funerals), (P v (~ P))')
+        fmm = string_to_sequent('((Dionysus eats bagels or Elephants like to crash Funerals) & (~ Dionysus eats bagels)); (P v (~ P)), Elephants like to crash Funerals')
+        fmmm = string_to_sequent('(Dionysus eats bagels or Elephants like to crash Funerals), (~ Dionysus eats bagels); (P v (~ P)), Elephants like to crash Funerals')
+        fmmml = string_to_sequent('~ Dionysus eats bagels, Dionysus eats bagels; P v (~ P), Elephants like to crash Funerals')
+        fmmmr = string_to_sequent('~ Dionysus eats bagels, Elephants like to crash Funerals; P v (~ P), Elephants like to crash Funerals')
+        fmmmlm = string_to_sequent('Dionysus eats bagels; P v (~ P), Elephants like to crash Funerals, Dionysus eats bagels')
+        fmmmrm = string_to_sequent('Elephants like to crash Funerals; P v (~ P), Elephants like to crash Funerals, Dionysus eats bagels')
+        fmmmlmm = string_to_sequent('Dionysus eats bagels; Elephants like to crash Funerals, Dionysus eats bagels, P, (~ P)')
+        fmmmrmm = string_to_sequent('Elephants like to crash Funerals; Elephants like to crash Funerals, Dionysus eats bagels, P, (~ P)')
+        fmmmlmmm = string_to_sequent('Dionysus eats bagels, P; Elephants like to crash Funerals, Dionysus eats bagels, P')
+        fmmmrmmm = string_to_sequent('Elephants like to crash Funerals, P; Elephants like to crash Funerals, Dionysus eats bagels, P')
+
+        tree = string_to_tree(string)
+
+        expected_grid_template_areas = [
+            ['.', 'fmmmlmmmt', '.', 'fmmmrmmmt'],
+            ['fmmmlmmm', 'fmmmlmmmt', 'fmmmrmmm', 'fmmmrmmmt'],
+            ['fmmmlmmm', 'fmmmlmmt', 'fmmmrmmm', 'fmmmrmmt'],
+            ['fmmmlmm', 'fmmmlmmt', 'fmmmrmm', 'fmmmrmmt'],
+            ['fmmmlmm', 'fmmmlmt', 'fmmmrmm', 'fmmmrmt'],
+            ['fmmmlm', 'fmmmlmt', 'fmmmrm', 'fmmmrmt'],
+            ['fmmmlm', 'fmmmlt', 'fmmmrm', 'fmmmrt'],
+            ['fmmml', 'fmmmlt', 'fmmmr', 'fmmmrt'],
+            ['fmmml', '.', 'fmmmr', 'fmmmt'],
+            ['fmmm', 'fmmm', 'fmmm', 'fmmmt'],
+            ['fmmm', 'fmmm', 'fmmm', 'fmmt'],
+            ['fmm', 'fmm', 'fmm', 'fmmt'],
+            ['fmm', 'fmm', 'fmm', 'fmt'],
+            ['fm', 'fm', 'fm', 'fmt'],
+            ['fm', 'fm', 'fm', 'ft'],
+            ['f', 'f', 'f', 'ft'],
+            ['f', 'f', 'f', '.']
+        ]
+
+        expected_objects = [
+            [None, fmmmlmmm.tag(), None, fmmmrmmm.tag()],
+            [fmmmlmmm.long_string, fmmmlmmm.tag(), fmmmrmmm.long_string, fmmmrmmm.tag()],
+            [fmmmlmmm.long_string, fmmmlmm.tag(), fmmmrmmm.long_string, fmmmrmm.tag()],
+            [fmmmlmm.long_string, fmmmlmm.tag(), fmmmrmm.long_string, fmmmrmm.tag()],
+            [fmmmlmm.long_string, fmmmlm.tag(), fmmmrmm.long_string, fmmmrm.tag()],
+            [fmmmlm.long_string, fmmmlm.tag(), fmmmrm.long_string, fmmmrm.tag()],
+            [fmmmlm.long_string, fmmml.tag(), fmmmrm.long_string, fmmmr.tag()],
+            [fmmml.long_string, fmmml.tag(), fmmmr.long_string, fmmmr.tag()],
+            [fmmml.long_string, None, fmmmr.long_string, fmmm.tag()],
+            [fmmm.long_string, fmmm.long_string, fmmm.long_string, fmmm.tag()],
+            [fmmm.long_string, fmmm.long_string, fmmm.long_string, fmm.tag()],
+            [fmm.long_string, fmm.long_string, fmm.long_string, fmm.tag()],
+            [fmm.long_string, fmm.long_string, fmm.long_string, fm.tag()],
+            [fm.long_string, fm.long_string, fm.long_string, fm.tag()],
+            [fm.long_string, fm.long_string, fm.long_string, f.tag()],
+            [f.long_string, f.long_string, f.long_string, f.tag()],
+            [f.long_string, f.long_string, f.long_string, None]
+        ]
+
+        expected = expected_grid_template_areas, expected_objects
+
+        actual = gridify(tree)
+
+        self.assertEqual(expected, actual)
 
 
 if __name__ == '__main__':

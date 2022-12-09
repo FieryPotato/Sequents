@@ -380,13 +380,30 @@ class TestBinary(unittest.TestCase):
                 with self.assertRaises(TypeError):
                     t('oh no', 'errors')
 
-    def test_complexity_is_one_plus_greatest_content_complexity(self) -> None:
+    def test_complexity_is_one_plus_content(self) -> None:
         for propset in (self.conjunctions, self.conditionals, self.disjunctions):
             with self.subTest(i=propset):
                 p1, p201, p211 = propset
                 self.assertEqual(1, p1.complexity)
                 self.assertEqual(2, p201.complexity)
                 self.assertEqual(2, p211.complexity)
+
+    def test_messy_complexity(self) -> None:
+        prop = Conditional(
+            Conjunction(
+                Disjunction(
+                    Atom('D'),
+                    Atom('E')
+                ),
+                Negation(
+                    Atom('D')
+                )
+            ),
+            Atom('E')
+        )
+        expected = 3
+        actual = prop.complexity
+        self.assertEqual(expected, actual)
 
     def test_arity_is_2(self) -> None:
         for prop in self.cd1, self.cj1, self.dj1:
