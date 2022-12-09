@@ -24,6 +24,7 @@ from convert import sequent_to_tree
 
 
 class Sequent(Protocol):
+    names: set[str]
     ...
 
 
@@ -59,6 +60,10 @@ class Prover:
         # 10 seems like an okay number to start, but at some point I
         # want to figure out what a good cutoff is, where the benefits
         # of parallelism start to outweigh the costs of pool creation.
+        # Obviously for small trees differences will be negligible, but
+        # I want to be able to throw unbounded numbers of sequents into
+        # this without it taking a year to decompose them all,
+        # especially if any non-invertible rules are in use.
         if len(self.roots) > 10:
             with Pool() as pool:
                 results = pool.starmap(sequent_to_tree, ((root, self.names) for root in self.roots))

@@ -26,10 +26,10 @@ Tree(root: str, is_grown: bool = False, names: list[str] = [])
 __all__ = ['Tree']
 
 from dataclasses import dataclass, field
-from typing import Protocol
+from typing import Protocol, Generator
 
+import utils
 from rules import get_decomposer
-from utils import count_dict_branches, split_branch
 
 
 class Sequent(Protocol):
@@ -61,7 +61,9 @@ class Tree:
         Return the proof height of this tree, which is just the
         complexity of its root.
         """
-        return 1 + self.root.complexity
+        if not self.is_grown:
+            raise RuntimeError('Trees must be grown to measure their height.')
+        return utils.nested_dict_depth(self.branches)
 
     def width(self) -> int:
         """
@@ -69,7 +71,15 @@ class Tree:
         any list branches (i.e. non-invertible rules) in it. Returns 0 
         if any value in any branch is a list.
         """
-        return count_dict_branches(self.branches)
+        if not self.is_grown:
+            raise RuntimeError('Trees must be grown to measure their width.')
+        return utils.count_dict_branches(self.branches)
+
+    def sequents(self) -> Generator[Sequent, None, None]:
+        """ Yields from sequents in self. """
+        if not self.is_grown:
+            raise RuntimeError('Trees must be grown to inspect their sequents.')
+        yield from utils.nodes_in_dict(self.branches)
 
     def grow(self):
         """Solve the root, then recursively solve each branch."""
@@ -112,7 +122,7 @@ class Tree:
         """Trees should only be able to be grown once."""
 
         def __init__(self, tree) -> None:
-            m = f'The tree beginning in {tree.root} has already been decomposed.'
+            m = f'{self.__repr__()} has already been decomposed.'
             super().__init__(m)
 
 
@@ -128,7 +138,7 @@ def split_tree(tree) -> list[Tree]:
     if (root_parent := tree.branches[tree.root]) is None:
         return [tree]
     result = []
-    for sub_tree in split_branch(root_parent):
+    for sub_tree in utils.split_branch(root_parent):
         new_dict = {tree.root: sub_tree}
         result.append(
             Tree(

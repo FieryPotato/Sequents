@@ -1,5 +1,8 @@
 import unittest
 
+import convert
+from import_file import get_importer
+
 from proposition import Atom, Negation, Conjunction, Conditional,\
     Disjunction, Existential, Universal
 from prover import Prover
@@ -166,8 +169,6 @@ class TestProverSolvesComplexity1(unittest.TestCase):
         e_branches = {k for d in branches[self.runi] for k in d.keys()}
         a_branches = {k for d in p[0].branches[self.runi] for k in d.keys()}
         self.assertEqual(e_branches, a_branches)
-
-
 
 
 if __name__ == '__main__':
