@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <style>
+      .tree {
+        display: grid;
+        justify-content: center;
+        align-items: center;
+        margin: 10px;
+        padding: 10px;
+      }
+      .cell {
+        text-align: center;
+        border-top: 2px solid black;
+        padding: 0px 0px 0px 10px;
+        margin: 0px 4px 0px 16px;
+      }
+      .tag {
+        text-align: center;
+      }
+      ._forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4 { grid-template-areas:
+        ". fmlt . fmrt"
+        "fml fmlt fmr fmrt"
+        "fml . fmr fmt"
+        "fm fm fm fmt"
+        "fm fm fm ft"
+        "f f f ft"
+        "f f f ."
+      }
+      ._forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4-f { grid-area: f; }
+      ._forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4-fm { grid-area: fm; }
+      ._forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4-fml { grid-area: fml; }
+      ._forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4-fmlt { grid-area: fmlt; }
+      ._forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4-fmr { grid-area: fmr; }
+      ._forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4-fmrt { grid-area: fmrt; }
+      ._forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4-fmt { grid-area: fmt; }
+      ._forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4-ft { grid-area: ft; }
+    </style>
+  </head>
+  <body>
+    <h3>&forall;x (human &lt; x &gt;  &rarr; mortal &lt; x &gt; ), human &lt; Socrates &gt;  &vdash; mortal &lt; Socrates &gt;</h3>
+    <div class="tree _forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4">
+      <div class="cell _forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4-f">&forall;x (human &lt; x &gt;  &rarr; mortal &lt; x &gt; ), human &lt; Socrates &gt;  &vdash; mortal &lt; Socrates &gt; </div>
+      <div class="cell _forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4-fm">human &lt; Socrates &gt; , (human &lt; Socrates &gt;  &rarr; mortal &lt; Socrates &gt; ) &vdash; mortal &lt; Socrates &gt; </div>
+      <div class="cell _forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4-fml">human &lt; Socrates &gt;  &vdash; mortal &lt; Socrates &gt; , human &lt; Socrates &gt; </div>
+      <div class="tag _forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4-fmlt">Ax</div>
+      <div class="cell _forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4-fmr">human &lt; Socrates &gt; , mortal &lt; Socrates &gt;  &vdash; mortal &lt; Socrates &gt; </div>
+      <div class="tag _forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4-fmrt">Ax</div>
+      <div class="tag _forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4-fmt">L&rarr;</div>
+      <div class="tag _forallx_1human3x4_implies_mortal3x425_human3Socrates46_mortal3Socrates4-ft">L&&forall;;</div>
+    </div>
+  </body>
+</html>

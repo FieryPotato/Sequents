@@ -2,6 +2,7 @@ import unittest
 
 from unittest.mock import patch
 
+import convert
 from convert import dict_to_tree, tree_to_dict, string_to_tree, \
     string_to_sequent, sequent_to_tree
 from proposition import Atom, Conjunction, Negation, Disjunction, Conditional
@@ -762,6 +763,52 @@ class TestTreeSplitting(unittest.TestCase):
             split = split_tree(tree)
             actual = [t.branches for t in split]
             self.assertEqual(expected, actual)
+
+    def test_1pni_then_2pi_split(self) -> None:
+        string = 'A & C, A -> B; B'
+        root = convert.string_to_sequent(string)
+        a = {
+            root: {
+                convert.string_to_sequent('A, A -> B; B'): {
+                    convert.string_to_sequent('A, A; A'): None,
+                    convert.string_to_sequent('A, B; B'): None
+                }
+            }
+        }
+        b = {
+            root: {
+                convert.string_to_sequent('C, A -> B; B'): {
+                    convert.string_to_sequent('C, A; A'): None,
+                    convert.string_to_sequent('C, B; B'): None
+                }
+            }
+            
+        }
+        expected = [a, b]
+        with patch('rules.get_rule_setting', return_value='add'):
+            tree = convert.sequent_to_tree(root)
+            split = split_tree(tree)
+            actual = [t.branches for t in split]
+            self.assertEqual(expected, actual)
+
+
+    def test_quantified_split(self) -> None:
+        string = 'Human<socrates>, forallx (Human<x> -> Mortal<x>); Mortal<socrates>'
+        root = string_to_sequent(string)
+        tree = string_to_tree(string)
+        split = split_tree(tree)
+        actual = [t.branches for t in split]
+        a = {
+            root: {
+                string_to_sequent('Human<socrates>, Human<socrates> -> Mortal<socrates>; Mortal<socrates>'): {
+                    string_to_sequent('Human<socrates>; Mortal<socrates>, Human<socrates>'): None,
+                    string_to_sequent('Human<socrates>, Mortal<socrates>; Human<socrates>'): None
+                }
+            }
+
+        }
+        expected = [a]
+        self.assertEqual(expected, actual)
 
 
 if __name__ == '__main__':

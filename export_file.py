@@ -17,6 +17,7 @@ from typing import Protocol
 
 from convert import tree_to_dict
 from HTML.document import Builder
+from tree import split_tree
 
 
 class Exporter(Protocol):
@@ -86,8 +87,10 @@ class HTMLExporter:
             self.file = path / 'results.json'
 
     def export(self, data) -> None:
+        forest = data['forest']
+        trees = [subtree for tree in forest for subtree in split_tree(tree)]
         builder = Builder()
-        builder.build(data['forest'])
+        builder.build(trees)
         builder.save(self.file)
 
 

@@ -121,13 +121,20 @@ class TestConvertProposition(unittest.TestCase):
             with self.subTest(i=connective):
                 self.assertEqual(e, actual)
 
-    def test_quntifier_complex_creation(self) -> None:
+    def test_quantifier_complex_creation(self) -> None:
         expected = [self.comp_uni, self.comp_exi] *2
         for e, connective in zip(expected, self.quantified_connectives):
             string = f'{connective}y {connective}x isABug<x, y>'
             actual = convert.string_to_proposition(string)
             with self.subTest(i=connective):
                 self.assertEqual(e, actual)
+
+    def test_complex_universal_creation(self) -> None:
+        long_string = 'forallx (Human<x> -> Mortal<x>)'
+        short_string = '∀x (Human<x> -> Mortal<x>)'
+        expected = Universal('x', Conditional(Atom('Human<x>'), Atom('Mortal<x>')))
+        self.assertEqual(expected, convert.string_to_proposition(long_string))
+        self.assertEqual(expected, convert.string_to_proposition(short_string))
 
 
 class TestFindConnective(unittest.TestCase):
