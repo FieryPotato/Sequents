@@ -40,30 +40,22 @@ __all__ = ['Sequent']
 
 import itertools
 from dataclasses import dataclass
-from typing import Protocol, TypeVar# , Self
+from typing import Self
 
 import utils
+from proposition import Proposition
 
 
-Self = TypeVar('Self')
-
-
-class Proposition(Protocol):
-    complexity: int
-
-
-@dataclass(frozen=True, slots=True, order=True)
+@dataclass(slots=True, order=True)
 class Sequent:
-    ant: tuple
-    con: tuple
-    
+    ant: tuple[Proposition, ...] | Proposition
+    con: tuple[Proposition, ...] | Proposition
+
     def __post_init__(self):
-        for side in self:
-            if not isinstance(side, tuple):
-                # I'd like to be able to convert on the fly for people
-                # not using the convert module, but I can't make sequents
-                # frozen if I do.
-                raise ValueError(f'Sequent sides must be of type tuple, not {type(side)}.')
+        # Ensure self.ant and self.con contain tuples of propositions
+        for attr in 'ant', 'con':
+            if not isinstance(getattr(self, attr), tuple):
+                setattr(self, attr, tuple(getattr(self, attr)))
 
     def __iter__(self):
         yield from (self.ant, self.con)
@@ -145,7 +137,7 @@ class Sequent:
             side_map = {'ant': 'L', 'con': 'R'}
             return side_map[side] + symbol
 
-    def first_complex_prop(self) ->\
+    def first_complex_prop(self) -> \
             tuple[Proposition, str, int] | None:
         """
         Return the leftmost complex proposition in the sequent, the
@@ -174,4 +166,3 @@ class Sequent:
             )
             for antecedents, consequents in combinations
         ]
-
