@@ -49,11 +49,9 @@ class Tree:
     root: Sequent
     is_grown: bool = field(default=False)
     names: set[str] = field(default_factory=set)
-    branches: dict = field(default_factory=dict)
+    branches: list = field(default_factory=list)
 
     def __post_init__(self) -> None:
-        if not self.branches:
-            self.branches.update({self.root: None})
         self.names.update({name for name in self.root.names})
 
     def height(self) -> int:
@@ -61,9 +59,10 @@ class Tree:
         Return the proof height of this tree, which is just the
         complexity of its root.
         """
-        if not self.is_grown:
-            raise RuntimeError('Trees must be grown to measure their height.')
-        return utils.nested_dict_depth(self.branches)
+        # if not self.is_grown:
+        #     raise RuntimeError('Trees must be grown to measure their height.')
+        # return utils.nested_dict_depth(self.branches)
+        ...
 
     def width(self) -> int:
         """
@@ -71,59 +70,58 @@ class Tree:
         any list branches (i.e. non-invertible rules) in it. Returns 0 
         if any value in any branch is a list.
         """
-        if not self.is_grown:
-            raise RuntimeError('Trees must be grown to measure their width.')
-        return utils.count_dict_branches(self.branches)
+        # if not self.is_grown:
+        #     raise RuntimeError('Trees must be grown to measure their width.')
+        # return utils.count_dict_branches(self.branches)
+        ...
 
     def sequents(self) -> Generator[Sequent, None, None]:
         """ Yields from sequents in self. """
-        if not self.is_grown:
-            raise RuntimeError('Trees must be grown to inspect their sequents.')
-        yield from utils.nodes_in_dict(self.branches)
+        # if not self.is_grown:
+        #     raise RuntimeError('Trees must be grown to inspect their sequents.')
+        # yield from utils.nodes_in_dict(self.branches)
+        ...
 
     def grow(self):
         """Solve the root, then recursively solve each branch."""
-        if self.is_grown:
-            raise self.TreeIsGrownError(self)
-        self.branches[self.root] = self.grow_branch(self.root)
-        self.is_grown = True
+        # if self.is_grown:
+        #     raise self.TreeIsGrownError(self)
+        # self.branches[self.root] = self.grow_branch(self.root)
+        # self.is_grown = True
+        ...
 
     def grow_branch(self, sequent) -> dict | list | None:
         """
         Return the body of the tree whose root is sequent.
         """
-        decomposer = get_decomposer(sequent, names=self.names)
-        if (parents := decomposer.get_parents()) is None:
-            return None
-        elif isinstance(parents, dict):
-            return self.grow_dict_branch(parents)
-        elif isinstance(parents, list):
-            return self.grow_list_branch(parents)
+        # decomposer = get_decomposer(sequent, names=self.names)
+        # if (parents := decomposer.get_parents()) is None:
+        #     return None
+        # elif isinstance(parents, dict):
+        #     return self.grow_dict_branch(parents)
+        # elif isinstance(parents, list):
+        #     return self.grow_list_branch(parents)
+        ...
 
     def grow_list_branch(self, seq_dict_list: list[dict[Sequent, None]]) \
             -> list[dict[Sequent, Sequent | None]]:
         """
         Return branches expanded from sequents in seq_dict_list.
         """
-        return [
-            self.grow_dict_branch(sequent) for sequent in seq_dict_list
-        ]
+        # return [
+        #     self.grow_dict_branch(sequent) for sequent in seq_dict_list
+        # ]
+        ...
 
     def grow_dict_branch(self, seq_dict: dict[Sequent, None]) \
             -> dict[Sequent, Sequent | None]:
         """
         Return branches expanded from sequents in seq_dict.
         """
-        return {
-            sequent: self.grow_branch(sequent) for sequent in seq_dict.keys()
-        }
-
-    class TreeIsGrownError(Exception):
-        """Trees should only be able to be grown once."""
-
-        def __init__(self, tree) -> None:
-            m = f'{self.__repr__()} has already been decomposed.'
-            super().__init__(m)
+        # return {
+        #     sequent: self.grow_branch(sequent) for sequent in seq_dict.keys()
+        # }
+        ...
 
 
 def split_tree(tree) -> list[Tree]:
@@ -131,7 +129,7 @@ def split_tree(tree) -> list[Tree]:
     Return a list of all possible full trees in tree, where a full tree
     consists only of dict[Sequent, dict | None] pairs. All non-
     invertible rules are split into separate trees, which are identical
-    to each other up to the rule application, after which they each
+    to eac.................................................................................................h other up to the rule application, after which they each
     follow one of the possibilities in the list from
     sequent.possible_mix_parents.
     """

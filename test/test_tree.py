@@ -24,11 +24,6 @@ class TestTreeMethods(unittest.TestCase):
         self.assertEqual(tree.root, sequent)
         self.assertEqual(tree.branches, {sequent: None})
 
-    def test_tree_starts_not_full(self) -> None:
-        sequent = Sequent((self.p,), (self.q,))
-        tree = Tree(sequent)
-        self.assertFalse(tree.is_grown)
-
     def test_tree_height(self) -> None:
         self.assertEqual(1, string_to_tree('A; B').height())
         self.assertEqual(2, string_to_tree('A & B; C').height())
@@ -42,7 +37,6 @@ class TestTreeMethods(unittest.TestCase):
         self.assertEqual(4, string_to_tree('A; (A v B) v (C v D)').height())
         self.assertEqual(3, string_to_tree('(A -> B) -> (C -> D); A').height())
         self.assertEqual(4, string_to_tree('A; (A -> B) -> (C -> D)').height())
-
 
     def test_tree_width(self) -> None:
         with patch('rules.get_rule_setting', return_value='add'):
@@ -65,35 +59,35 @@ class TestTreeGrowth(unittest.TestCase):
     cd = Conditional(p, q)
     dj = Disjunction(p, q)
 
-    def test_tree_can_only_be_grown_once(self) -> None:
-        sequent = Sequent((), ())
-        tree = Tree(sequent)
-        tree.grow()
-        with self.assertRaises(Tree.TreeIsGrownError):
-            tree.grow()
-
     def test_tree_grows_atom_to_none(self) -> None:
         sequent = Sequent((self.p,), (self.q,))
         tree = Tree(sequent)
         tree.grow()
-        actual = tree.branches
-        expected = {
-            sequent: None
-        }
-        self.assertEqual(expected, actual)
+        expected = [None]
+        self.assertEqual(expected, Tree.branches)
 
-    def test_tree_grows_opi_only(self) -> None:
+    def test_tree_grows_opi(self) -> None:
         with patch('rules.get_rule_setting', return_value='mul'):
-            sequent = Sequent((self.cj,), ())
+            p = Atom('p')
+            q = Atom('q')
+
+            sequent = Sequent(
+                ant=Conjunction(p, q),
+                con=()
+            )
             tree = Tree(sequent)
             tree.grow()
             actual = tree.branches
-            expected = {
-                sequent: {
-                    Sequent((self.p, self.q), ()): None
-                }
-            }
-            self.assertEqual(expected, actual)
+
+            parent_sequent = Sequent(
+                ant=(p, q),
+                con=()
+            )
+            parent_tree = Tree(parent_sequent)
+            expected = [parent_tree]
+
+            self.assertEqual(actual, expected)
+
 
     def test_tree_grows_tpi_only(self) -> None:
         with patch('rules.get_rule_setting', return_value='add'):
