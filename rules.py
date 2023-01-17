@@ -24,22 +24,11 @@ in config.json).
 
 __all__ = ['get_decomposer']
 
-from typing import Protocol, Union
+from typing import Protocol
 
+from proposition import Proposition
 from sequent import Sequent
 from settings import Settings
-
-
-class Proposition(Protocol):
-    content: tuple
-    left: 'Proposition'
-    right: 'Proposition'
-    prop: Union['Proposition', str]
-    variable: str
-    symb: str
-
-    def instantiate(self, variable, name) -> 'Proposition':
-        ...
 
 
 class Decomposer(Protocol):
@@ -590,7 +579,7 @@ decomposers = {
 }
 
 
-def get_rule_setting(connective, side) -> str:
+def get_rule_setting(connective: str, side: str) -> str:
     """Return 'add' or 'mul' from config.json for this rule."""
     return Settings().get_rule(connective, side)
 
@@ -612,7 +601,7 @@ def get_rule(proposition: Proposition, side: str, names=None) -> Rule:
 def get_decomposer(sequent: Sequent, names=None) -> Decomposer:
     """Return the appropriate decomposer for a given sequent."""
     if names is None:
-        names = {}
+        names = set()
     if sequent.is_atomic:
         return AtomDecomposer(sequent)
     prop, side, index = sequent.first_complex_prop()

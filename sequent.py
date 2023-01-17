@@ -55,7 +55,10 @@ class Sequent:
         # Ensure self.ant and self.con contain tuples of propositions
         for attr in 'ant', 'con':
             if not isinstance(getattr(self, attr), tuple):
-                setattr(self, attr, tuple(getattr(self, attr)))
+                # Create a list to avoid tuple() using the proposition's
+                # .__iter__() for tuple construction.
+                side = [getattr(self, attr)]
+                setattr(self, attr, tuple(side))
 
     def __iter__(self):
         yield from (self.ant, self.con)

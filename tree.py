@@ -26,16 +26,12 @@ Tree(root: str, is_grown: bool = False, names: list[str] = [])
 __all__ = ['Tree']
 
 from dataclasses import dataclass, field
-from typing import Protocol, Generator
+from typing import Generator
 
+import decompose
+import rules
 import utils
-from rules import get_decomposer
-
-
-class Sequent(Protocol):
-    names: set
-    complexity: int
-    long_string: str
+from sequent import Sequent
 
 
 @dataclass(slots=True)
@@ -83,12 +79,28 @@ class Tree:
         ...
 
     def grow(self):
-        """Solve the root, then recursively solve each branch."""
+        """
+        Solve the root, then recursively solve each branch.
+        """
         # if self.is_grown:
         #     raise self.TreeIsGrownError(self)
         # self.branches[self.root] = self.grow_branch(self.root)
         # self.is_grown = True
-        ...
+
+        # No operation if tree si already grown.
+        if self.branches:
+            return
+
+        # Atomic root means no branches, but this must be distinct from
+        # a tree that has not been grown. We use [None] to mark this.
+        if self.root.is_atomic:
+            self.branches.append(None)
+            return
+
+        decomposer = decompose.get_function(sequent=self.root, names=self.names)
+
+
+
 
     def grow_branch(self, sequent) -> dict | list | None:
         """

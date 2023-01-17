@@ -17,19 +17,10 @@ __all__ = ['Prover']
 
 import itertools
 
-from typing import Protocol
 from multiprocessing import Pool
 
-from convert import sequent_to_tree
-
-
-class Sequent(Protocol):
-    names: set[str]
-    ...
-
-
-class Tree(Protocol):
-    ...
+import convert
+from sequent import Sequent
 
 
 class Prover:
@@ -66,9 +57,9 @@ class Prover:
         # especially if any non-invertible rules are in use.
         if len(self.roots) > 10:
             with Pool() as pool:
-                results = pool.starmap(sequent_to_tree, ((root, self.names) for root in self.roots))
+                results = pool.starmap(convert.sequent_to_tree, ((root, self.names) for root in self.roots))
         else:
-            results = itertools.starmap(sequent_to_tree, ((root, self.names) for root in self.roots))
+            results = itertools.starmap(convert.sequent_to_tree, ((root, self.names) for root in self.roots))
         self.forest.extend(results)
 
     def export(self) -> dict:
