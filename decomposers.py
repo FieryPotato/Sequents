@@ -4,11 +4,13 @@ from sequent import Sequent
 
 RULE_DICT = {
     'ant': {
-        '&': rules.LeftMultAnd
+        '~': rules.LeftNot,
+        '&': rules.LeftMultAnd,
     },
     'con': {
+        '~': rules.RightNot,
         'v': rules.RightMultOr,
-        '->': rules.RightMultIf
+        '->': rules.RightMultIf,
     }
 }
 

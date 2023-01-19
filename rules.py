@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Protocol, TypeVar
 
-from proposition import Proposition, Conjunction, Disjunction
+from proposition import Proposition, Conjunction, Disjunction, Negation, Conditional
 from sequent import Sequent
 
 decomp_result = TypeVar('decomp_result',
@@ -61,7 +61,7 @@ class RightMultOr:
 class RightMultIf:
     type = RuleTypes.OPI
 
-    def __init__(self, prop: Disjunction, sequent: Sequent):
+    def __init__(self, prop: Conditional, sequent: Sequent):
         self.prop = prop
         self.sequent = sequent
 
@@ -69,5 +69,35 @@ class RightMultIf:
         prop_sequent = Sequent(
             ant=self.prop.left,
             con=self.prop.right
+        )
+        return [(self.sequent.mix(prop_sequent),)]
+
+
+class LeftNot:
+    type = RuleTypes.OPI
+
+    def __init__(self, prop: Negation, sequent: Sequent):
+        self.prop = prop
+        self.sequent = sequent
+
+    def apply(self) -> list[tuple[Sequent]]:
+        prop_sequent = Sequent(
+            ant=None,
+            con=self.prop.prop
+        )
+        return [(self.sequent.mix(prop_sequent),)]
+
+
+class RightNot:
+    type = RuleTypes.OPI
+
+    def __init__(self, prop: Negation, sequent: Sequent):
+        self.prop = prop
+        self.sequent = sequent
+
+    def apply(self) -> list[tuple[Sequent]]:
+        prop_sequent = Sequent(
+            ant=self.prop.prop,
+            con=None
         )
         return [(self.sequent.mix(prop_sequent),)]

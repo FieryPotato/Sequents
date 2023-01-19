@@ -1,6 +1,6 @@
 import unittest
 
-from proposition import Atom, Conjunction, Disjunction, Conditional
+from proposition import Atom, Conjunction, Disjunction, Conditional, Negation
 from sequent import Sequent
 from tree import Tree
 
@@ -87,3 +87,46 @@ class TestOneParentInvertible(unittest.TestCase):
         assert isinstance(tree.branches[0][0], Tree)
         assert parent_sequent == tree.branches[0][0].root
 
+    def test_left_not(self) -> None:
+        p = Atom('p')
+
+        sequent = Sequent(
+            ant=Negation(p),
+            con=None
+        )
+        tree = Tree(sequent)
+        tree.grow()
+
+        parent_sequent = Sequent(
+            ant=None,
+            con=p
+        )
+
+        assert isinstance(tree.branches, list)
+        assert len(tree.branches) == 1
+        assert isinstance(tree.branches[0], tuple)
+        assert len(tree.branches[0]) == 1
+        assert isinstance(tree.branches[0][0], Tree)
+        assert parent_sequent == tree.branches[0][0].root
+
+    def test_right_not(self) -> None:
+        p = Atom('p')
+
+        sequent = Sequent(
+            ant=None,
+            con=Negation(p)
+        )
+        tree = Tree(sequent)
+        tree.grow()
+
+        parent_sequent = Sequent(
+            ant=p,
+            con=None
+        )
+
+        assert isinstance(tree.branches, list)
+        assert len(tree.branches) == 1
+        assert isinstance(tree.branches[0], tuple)
+        assert len(tree.branches[0]) == 1
+        assert isinstance(tree.branches[0][0], Tree)
+        assert parent_sequent == tree.branches[0][0].root
