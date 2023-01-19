@@ -1,6 +1,6 @@
 import unittest
 
-from proposition import Atom, Conjunction, Disjunction
+from proposition import Atom, Conjunction, Disjunction, Conditional
 from sequent import Sequent
 from tree import Tree
 
@@ -63,3 +63,27 @@ class TestOneParentInvertible(unittest.TestCase):
         assert len(tree.branches[0]) == 1
         assert isinstance(tree.branches[0][0], Tree)
         assert parent_sequent == tree.branches[0][0].root
+
+    def test_right_implies(self) -> None:
+        p = Atom('p')
+        q = Atom('q')
+
+        sequent = Sequent(
+            ant=None,
+            con=Conditional(p, q)
+        )
+        tree = Tree(sequent)
+        tree.grow()
+
+        parent_sequent = Sequent(
+            ant=p,
+            con=q
+        )
+
+        assert isinstance(tree.branches, list)
+        assert len(tree.branches) == 1
+        assert isinstance(tree.branches[0], tuple)
+        assert len(tree.branches[0]) == 1
+        assert isinstance(tree.branches[0][0], Tree)
+        assert parent_sequent == tree.branches[0][0].root
+

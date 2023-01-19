@@ -7,7 +7,8 @@ RULE_DICT = {
         '&': rules.LeftMultAnd
     },
     'con': {
-        'v': rules.RightMultOr
+        'v': rules.RightMultOr,
+        '->': rules.RightMultIf
     }
 }
 

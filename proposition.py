@@ -46,7 +46,7 @@ string_to_proposition) over creating these classes directly.
 """
 
 __all__ = ['Atom', 'Negation', 'Conjunction', 'Conditional', 'Disjunction',
-           'Universal', 'Existential']
+           'Proposition', 'Universal', 'Existential']
 
 import re
 
@@ -63,8 +63,8 @@ objects_re = re.compile(r'<(.*)>')
 # Match anything before an opening angle bracket ('<')
 predicate_re = re.compile(r'(.+)<')
 
-
 Self = TypeVar('Self')
+
 
 @dataclass(frozen=True, slots=True, order=True)
 class Proposition(ABC):
@@ -363,4 +363,3 @@ class Disjunction(BinaryProposition):
     """
     symb = 'v'
     word = 'or'
-
