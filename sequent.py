@@ -38,6 +38,7 @@ other data types into sequents, I'll add one there.
 
 __all__ = ['Sequent']
 
+import functools
 import itertools
 from dataclasses import dataclass
 from typing import Self
@@ -48,12 +49,15 @@ from proposition import Proposition
 
 @dataclass(slots=True, order=True)
 class Sequent:
-    ant: tuple[Proposition, ...] | Proposition
-    con: tuple[Proposition, ...] | Proposition
+    ant: tuple[Proposition, ...] | Proposition | None
+    con: tuple[Proposition, ...] | Proposition | None
 
     def __post_init__(self):
         # Ensure self.ant and self.con contain tuples of propositions
         for attr in 'ant', 'con':
+            if getattr(self, attr) is None:
+                setattr(self, attr, ())
+                continue
             if not isinstance(getattr(self, attr), tuple):
                 # Create a list to avoid tuple() using the proposition's
                 # .__iter__() for tuple construction.
@@ -61,12 +65,25 @@ class Sequent:
                 setattr(self, attr, tuple(side))
 
     def __iter__(self):
-        yield from (self.ant, self.con)
+        yield self.ant
+        yield self.con
 
     def __str__(self) -> str:
         ant_str = ', '.join(map(str, self.ant))
         con_str = ', '.join(map(str, self.con))
         return f'{ant_str}; {con_str}'
+
+    def __hash__(self):
+        """
+        What makes a sequent unique is the contents of its antecedent
+        and consequent as well as where the divider is between the two.
+        """
+        return hash(self.ant + ('|-',) + self.con)
+
+    def __eq__(self, other):
+        if not isinstance(other, Sequent):
+            return False
+        return self.ant == other.ant and self.con == other.con
 
     @property
     def is_atomic(self) -> bool:
@@ -114,18 +131,15 @@ class Sequent:
             raise ValueError(f'Parameter side must be "ant" or "con", not {side}.')
         return Sequent(ant, con)
 
-    @staticmethod
-    def mix(*args) -> Self:
+    def mix(*sequents) -> Self:
         """
         Return a sequent whose antecedent is the combined antecedents
-        of all sequents in args, and likewise for consequents.
+        of the input sequents, and likewise for consequents.
         """
-        new_ant = ()
-        new_con = ()
-        for arg in args:
-            new_ant = new_ant + arg.ant
-            new_con = new_con + arg.con
-        return Sequent(new_ant, new_con)
+        return Sequent(
+            ant=sum((sequent.ant for sequent in sequents), ()),
+            con=sum((sequent.con for sequent in sequents), ())
+        )
 
     def tag(self) -> str:
         """

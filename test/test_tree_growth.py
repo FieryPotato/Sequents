@@ -1,7 +1,6 @@
 import unittest
-from unittest.mock import patch
 
-from proposition import Atom, Conjunction
+from proposition import Atom, Conjunction, Disjunction
 from sequent import Sequent
 from tree import Tree
 
@@ -20,24 +19,47 @@ class TestAtomic(unittest.TestCase):
 
 class TestOneParentInvertible(unittest.TestCase):
     def test_left_and(self) -> None:
-        with patch('rules.get_rule_setting', return_value='mul'):
-            p = Atom('p')
-            q = Atom('q')
+        p = Atom('p')
+        q = Atom('q')
 
-            sequent = Sequent(
-                ant=Conjunction(p, q),
-                con=()
-            )
-            tree = Tree(sequent)
-            tree.grow()
-            actual = tree.branches
+        sequent = Sequent(
+            ant=Conjunction(p, q),
+            con=None
+        )
+        tree = Tree(sequent)
+        tree.grow()
 
-            parent_sequent = Sequent(
-                ant=(p, q),
-                con=()
-            )
-            parent_tree = Tree(parent_sequent)
-            expected = [parent_tree]
+        parent_sequent = Sequent(
+            ant=(p, q),
+            con=None
+        )
 
-            self.assertEqual(actual, expected)
-            self.assertEqual([None], parent_tree.branches)
+        assert isinstance(tree.branches, list)
+        assert len(tree.branches) == 1
+        assert isinstance(tree.branches[0], tuple)
+        assert len(tree.branches[0]) == 1
+        assert isinstance(tree.branches[0][0], Tree)
+        assert parent_sequent == tree.branches[0][0].root
+
+    def test_right_or(self) -> None:
+        p = Atom('p')
+        q = Atom('q')
+
+        sequent = Sequent(
+            ant=None,
+            con=Disjunction(p, q)
+        )
+        tree = Tree(sequent)
+        tree.grow()
+
+        parent_sequent = Sequent(
+            ant=None,
+            con=(p, q)
+        )
+
+        assert isinstance(tree.branches, list)
+        assert len(tree.branches) == 1
+        assert isinstance(tree.branches[0], tuple)
+        assert len(tree.branches[0]) == 1
+        assert isinstance(tree.branches[0][0], Tree)
+        assert parent_sequent == tree.branches[0][0].root

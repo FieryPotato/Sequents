@@ -26,12 +26,13 @@ Tree(root: str, is_grown: bool = False, names: list[str] = [])
 __all__ = ['Tree']
 
 from dataclasses import dataclass, field
-from typing import Generator
+from typing import Generator, Callable
 
-import decompose
+import decomposers
 import rules
 import utils
 from sequent import Sequent
+from rules import RuleTypes
 
 
 @dataclass(slots=True)
@@ -82,12 +83,7 @@ class Tree:
         """
         Solve the root, then recursively solve each branch.
         """
-        # if self.is_grown:
-        #     raise self.TreeIsGrownError(self)
-        # self.branches[self.root] = self.grow_branch(self.root)
-        # self.is_grown = True
-
-        # No operation if tree si already grown.
+        # No operation if tree is already grown.
         if self.branches:
             return
 
@@ -97,9 +93,28 @@ class Tree:
             self.branches.append(None)
             return
 
-        decomposer = decompose.get_function(sequent=self.root, names=self.names)
-
-
+        rule = decomposers.get_rule(self.root)
+        result: rules.decomp_result
+        match rule.type:
+            case RuleTypes.OPI:
+                result_sequents: list[tuple[Sequent]] = rule.apply()
+                results = []
+                for branch in result_sequents:
+                    branch_result = ()
+                    for leaf in branch:
+                        sub_tree = Tree(leaf)
+                        sub_tree.grow()
+                        branch_result += (sub_tree,)
+                    results.append(branch_result)
+                self.branches = results
+            case RuleTypes.TPI:
+                ...
+            case RuleTypes.OPNI:
+                ...
+            case RuleTypes.TPNI:
+                ...
+            case _:
+                raise ValueError(f'Unknown rule type: {rule.type!r}')
 
 
     def grow_branch(self, sequent) -> dict | list | None:
@@ -141,7 +156,7 @@ def split_tree(tree) -> list[Tree]:
     Return a list of all possible full trees in tree, where a full tree
     consists only of dict[Sequent, dict | None] pairs. All non-
     invertible rules are split into separate trees, which are identical
-    to eac.................................................................................................h other up to the rule application, after which they each
+    to each other up to the rule application, after which they each
     follow one of the possibilities in the list from
     sequent.possible_mix_parents.
     """

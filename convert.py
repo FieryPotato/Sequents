@@ -11,14 +11,10 @@ from typing import Protocol, Type
 
 import utils
 
-from proposition import Atom, Negation, Universal, Existential, Conjunction, Disjunction, Conditional
+from proposition import Atom, Negation, Universal, Existential, Conjunction, Disjunction, Conditional, Proposition
 from sequent import Sequent
 from tree import Tree
 from utils import serialize
-
-
-class Proposition(Protocol):
-    ...
 
 
 def string_to_proposition(string) -> Proposition:
