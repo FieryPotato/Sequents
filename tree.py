@@ -95,10 +95,12 @@ class Tree:
             self.branches = self.decompose_1pi_branch(rule)
         elif rule.invertible and rule.parents == 2:
             self.branches = self.decompose_2pi_branch(rule)
+
+        # rule.invertible is now known to be False
         elif rule.parents == 1:
             self.branches = self.decompose_1pni_branch(rule)
         elif rule.parents == 2:
-            ...
+            pass
 
     def decompose_1pi_branch(self, rule) -> tuple[tuple[Self]]:
         result_sequents: tuple[tuple[Sequent]] = rule.apply()

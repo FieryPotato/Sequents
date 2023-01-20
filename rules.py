@@ -1,6 +1,6 @@
 from typing import Protocol, TypeVar
 
-from proposition import Proposition, Conjunction, Disjunction, Negation, Conditional, Quantifier, Universal
+from proposition import Proposition, Conjunction, Disjunction, Negation, Conditional, Quantifier, Universal, Existential
 from sequent import Sequent
 
 decomp_result = TypeVar('decomp_result',
@@ -167,15 +167,37 @@ class LeftForall:
     def __init__(self, proposition: Universal, sequent: Sequent, names: set[str]):
         if not names:
             names.add('NONE')
-        self.names = names
         self.proposition = proposition
         self.sequent = sequent
+        self.names = names
 
     def apply(self) -> tuple[tuple[Sequent], ...]:
         prop_sequents = (
             Sequent(
                 ant=self.proposition.instantiate_with(name),
                 con=None
+            )
+            for name in self.names
+        )
+        return tuple((self.sequent.mix(sequent),) for sequent in prop_sequents)  # type: ignore
+
+
+class RightExists:
+    invertible = False
+    parents = 1
+
+    def __init__(self, proposition: Existential, sequent: Sequent, names: set[str]):
+        if not names:
+            names.add('NONE')
+        self.proposition = proposition
+        self.sequent = sequent
+        self.names = names
+
+    def apply(self) -> tuple[tuple[Sequent], ...]:
+        prop_sequents = (
+            Sequent(
+                ant=None,
+                con=self.proposition.instantiate_with(name)
             )
             for name in self.names
         )
@@ -197,7 +219,7 @@ RULE_DICT = {
         'v': RightMultOr,
         '->': RightMultIf,
         '∀': ...,
-        '∃': ...,
+        '∃': RightExists,
     }
 }
 
