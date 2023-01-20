@@ -26,16 +26,14 @@ Tree(root: str, is_grown: bool = False, names: list[str] = [])
 __all__ = ['Tree']
 
 from dataclasses import dataclass, field
-from typing import Generator, Callable
+from typing import Generator, Self
 
-import decomposers
 import rules
 import utils
 from sequent import Sequent
-from rules import RuleTypes
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, order=True)
 class Tree:
     """
     Class representing proof-trees with a Sequent object as the root.
@@ -44,9 +42,8 @@ class Tree:
     {atomic_sequent: None}).
     """
     root: Sequent
-    is_grown: bool = field(default=False)
     names: set[str] = field(default_factory=set)
-    branches: list = field(default_factory=list)
+    branches: tuple = ()
 
     def __post_init__(self) -> None:
         self.names.update({name for name in self.root.names})
@@ -90,32 +87,54 @@ class Tree:
         # Atomic root means no branches, but this must be distinct from
         # a tree that has not been grown. We use [None] to mark this.
         if self.root.is_atomic:
-            self.branches.append(None)
+            self.branches = None,
             return
 
-        rule = decomposers.get_rule(self.root)
-        result: rules.decomp_result
-        match rule.type:
-            case RuleTypes.OPI:
-                result_sequents: list[tuple[Sequent]] = rule.apply()
-                results = []
-                for branch in result_sequents:
-                    branch_result = ()
-                    for leaf in branch:
-                        sub_tree = Tree(leaf)
-                        sub_tree.grow()
-                        branch_result += (sub_tree,)
-                    results.append(branch_result)
-                self.branches = results
-            case RuleTypes.TPI:
-                ...
-            case RuleTypes.OPNI:
-                ...
-            case RuleTypes.TPNI:
-                ...
-            case _:
-                raise ValueError(f'Unknown rule type: {rule.type!r}')
+        rule = rules.get_rule(self.root, names=self.names)
+        if rule.invertible and rule.parents == 1:
+            self.branches = self.decompose_1pi_branch(rule)
+        elif rule.invertible and rule.parents == 2:
+            self.branches = self.decompose_2pi_branch(rule)
+        elif rule.parents == 1:
+            self.branches = self.decompose_1pni_branch(rule)
+        elif rule.parents == 2:
+            ...
 
+    def decompose_1pi_branch(self, rule) -> tuple[tuple[Self]]:
+        result_sequents: tuple[tuple[Sequent]] = rule.apply()
+        results = []
+        for branch in result_sequents:
+            branch_result = ()
+            for leaf in branch:
+                sub_tree = Tree(leaf)
+                sub_tree.grow()
+                branch_result += (sub_tree,)
+            results.append(branch_result)
+        return tuple(results)  # type: ignore
+
+    def decompose_2pi_branch(self, rule) -> tuple[tuple[Self, Self]]:
+        result_sequents: tuple[tuple[Sequent, Sequent]] = rule.apply()
+        results = []
+        for branch in result_sequents:
+            branch_result = ()
+            for leaf in branch:
+                sub_tree = Tree(leaf)
+                sub_tree.grow()
+                branch_result += sub_tree,
+            results.append(branch_result)
+        return tuple(results)  # type: ignore
+
+    def decompose_1pni_branch(self, rule) -> tuple[tuple[Self], ...]:
+        result_sequents: tuple[tuple[Sequent], ...] = rule.apply()
+        results = []
+        for branch in result_sequents:
+            branch_result = ()
+            for leaf in branch:
+                sub_tree = Tree(leaf)
+                sub_tree.grow()
+                branch_result += sub_tree,
+            results.append(branch_result)
+        return tuple(results)  # type :ignore
 
     def grow_branch(self, sequent) -> dict | list | None:
         """

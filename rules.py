@@ -1,7 +1,6 @@
-from enum import Enum
 from typing import Protocol, TypeVar
 
-from proposition import Proposition, Conjunction, Disjunction, Negation, Conditional
+from proposition import Proposition, Conjunction, Disjunction, Negation, Conditional, Quantifier, Universal
 from sequent import Sequent
 
 decomp_result = TypeVar('decomp_result',
@@ -12,16 +11,10 @@ decomp_result = TypeVar('decomp_result',
                         )
 
 
-class RuleTypes(Enum):
-    OPI = 'One-Parent Invertible'
-    TPI = 'Two-Parent Invertible'
-    OPNI = 'One-Parent Non-Invertible'
-    TPNI = 'Two-Parent Non-Invertible'
-
-
 class Rule(Protocol):
-    type: RuleTypes
-    prop: Proposition
+    invertible: bool
+    parents: int
+    proposition: Proposition
     sequent: Sequent
 
     def apply(self) -> decomp_result:
@@ -29,146 +22,190 @@ class Rule(Protocol):
 
 
 class LeftMultAnd:
-    type = RuleTypes.OPI
+    invertible = True
+    parents = 1
 
-    def __init__(self, prop: Conjunction, sequent: Sequent):
-        self.prop = prop
+    def __init__(self, proposition: Conjunction, sequent: Sequent):
+        self.proposition = proposition
         self.sequent = sequent
 
     def apply(self) -> tuple[tuple[Sequent]]:
         prop_sequent = Sequent(
-            ant=(self.prop.left, self.prop.right),
+            ant=(self.proposition.left, self.proposition.right),
             con=None
         )
-        return ((self.sequent.mix(prop_sequent),),)
+        return (self.sequent.mix(prop_sequent),),
 
 
 class RightAddAnd:
-    type = RuleTypes.TPI
+    invertible = True
+    parents = 2
     
-    def __init__(self, prop: Conjunction, sequent: Sequent):
-        self.prop = prop
+    def __init__(self, proposition: Conjunction, sequent: Sequent):
+        self.proposition = proposition
         self.sequent = sequent
     
     def apply(self) -> tuple[tuple[Sequent, Sequent]]:
         left = Sequent(
             ant=None,
-            con=self.prop.left
+            con=self.proposition.left
         )
         right = Sequent(
             ant=None,
-            con=self.prop.right
+            con=self.proposition.right
         )
-        return (
-            tuple(
-                self.sequent.mix(parent)
-                for parent in left, right
-            ),
-        )
+        return tuple(self.sequent.mix(parent) for parent in (left, right)),  # type: ignore
+
 
 class RightMultOr:
-    type = RuleTypes.OPI
+    invertible = True
+    parents = 1
 
-    def __init__(self, prop: Disjunction, sequent: Sequent):
-        self.prop = prop
+    def __init__(self, proposition: Disjunction, sequent: Sequent):
+        self.proposition = proposition
         self.sequent = sequent
 
     def apply(self) -> tuple[tuple[Sequent]]:
         prop_sequent = Sequent(
             ant=None,
-            con=(self.prop.left, self.prop.right)
+            con=(self.proposition.left, self.proposition.right)
         )
-        return ((self.sequent.mix(prop_sequent),),)
+        return (self.sequent.mix(prop_sequent),),
 
 
 class LeftAddOr:
-    type = RuleTypes.TPI
+    invertible = True
+    parents = 2
     
-    def __init__(self, prop: Disjunction, sequent: Sequent):
-        self.prop = prop
+    def __init__(self, proposition: Disjunction, sequent: Sequent):
+        self.proposition = proposition
         self.sequent = sequent
         
     def apply(self) -> tuple[tuple[Sequent, Sequent]]:
         left = Sequent(
-            ant=self.prop.left,
+            ant=self.proposition.left,
             con=None
         )
         right = Sequent(
-            ant=self.prop.right,
+            ant=self.proposition.right,
             con=None
         )
-        return (
-            tuple(
-                self.sequent.mix(parent) 
-                for parent in left, right
-            ),
-        )
+        return tuple(self.sequent.mix(parent) for parent in (left, right)),  # type: ignore
 
 
 class RightMultIf:
-    type = RuleTypes.OPI
+    invertible = True
+    parents = 1
 
-    def __init__(self, prop: Conditional, sequent: Sequent):
-        self.prop = prop
+    def __init__(self, proposition: Conditional, sequent: Sequent):
+        self.proposition = proposition
         self.sequent = sequent
 
     def apply(self) -> tuple[tuple[Sequent]]:
         prop_sequent = Sequent(
-            ant=self.prop.left,
-            con=self.prop.right
+            ant=self.proposition.left,
+            con=self.proposition.right
         )
-        return ((self.sequent.mix(prop_sequent),),)
+        return (self.sequent.mix(prop_sequent),),
 
 
 class LeftAddIf:
-    type = RuleTypes.TPI
+    invertible = True
+    parents = 2
     
-    def __init__(self, prop: Conditional, sequent: Sequent):
-        self.prop = prop
+    def __init__(self, proposition: Conditional, sequent: Sequent):
+        self.proposition = proposition
         self.sequent = sequent
         
     def apply(self) -> tuple[tuple[Sequent, Sequent]]:
         left = Sequent(
             ant=None,
-            con=self.prop.left
+            con=self.proposition.left
         )
         right = Sequent(
-            ant=self.prop.right,
+            ant=self.proposition.right,
             con=None
         )
-        return (
-            tuple(
-                self.sequent.mix(parent) 
-                for parent in left, right
-            )
-        )
-
+        return tuple(self.sequent.mix(parent) for parent in (left, right)),  # type: ignore
 
 class LeftNot:
-    type = RuleTypes.OPI
+    invertible = True
+    parents = 1
 
-    def __init__(self, prop: Negation, sequent: Sequent):
-        self.prop = prop
+    def __init__(self, proposition: Negation, sequent: Sequent):
+        self.proposition = proposition
         self.sequent = sequent
 
     def apply(self) -> tuple[tuple[Sequent]]:
         prop_sequent = Sequent(
             ant=None,
-            con=self.prop.prop
+            con=self.proposition.prop
         )
-        return ((self.sequent.mix(prop_sequent),),)
+        return (self.sequent.mix(prop_sequent),),
 
 
 class RightNot:
-    type = RuleTypes.OPI
+    invertible = True
+    parents = 1
 
-    def __init__(self, prop: Negation, sequent: Sequent):
-        self.prop = prop
+    def __init__(self, proposition: Negation, sequent: Sequent):
+        self.proposition = proposition
         self.sequent = sequent
 
     def apply(self) -> tuple[tuple[Sequent]]:
         prop_sequent = Sequent(
-            ant=self.prop.prop,
+            ant=self.proposition.prop,
             con=None
         )
-        return ((self.sequent.mix(prop_sequent),),)
+        return (self.sequent.mix(prop_sequent),),
+
+
+class LeftForall:
+    invertible = False
+    parents = 1
+
+    def __init__(self, proposition: Universal, sequent: Sequent, names: set[str]):
+        if not names:
+            names.add('NONE')
+        self.names = names
+        self.proposition = proposition
+        self.sequent = sequent
+
+    def apply(self) -> tuple[tuple[Sequent], ...]:
+        prop_sequents = (
+            Sequent(
+                ant=self.proposition.instantiate_with(name),
+                con=None
+            )
+            for name in self.names
+        )
+        return tuple((self.sequent.mix(sequent),) for sequent in prop_sequents)  # type: ignore
+
+
+RULE_DICT = {
+    'ant': {
+        '~': LeftNot,
+        '&': LeftMultAnd,
+        'v': LeftAddOr,
+        '->': LeftAddIf,
+        '∀': LeftForall,
+        '∃': ...,
+    },
+    'con': {
+        '~': RightNot,
+        '&': RightAddAnd,
+        'v': RightMultOr,
+        '->': RightMultIf,
+        '∀': ...,
+        '∃': ...,
+    }
+}
+
+
+def get_rule(sequent: Sequent, names: set[str] = None) -> Rule:
+    prop, side, index = sequent.first_complex_prop()
+    sequent_minus_prop = sequent.remove_proposition_at(side, index)
+    rule = RULE_DICT[side][prop.symb]
+    if isinstance(prop, Quantifier):
+        return rule(prop, sequent_minus_prop, names)
+    return rule(prop, sequent_minus_prop)

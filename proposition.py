@@ -46,14 +46,13 @@ string_to_proposition) over creating these classes directly.
 """
 
 __all__ = ['Atom', 'Negation', 'Conjunction', 'Conditional', 'Disjunction',
-           'Proposition', 'Universal', 'Existential']
+           'Proposition', 'Quantifier', 'Universal', 'Existential']
 
 import re
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-# from typing import Self
-from typing import TypeVar
+from typing import Self
 
 SIDES: set[str] = {'ant', 'con'}
 
@@ -62,8 +61,6 @@ objects_re = re.compile(r'<(.*)>')
 
 # Match anything before an opening angle bracket ('<')
 predicate_re = re.compile(r'(.+)<')
-
-Self = TypeVar('Self')
 
 
 @dataclass(frozen=True, slots=True, order=True)
@@ -78,16 +75,7 @@ class Proposition(ABC):
     def __post_init__(self) -> None:
         self.validate_content()
 
-    def __getitem__(self, index) -> 'Proposition':
-        """
-        Allows slicing into self, e.g.:
-        >>> p, q = Atom('proposition'), Atom('another_prop')
-        >>> cj = Conjunction(p, q)
-        >>> cj[0] == p == cj.left
-        True
-        >>> cj[1] == q == cj.right
-        True
-        """
+    def __getitem__(self, index: int) -> str | Self:
         return self.content[index]
 
     @property
@@ -128,7 +116,7 @@ class Proposition(ABC):
         for prop in self.content:
             variables.update(set(prop.unbound_variables))
 
-        return tuple(sorted(variables))
+        return tuple(sorted(variables))  # type: ignore
 
     def instantiate(self, variable, name) -> Self:
         """
@@ -136,7 +124,7 @@ class Proposition(ABC):
         are replaced with name.
         """
         props = [prop.instantiate(variable, name) for prop in self.content]
-        return self.__class__(*props)
+        return self.__class__(*props)  # type: ignore
 
 
 @dataclass(slots=True, frozen=True, order=True)
@@ -192,7 +180,7 @@ class Quantifier(Proposition):
         unbound = [v for v in variables if v != self.variable]
         return tuple(sorted(unbound))
 
-    def instantiate(self, variable, name) -> Proposition:
+    def instantiate(self, variable: str, name: str) -> Proposition:
         """
         Return self with instances of variable replaced with name.
         If variable is self.variable, instead return instantiated 
@@ -201,9 +189,9 @@ class Quantifier(Proposition):
         if variable == self.variable:
             return self.instantiate_with(name)
         sub_prop = self.prop.instantiate(variable, name)
-        return self.__class__(self.variable, sub_prop)
+        return self.__class__(self.variable, sub_prop)  # type: ignore
 
-    def instantiate_with(self, name) -> Self:
+    def instantiate_with(self, name: str) -> Self:
         """Return self.prop instantiated with self.variable."""
         return self.prop.instantiate(self.variable, name)
 
