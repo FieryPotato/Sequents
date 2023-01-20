@@ -6,9 +6,12 @@ RULE_DICT = {
     'ant': {
         '~': rules.LeftNot,
         '&': rules.LeftMultAnd,
+        'v': rules.LeftAddOr,
+        '->': rules.LeftAddIf,
     },
     'con': {
         '~': rules.RightNot,
+        '&': rules.RightAddAnd,
         'v': rules.RightMultOr,
         '->': rules.RightMultIf,
     }

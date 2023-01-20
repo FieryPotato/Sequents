@@ -13,7 +13,7 @@ class TestAtomic(unittest.TestCase):
         sequent = Sequent(ant=p, con=q)
         tree = Tree(sequent)
         tree.grow()
-        expected = [None]
+        expected = (None,)
         self.assertEqual(expected, tree.branches)
 
 
@@ -34,7 +34,7 @@ class TestOneParentInvertible(unittest.TestCase):
             con=None
         )
 
-        self.assertIsInstance(tree.branches, list)
+        self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(len(tree.branches), 1)
         self.assertIsInstance(tree.branches[0], tuple)
         self.assertEqual(len(tree.branches[0]), 1)
@@ -57,7 +57,7 @@ class TestOneParentInvertible(unittest.TestCase):
             con=(p, q)
         )
 
-        self.assertIsInstance(tree.branches, list)
+        self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(len(tree.branches), 1)
         self.assertIsInstance(tree.branches[0], tuple)
         self.assertEqual(len(tree.branches[0]), 1)
@@ -80,7 +80,7 @@ class TestOneParentInvertible(unittest.TestCase):
             con=q
         )
 
-        self.assertIsInstance(tree.branches, list)
+        self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(len(tree.branches), 1)
         self.assertIsInstance(tree.branches[0], tuple)
         self.assertEqual(len(tree.branches[0]), 1)
@@ -102,7 +102,7 @@ class TestOneParentInvertible(unittest.TestCase):
             con=p
         )
 
-        self.assertIsInstance(tree.branches, list)
+        self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(len(tree.branches), 1)
         self.assertIsInstance(tree.branches[0], tuple)
         self.assertEqual(len(tree.branches[0]), 1)
@@ -124,7 +124,7 @@ class TestOneParentInvertible(unittest.TestCase):
             con=None
         )
 
-        self.assertIsInstance(tree.branches, list)
+        self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(len(tree.branches), 1)
         self.assertIsInstance(tree.branches[0], tuple)
         self.assertEqual(len(tree.branches[0]), 1)
@@ -153,7 +153,7 @@ class TestTwoParentInvertible(unittest.TestCase):
             con=q
         )
 
-        self.assertIsInstance(tree.branches, list)
+        self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(len(tree.branches), 1)
         self.assertIsInstance(tree.branches[0], tuple)
         self.assertEqual(len(tree.branches[0]), 2)
@@ -161,3 +161,33 @@ class TestTwoParentInvertible(unittest.TestCase):
         self.assertEqual(left_parent, tree.branches[0][0].root)
         self.assertIsInstance(tree.branches[0][1], Tree)
         self.assertEqual(right_parent, tree.branches[0][1].root)
+
+    def test_right_add_and(self):
+        p = Atom('p')
+        q = Atom('q')
+
+        sequent = Sequent(
+            ant=Disjunction(p, q)
+            con=None
+        )
+        tree = Tree(sequent)
+        tree.grow()
+
+        left_parent = Sequent(
+            ant=p,
+            con=None
+        )
+        right_parent = Sequent(
+            ant=q,
+            con=None
+        )
+
+        self.assertIsInstance(tree.branches, tuple)
+        self.assertEqual(len(tree.branches), 1)
+        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertEqual(len(tree.branches[0]), 2)
+        self.assertIsInstance(tree.branches[0][0], Tree)
+        self.assertEqual(left_parent, tree.branches[0][0].root)
+        self.assertIsInstance(tree.branches[0][1], Tree)
+        self.assertEqual(right_parent, tree.branches[0][1].root)
+

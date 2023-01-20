@@ -5,10 +5,10 @@ from proposition import Proposition, Conjunction, Disjunction, Negation, Conditi
 from sequent import Sequent
 
 decomp_result = TypeVar('decomp_result',
-                        list[tuple[Sequent]],  # One-Parent Invertible
-                        list[tuple[Sequent, Sequent]],  # Two-Parent Invertible
-                        list[tuple[Sequent], ...],  # One-Parent Non-Invertible
-                        list[tuple[Sequent, Sequent], ...]  # Two-Parent Non-Invertible
+                        tuple[tuple[Sequent]],  # One-Parent Invertible
+                        tuple[tuple[Sequent, Sequent]],  # Two-Parent Invertible
+                        tuple[tuple[Sequent], ...],  # One-Parent Non-Invertible
+                        tuple[tuple[Sequent, Sequent], ...]  # Two-Parent Non-Invertible
                         )
 
 
@@ -35,13 +35,36 @@ class LeftMultAnd:
         self.prop = prop
         self.sequent = sequent
 
-    def apply(self) -> list[tuple[Sequent]]:
+    def apply(self) -> tuple[tuple[Sequent]]:
         prop_sequent = Sequent(
             ant=(self.prop.left, self.prop.right),
             con=None
         )
-        return [(self.sequent.mix(prop_sequent),)]
+        return ((self.sequent.mix(prop_sequent),),)
 
+
+class RightAddAnd:
+    type = RuleTypes.TPI
+    
+    def __init__(self, prop: Conjunction, sequent: Sequent):
+        self.prop = prop
+        self.sequent = sequent
+    
+    def apply(self) -> tuple[tuple[Sequent, Sequent]]:
+        left = Sequent(
+            ant=None,
+            con=self.prop.left
+        )
+        right = Sequent(
+            ant=None,
+            con=self.prop.right
+        )
+        return (
+            tuple(
+                self.sequent.mix(parent)
+                for parent in left, right
+            ),
+        )
 
 class RightMultOr:
     type = RuleTypes.OPI
@@ -50,12 +73,36 @@ class RightMultOr:
         self.prop = prop
         self.sequent = sequent
 
-    def apply(self) -> list[tuple[Sequent]]:
+    def apply(self) -> tuple[tuple[Sequent]]:
         prop_sequent = Sequent(
             ant=None,
             con=(self.prop.left, self.prop.right)
         )
-        return [(self.sequent.mix(prop_sequent),)]
+        return ((self.sequent.mix(prop_sequent),),)
+
+
+class LeftAddOr:
+    type = RuleTypes.TPI
+    
+    def __init__(self, prop: Disjunction, sequent: Sequent):
+        self.prop = prop
+        self.sequent = sequent
+        
+    def apply(self) -> tuple[tuple[Sequent, Sequent]]:
+        left = Sequent(
+            ant=self.prop.left,
+            con=None
+        )
+        right = Sequent(
+            ant=self.prop.right,
+            con=None
+        )
+        return (
+            tuple(
+                self.sequent.mix(parent) 
+                for parent in left, right
+            ),
+        )
 
 
 class RightMultIf:
@@ -65,12 +112,36 @@ class RightMultIf:
         self.prop = prop
         self.sequent = sequent
 
-    def apply(self) -> list[tuple[Sequent]]:
+    def apply(self) -> tuple[tuple[Sequent]]:
         prop_sequent = Sequent(
             ant=self.prop.left,
             con=self.prop.right
         )
-        return [(self.sequent.mix(prop_sequent),)]
+        return ((self.sequent.mix(prop_sequent),),)
+
+
+class LeftAddIf:
+    type = RuleTypes.TPI
+    
+    def __init__(self, prop: Conditional, sequent: Sequent):
+        self.prop = prop
+        self.sequent = sequent
+        
+    def apply(self) -> tuple[tuple[Sequent, Sequent]]:
+        left = Sequent(
+            ant=None,
+            con=self.prop.left
+        )
+        right = Sequent(
+            ant=self.prop.right,
+            con=None
+        )
+        return (
+            tuple(
+                self.sequent.mix(parent) 
+                for parent in left, right
+            )
+        )
 
 
 class LeftNot:
@@ -80,12 +151,12 @@ class LeftNot:
         self.prop = prop
         self.sequent = sequent
 
-    def apply(self) -> list[tuple[Sequent]]:
+    def apply(self) -> tuple[tuple[Sequent]]:
         prop_sequent = Sequent(
             ant=None,
             con=self.prop.prop
         )
-        return [(self.sequent.mix(prop_sequent),)]
+        return ((self.sequent.mix(prop_sequent),),)
 
 
 class RightNot:
@@ -95,9 +166,9 @@ class RightNot:
         self.prop = prop
         self.sequent = sequent
 
-    def apply(self) -> list[tuple[Sequent]]:
+    def apply(self) -> tuple[tuple[Sequent]]:
         prop_sequent = Sequent(
             ant=self.prop.prop,
             con=None
         )
-        return [(self.sequent.mix(prop_sequent),)]
+        return ((self.sequent.mix(prop_sequent),),)
