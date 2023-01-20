@@ -32,7 +32,6 @@ import decomposers
 import rules
 import utils
 from sequent import Sequent
-from rules import RuleTypes
 
 
 @dataclass(slots=True)
@@ -46,7 +45,7 @@ class Tree:
     root: Sequent
     is_grown: bool = field(default=False)
     names: set[str] = field(default_factory=set)
-    branches: list = field(default_factory=list)
+    branches: tuple = ()
 
     def __post_init__(self) -> None:
         self.names.update({name for name in self.root.names})
@@ -90,14 +89,14 @@ class Tree:
         # Atomic root means no branches, but this must be distinct from
         # a tree that has not been grown. We use [None] to mark this.
         if self.root.is_atomic:
-            self.branches.append(None)
+            self.branches = None,
             return
 
         rule = decomposers.get_rule(self.root)
         result: rules.decomp_result
-        match rule.type:
-            case RuleTypes.OPI:
-                result_sequents: list[tuple[Sequent]] = rule.apply()
+        if rule.invertible:
+            if rule.parents == 1:
+                result_sequents: tuple[tuple[Sequent]] = rule.apply()
                 results = []
                 for branch in result_sequents:
                     branch_result = ()
@@ -106,16 +105,23 @@ class Tree:
                         sub_tree.grow()
                         branch_result += (sub_tree,)
                     results.append(branch_result)
-                self.branches = results
-            case RuleTypes.TPI:
+                self.branches = tuple(results)
+            elif rule.parents == 2:
+                result_sequents: tuple[tuple[Sequent, Sequent]] = rule.apply()
+                results = []
+                for branch in result_sequents:
+                    branch_result = ()
+                    for leaf in branch:
+                        sub_tree = Tree(leaf)
+                        sub_tree.grow()
+                        branch_result += sub_tree,
+                    results.append(branch_result)
+                self.branches = tuple(results)
+        else:
+            if rule.parents == 1:
                 ...
-            case RuleTypes.OPNI:
+            elif rule.parents == 2:
                 ...
-            case RuleTypes.TPNI:
-                ...
-            case _:
-                raise ValueError(f'Unknown rule type: {rule.type!r}')
-
 
     def grow_branch(self, sequent) -> dict | list | None:
         """

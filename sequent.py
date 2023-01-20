@@ -38,7 +38,6 @@ other data types into sequents, I'll add one there.
 
 __all__ = ['Sequent']
 
-import functools
 import itertools
 from dataclasses import dataclass
 from typing import Self
