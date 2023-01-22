@@ -318,6 +318,50 @@ class TestOneParentNonInvertible(unittest.TestCase):
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(parent, tree.branches[0][0].root)
 
+    def test_right_universal_with_self_name(self):
+        uni = Universal('x', Atom('P<x, robert>'))
+        sequent = Sequent(
+            ant=None,
+            con=uni
+        )
+        tree = Tree(sequent)
+        tree.grow()
+
+        prop = Atom('P<NONE, robert>')
+        parent = Sequent(
+            ant=None,
+            con=prop,
+        )
+        
+        self.assertIsInstance(tree.branches, tuple)
+        self.assertEqual(1, len(tree.branches))
+        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertEqual(len(tree.branches[0]), 1)
+        self.assertIsInstance(tree.branches[0][0], Tree)
+        self.assertEqual(parent, tree.branches[0][0].root)
+
+    def test_right_universal_with_two_names(self):
+        uni = Universal('x', Atom('P<x, alice>'))
+        sequent = Sequent(
+            ant=None,
+            con=uni,
+        )
+        tree = Tree(sequent, names={'robert'})
+        tree.grow()
+
+        prop = Atom('P<robert, alice>')
+        parent = Sequent(
+            ant=None,
+            con=prop
+        )
+
+        self.assertIsInstance(tree.branches, tuple)
+        self.assertEqual(1, len(tree.branches))
+        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertEqual(len(tree.branches[0]), 1)
+        self.assertIsInstance(tree.branches[0][0], Tree)
+        self.assertEqual(parent, tree.branches[0][0].root)
+
     def test_right_existential_with_no_names(self):
         exi = Existential('x', Atom('P<x>'))
         sequent = Sequent(
@@ -391,3 +435,4 @@ class TestOneParentNonInvertible(unittest.TestCase):
         self.assertEqual(len(tree.branches[0]), 1)
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(parent, tree.branches[0][0].root)
+

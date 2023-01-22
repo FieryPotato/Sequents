@@ -128,6 +128,7 @@ class LeftAddIf:
         )
         return tuple(self.sequent.mix(parent) for parent in (left, right)),  # type: ignore
 
+
 class LeftNot:
     invertible = True
     parents = 1
@@ -187,11 +188,14 @@ class RightForall:
     parents = 1
 
     def __init__(self, proposition: Universal, sequent: Sequent, names: set[str]):
-        if not names:
-            names.add('NONE')
+        # Right Universals can only be instantiated by names not present
+        # in the rest of the sequent
+        legal_names: set[str] = names - proposition.names.union(sequent.names)
+        if not legal_names:
+            legal_names.add('NONE')
         self.proposition = proposition
         self.sequent = sequent
-        self.names = names
+        self.names = legal_names
 
     def apply(self) -> tuple[tuple[Sequent], ...]:
         prop_sequents = (

@@ -48,6 +48,16 @@ class Tree:
     def __post_init__(self) -> None:
         self.names.update({name for name in self.root.names})
 
+    @property
+    def is_grown(self) -> bool:
+        """Return whether this tree's .grow() method has been called."""
+        if not self.branches:
+            return False
+        if self.branches[0] is not None:
+            return False
+        return True
+
+
     def height(self) -> int:
         """
         Return the proof height of this tree, which is just the
@@ -91,16 +101,16 @@ class Tree:
             return
 
         rule = rules.get_rule(self.root, names=self.names)
-        if rule.invertible and rule.parents == 1:
-            self.branches = self.decompose_1pi_branch(rule)
-        elif rule.invertible and rule.parents == 2:
-            self.branches = self.decompose_2pi_branch(rule)
-
-        # rule.invertible is now known to be False
-        elif rule.parents == 1:
-            self.branches = self.decompose_1pni_branch(rule)
-        elif rule.parents == 2:
-            pass
+        if rule.invertible:
+            if rule.parents == 1:
+                self.branches = self.decompose_1pi_branch(rule)
+            elif rule.parents == 2:
+                self.branches = self.decompose_2pi_branch(rule)
+        else:
+            if rule.parents == 1:
+                self.branches = self.decompose_1pni_branch(rule)
+            elif rule.parents == 2:
+                pass
 
     def decompose_1pi_branch(self, rule) -> tuple[tuple[Self]]:
         result_sequents: tuple[tuple[Sequent]] = rule.apply()
