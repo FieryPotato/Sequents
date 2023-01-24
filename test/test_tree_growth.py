@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 from proposition import Atom, Conjunction, Disjunction, Conditional, Negation, Universal, Existential
 from sequent import Sequent
@@ -353,6 +354,80 @@ class TestOneParentNonInvertible(unittest.TestCase):
         parent = Sequent(
             ant=None,
             con=prop
+        )
+
+        self.assertIsInstance(tree.branches, tuple)
+        self.assertEqual(1, len(tree.branches))
+        self.assertIsInstance(tree.branches[0], Branch)
+        self.assertEqual(len(tree.branches[0]), 1)
+        self.assertIsInstance(tree.branches[0][0], Tree)
+        self.assertEqual(parent, tree.branches[0][0].root)
+
+    def test_left_existential_with_no_names(self):
+        exi = Existential('x', Atom('P<x>'))
+        sequent = Sequent(
+            ant=exi,
+            con=None
+        )
+        tree = Tree(sequent)
+        tree.grow()
+
+        prop = Atom('P<NONE>')
+        parent = Sequent(
+            ant=prop,
+            con=None
+        )
+
+        self.assertIsInstance(tree.branches, tuple)
+        self.assertEqual(1, len(tree.branches))
+        self.assertIsInstance(tree.branches[0], Branch)
+        self.assertEqual(len(tree.branches[0]), 1)
+        self.assertIsInstance(tree.branches[0][0], Tree)
+        self.assertEqual(parent, sorted(tree.branches[0])[0].root)
+
+    def test_left_existential_with_two_names(self):
+        exi = Existential('x', Atom('P<x, alice>'))
+        sequent = Sequent(
+            ant=exi,
+            con=None
+        )
+        tree = Tree(sequent, names={'robert'})
+        tree.grow()
+
+        p_1 = Atom('P<alice, alice>')
+        p_2 = Atom('P<robert, alice>')
+        parents = {
+            Sequent(
+                ant=parent,
+                con=None
+            )
+            for parent in (p_1, p_2)
+        }
+        leaves = {branch[0].root for branch in tree.branches}
+
+        self.assertIsInstance(tree.branches, tuple)
+        self.assertEqual(2, len(tree.branches))
+        self.assertIsInstance(tree.branches[0], Branch)
+        self.assertIsInstance(tree.branches[1], Branch)
+        self.assertEqual(len(tree.branches[0]), 1)
+        self.assertEqual(len(tree.branches[1]), 1)
+        self.assertIsInstance(tree.branches[0][0], Tree)
+        self.assertIsInstance(tree.branches[1][0], Tree)
+        self.assertEqual(leaves, parents)
+
+    def test_left_existential_with_three_names(self):
+        exi = Existential('x', Atom('P<x>'))
+        sequent = Sequent(
+            ant=exi,
+            con=None
+        )
+        tree = Tree(sequent, names={'alice'})
+        tree.grow()
+
+        prop = Atom('P<alice>')
+        parent = Sequent(
+            ant=prop,
+            con=None
         )
 
         self.assertIsInstance(tree.branches, tuple)

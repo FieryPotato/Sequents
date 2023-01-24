@@ -72,9 +72,6 @@ class Branch:
 class Tree:
     """
     Class representing proof-trees with a Sequent object as the root.
-    Applications of sequent rules to each leaf on the tree yield more
-    leaves until each leaf at the extremes is atomic (represented by
-    {atomic_sequent: None}).
     """
     root: Sequent
     names: set[str] = field(default_factory=set)

@@ -208,6 +208,28 @@ class RightForall:
         return tuple((self.sequent.mix(sequent),) for sequent in prop_sequents)  # type: ignore
 
 
+class LeftExists:
+    invertible = False
+    parents = 1
+
+    def __init__(self, proposition: Existential, sequent: Sequent, names: set[str]):
+        if not names:
+            names.add('NONE')
+        self.proposition = proposition
+        self.sequent = sequent
+        self.names = names
+
+    def apply(self) -> tuple[tuple[Sequent], ...]:
+        prop_sequents = (
+            Sequent(
+                ant=self.proposition.instantiate_with(name),
+                con=None,
+            )
+            for name in self.names
+        )
+        return tuple((self.sequent.mix(sequent),) for sequent in prop_sequents)
+
+
 class RightExists:
     invertible = False
     parents = 1
@@ -227,7 +249,7 @@ class RightExists:
             )
             for name in self.names
         )
-        return tuple((self.sequent.mix(sequent),) for sequent in prop_sequents)  # type: ignore
+        return tuple((self.sequent.mix(sequent),) for sequent in prop_sequents)
 
 
 RULE_DICT = {
@@ -237,7 +259,7 @@ RULE_DICT = {
         'v': LeftAddOr,
         '->': LeftAddIf,
         '∀': LeftForall,
-        '∃': ...,
+        '∃': LeftExists,
     },
     'con': {
         '~': RightNot,
