@@ -2,6 +2,7 @@ from typing import Protocol, TypeVar
 
 from proposition import Proposition, Conjunction, Disjunction, Negation, Conditional, Quantifier, Universal, Existential
 from sequent import Sequent
+from settings import Settings
 
 decomp_result = TypeVar('decomp_result',
                         tuple[tuple[Sequent]],  # One-Parent Invertible
@@ -254,20 +255,32 @@ class RightExists:
 
 RULE_DICT = {
     'ant': {
-        '~': LeftNot,
-        '&': LeftMultAnd,
-        'v': LeftAddOr,
-        '->': LeftAddIf,
-        '∀': LeftForall,
-        '∃': LeftExists,
+        '~': {'add': LeftNot,
+              'mul': LeftNot},
+        '&': {'add': ...,
+              'mul': LeftMultAnd},
+        'v': {'add': LeftAddOr,
+              'mul': ...},
+        '->': {'add': LeftAddIf,
+               'mul': ...},
+        '∀': {'add': LeftForall,
+              'mul': LeftForall},
+        '∃': {'add': LeftExists,
+              'mul': LeftExists},
     },
     'con': {
-        '~': RightNot,
-        '&': RightAddAnd,
-        'v': RightMultOr,
-        '->': RightMultIf,
-        '∀': RightForall,
-        '∃': RightExists,
+        '~': {'add': RightNot,
+              'mul': RightNot},
+        '&': {'add': RightAddAnd,
+              'mul': ...},
+        'v': {'add': ...,
+              'mul': RightMultOr},
+        '->': {'add': ...,
+               'mul': RightMultIf},
+        '∀': {'add': RightForall,
+              'mul': RightForall},
+        '∃': {'add': RightExists,
+              'mul': RightExists},
     }
 }
 
@@ -275,7 +288,8 @@ RULE_DICT = {
 def get_rule(sequent: Sequent, names: set[str] = None) -> Rule:
     prop, side, index = sequent.first_complex_prop()
     sequent_minus_prop = sequent.remove_proposition_at(side, index)
-    rule = RULE_DICT[side][prop.symb]
+    rule_type = Settings().get_rule(connective=prop.symb, side=side)
+    rule = RULE_DICT[side][prop.symb][rule_type]
     if isinstance(prop, Quantifier):
         return rule(prop, sequent_minus_prop, names)
     return rule(prop, sequent_minus_prop)
