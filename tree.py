@@ -26,11 +26,46 @@ Tree(root: str, is_grown: bool = False, names: list[str] = [])
 __all__ = ['Tree']
 
 from dataclasses import dataclass, field
-from typing import Generator, Self
+from typing import Generator, Self, Tuple
 
 import rules
 import utils
 from sequent import Sequent
+
+
+@dataclass(frozen=True, slots=True)
+class Branch:
+    """
+    A fancy tuple, whose goal is to make reasoning about the
+    abstraction easier. Each Branch symbolizes a possible way the
+    parents of any sequent might be.
+
+    Specifically, each one-parent non-invertible tree will contain a
+    number of branches equal to the number of possible parents that
+    tree has, each containing one parent sequent (one leaf), and each
+    two-parent non-invertible tree will contain a number of branches
+    equal to the number of possible pairs of parents the root sequent
+    has (i.e. 2^n, where n is the number of additional propositions in
+    the sequent).
+
+    Invertible sequents have exactly one branch and atomic sequents
+    have none.
+    """
+    leaves: tuple = ()
+
+    def __add__(self, other) -> Self:
+        added = ()
+        if isinstance(other, Branch):
+            added = other.leaves
+        elif isinstance(other, tuple):
+            added = other
+        return Branch(self.leaves + added)
+
+    def __getitem__(self, item):
+        return self.leaves[item]
+
+    def __len__(self) -> int:
+        return len(self.leaves)
 
 
 @dataclass(slots=True, order=True)
@@ -43,7 +78,7 @@ class Tree:
     """
     root: Sequent
     names: set[str] = field(default_factory=set)
-    branches: tuple = ()
+    branches: tuple[Branch | None, ...] = ()
 
     def __post_init__(self) -> None:
         self.names.update({name for name in self.root.names})
@@ -56,7 +91,6 @@ class Tree:
         if self.branches[0] is not None:
             return False
         return True
-
 
     def height(self) -> int:
         """
@@ -103,83 +137,53 @@ class Tree:
         rule = rules.get_rule(self.root, names=self.names)
         if rule.invertible:
             if rule.parents == 1:
-                self.branches = self.decompose_1pi_branch(rule)
+                self.branches = decompose_one_parent_invertible(rule)
             elif rule.parents == 2:
-                self.branches = self.decompose_2pi_branch(rule)
+                self.branches = decompose_two_parent_invertible(rule)
         else:
             if rule.parents == 1:
-                self.branches = self.decompose_1pni_branch(rule)
+                self.branches = decompose_one_parent_non_invertible(rule)
             elif rule.parents == 2:
                 pass
 
-    def decompose_1pi_branch(self, rule) -> tuple[tuple[Self]]:
-        result_sequents: tuple[tuple[Sequent]] = rule.apply()
-        results = []
-        for branch in result_sequents:
-            branch_result = ()
-            for leaf in branch:
-                sub_tree = Tree(leaf)
-                sub_tree.grow()
-                branch_result += (sub_tree,)
-            results.append(branch_result)
-        return tuple(results)  # type: ignore
 
-    def decompose_2pi_branch(self, rule) -> tuple[tuple[Self, Self]]:
-        result_sequents: tuple[tuple[Sequent, Sequent]] = rule.apply()
-        results = []
-        for branch in result_sequents:
-            branch_result = ()
-            for leaf in branch:
-                sub_tree = Tree(leaf)
-                sub_tree.grow()
-                branch_result += sub_tree,
-            results.append(branch_result)
-        return tuple(results)  # type: ignore
+def decompose_one_parent_invertible(rule: rules.Rule) -> tuple[Branch]:
+    result_sequents: tuple[tuple[Sequent]] = rule.apply()
+    results: tuple = ()
+    for result in result_sequents:
+        branch = Branch()
+        for sequent in result:
+            sub_tree = Tree(sequent)
+            sub_tree.grow()
+            branch += (sub_tree,)
+        results += (branch,)
+    return results
 
-    def decompose_1pni_branch(self, rule) -> tuple[tuple[Self], ...]:
-        result_sequents: tuple[tuple[Sequent], ...] = rule.apply()
-        results = []
-        for branch in result_sequents:
-            branch_result = ()
-            for leaf in branch:
-                sub_tree = Tree(leaf)
-                sub_tree.grow()
-                branch_result += sub_tree,
-            results.append(branch_result)
-        return tuple(results)  # type :ignore
 
-    def grow_branch(self, sequent) -> dict | list | None:
-        """
-        Return the body of the tree whose root is sequent.
-        """
-        # decomposer = get_decomposer(sequent, names=self.names)
-        # if (parents := decomposer.get_parents()) is None:
-        #     return None
-        # elif isinstance(parents, dict):
-        #     return self.grow_dict_branch(parents)
-        # elif isinstance(parents, list):
-        #     return self.grow_list_branch(parents)
-        ...
+def decompose_two_parent_invertible(rule: rules.Rule) -> tuple[Branch]:
+    result_sequents: tuple[tuple[Sequent, Sequent]] = rule.apply()
+    results: tuple = ()
+    for result in result_sequents:
+        branch = Branch()
+        for sequent in result:
+            sub_tree = Tree(sequent)
+            sub_tree.grow()
+            branch += (sub_tree,)
+        results += (branch,)
+    return results
 
-    def grow_list_branch(self, seq_dict_list: list[dict[Sequent, None]]) \
-            -> list[dict[Sequent, Sequent | None]]:
-        """
-        Return branches expanded from sequents in seq_dict_list.
-        """
-        # return [
-        #     self.grow_dict_branch(sequent) for sequent in seq_dict_list
-        # ]
-        ...
 
-    def grow_dict_branch(self, seq_dict: dict[Sequent, None]) \
-            -> dict[Sequent, Sequent | None]:
-        """
-        Return branches expanded from sequents in seq_dict.
-        """
-        # return {
-        #     sequent: self.grow_branch(sequent) for sequent in seq_dict.keys()
-        # }
-        ...
+def decompose_one_parent_non_invertible(rule: rules.Rule) -> tuple[Branch]:
+    result_sequents: tuple[tuple[Sequent], ...] = rule.apply()
+    results: tuple = ()
+    for result in result_sequents:
+        branch = Branch()
+        for sequent in result:
+            sub_tree = Tree(sequent)
+            sub_tree.grow()
+            branch += (sub_tree,)
+        results += (branch,)
+    return results
 
 
 def split_tree(tree) -> list[Tree]:

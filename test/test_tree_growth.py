@@ -2,7 +2,7 @@ import unittest
 
 from proposition import Atom, Conjunction, Disjunction, Conditional, Negation, Universal, Existential
 from sequent import Sequent
-from tree import Tree
+from tree import Tree, Branch
 
 
 class TestAtomic(unittest.TestCase):
@@ -36,7 +36,7 @@ class TestOneParentInvertible(unittest.TestCase):
 
         self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(len(tree.branches), 1)
-        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertIsInstance(tree.branches[0], Branch)
         self.assertEqual(len(tree.branches[0]), 1)
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(parent_sequent, tree.branches[0][0].root)
@@ -59,7 +59,7 @@ class TestOneParentInvertible(unittest.TestCase):
 
         self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(len(tree.branches), 1)
-        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertIsInstance(tree.branches[0], Branch)
         self.assertEqual(len(tree.branches[0]), 1)
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(parent_sequent, tree.branches[0][0].root)
@@ -82,7 +82,7 @@ class TestOneParentInvertible(unittest.TestCase):
 
         self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(len(tree.branches), 1)
-        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertIsInstance(tree.branches[0], Branch)
         self.assertEqual(len(tree.branches[0]), 1)
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(parent_sequent, tree.branches[0][0].root)
@@ -104,7 +104,7 @@ class TestOneParentInvertible(unittest.TestCase):
 
         self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(len(tree.branches), 1)
-        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertIsInstance(tree.branches[0], Branch)
         self.assertEqual(len(tree.branches[0]), 1)
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(parent_sequent, tree.branches[0][0].root)
@@ -126,7 +126,7 @@ class TestOneParentInvertible(unittest.TestCase):
 
         self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(len(tree.branches), 1)
-        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertIsInstance(tree.branches[0], Branch)
         self.assertEqual(len(tree.branches[0]), 1)
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(parent_sequent, tree.branches[0][0].root)
@@ -155,7 +155,7 @@ class TestTwoParentInvertible(unittest.TestCase):
 
         self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(len(tree.branches), 1)
-        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertIsInstance(tree.branches[0], Branch)
         self.assertEqual(len(tree.branches[0]), 2)
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(left_parent, tree.branches[0][0].root)
@@ -184,7 +184,7 @@ class TestTwoParentInvertible(unittest.TestCase):
 
         self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(1, len(tree.branches))
-        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertIsInstance(tree.branches[0], Branch)
         self.assertEqual(len(tree.branches[0]), 2)
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(left_parent, tree.branches[0][0].root)
@@ -213,7 +213,7 @@ class TestTwoParentInvertible(unittest.TestCase):
 
         self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(1, len(tree.branches))
-        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertIsInstance(tree.branches[0], Branch)
         self.assertEqual(len(tree.branches[0]), 2)
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(left_parent, tree.branches[0][0].root)
@@ -239,7 +239,7 @@ class TestOneParentNonInvertible(unittest.TestCase):
 
         self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(1, len(tree.branches))
-        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertIsInstance(tree.branches[0], Branch)
         self.assertEqual(len(tree.branches[0]), 1)
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(parent, tree.branches[0][0].root)
@@ -266,8 +266,8 @@ class TestOneParentNonInvertible(unittest.TestCase):
 
         self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(2, len(tree.branches))
-        self.assertIsInstance(tree.branches[0], tuple)
-        self.assertIsInstance(tree.branches[1], tuple)
+        self.assertIsInstance(tree.branches[0], Branch)
+        self.assertIsInstance(tree.branches[1], Branch)
         self.assertEqual(len(tree.branches[0]), 1)
         self.assertEqual(len(tree.branches[1]), 1)
         self.assertIsInstance(tree.branches[0][0], Tree)
@@ -291,7 +291,7 @@ class TestOneParentNonInvertible(unittest.TestCase):
 
         self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(1, len(tree.branches))
-        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertIsInstance(tree.branches[0], Branch)
         self.assertEqual(len(tree.branches[0]), 1)
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(parent, tree.branches[0][0].root)
@@ -313,7 +313,7 @@ class TestOneParentNonInvertible(unittest.TestCase):
 
         self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(1, len(tree.branches))
-        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertIsInstance(tree.branches[0], Branch)
         self.assertEqual(len(tree.branches[0]), 1)
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(parent, tree.branches[0][0].root)
@@ -335,7 +335,7 @@ class TestOneParentNonInvertible(unittest.TestCase):
         
         self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(1, len(tree.branches))
-        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertIsInstance(tree.branches[0], Branch)
         self.assertEqual(len(tree.branches[0]), 1)
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(parent, tree.branches[0][0].root)
@@ -357,7 +357,7 @@ class TestOneParentNonInvertible(unittest.TestCase):
 
         self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(1, len(tree.branches))
-        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertIsInstance(tree.branches[0], Branch)
         self.assertEqual(len(tree.branches[0]), 1)
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(parent, tree.branches[0][0].root)
@@ -379,7 +379,7 @@ class TestOneParentNonInvertible(unittest.TestCase):
 
         self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(1, len(tree.branches))
-        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertIsInstance(tree.branches[0], Branch)
         self.assertEqual(len(tree.branches[0]), 1)
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(parent, sorted(tree.branches[0])[0].root)
@@ -406,8 +406,8 @@ class TestOneParentNonInvertible(unittest.TestCase):
 
         self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(2, len(tree.branches))
-        self.assertIsInstance(tree.branches[0], tuple)
-        self.assertIsInstance(tree.branches[1], tuple)
+        self.assertIsInstance(tree.branches[0], Branch)
+        self.assertIsInstance(tree.branches[1], Branch)
         self.assertEqual(len(tree.branches[0]), 1)
         self.assertEqual(len(tree.branches[1]), 1)
         self.assertIsInstance(tree.branches[0][0], Tree)
@@ -431,7 +431,7 @@ class TestOneParentNonInvertible(unittest.TestCase):
 
         self.assertIsInstance(tree.branches, tuple)
         self.assertEqual(1, len(tree.branches))
-        self.assertIsInstance(tree.branches[0], tuple)
+        self.assertIsInstance(tree.branches[0], Branch)
         self.assertEqual(len(tree.branches[0]), 1)
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(parent, tree.branches[0][0].root)
