@@ -19,7 +19,7 @@ class TestAtomic(unittest.TestCase):
 
 
 class TestOneParentInvertible(unittest.TestCase):
-    def test_left_and(self) -> None:
+    def test_left_mul_and(self) -> None:
         p = Atom('p')
         q = Atom('q')
 
@@ -28,7 +28,8 @@ class TestOneParentInvertible(unittest.TestCase):
             con=None
         )
         tree = Tree(sequent)
-        tree.grow()
+        with patch('settings.__Settings.get_rule', return_value='mul'):
+            tree.grow()
 
         parent_sequent = Sequent(
             ant=(p, q),
@@ -42,7 +43,7 @@ class TestOneParentInvertible(unittest.TestCase):
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(parent_sequent, tree.branches[0][0].root)
 
-    def test_right_or(self) -> None:
+    def test_right_mul_or(self) -> None:
         p = Atom('p')
         q = Atom('q')
 
@@ -51,7 +52,8 @@ class TestOneParentInvertible(unittest.TestCase):
             con=Disjunction(p, q)
         )
         tree = Tree(sequent)
-        tree.grow()
+        with patch('settings.__Settings.get_rule', return_value='mul'):
+            tree.grow()
 
         parent_sequent = Sequent(
             ant=None,
@@ -65,7 +67,7 @@ class TestOneParentInvertible(unittest.TestCase):
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(parent_sequent, tree.branches[0][0].root)
 
-    def test_right_implies(self) -> None:
+    def test_right_mul_implies(self) -> None:
         p = Atom('p')
         q = Atom('q')
 
@@ -74,7 +76,8 @@ class TestOneParentInvertible(unittest.TestCase):
             con=Conditional(p, q)
         )
         tree = Tree(sequent)
-        tree.grow()
+        with patch('settings.__Settings.get_rule', return_value='mul'):
+            tree.grow()
 
         parent_sequent = Sequent(
             ant=p,
@@ -143,7 +146,8 @@ class TestTwoParentInvertible(unittest.TestCase):
             con=Conjunction(p, q)
         )
         tree = Tree(sequent)
-        tree.grow()
+        with patch('settings.__Settings.get_rule', return_value='add'):
+            tree.grow()
 
         left_parent = Sequent(
             ant=None,
@@ -172,7 +176,8 @@ class TestTwoParentInvertible(unittest.TestCase):
             con=None
         )
         tree = Tree(sequent)
-        tree.grow()
+        with patch('settings.__Settings.get_rule', return_value='add'):
+            tree.grow()
 
         left_parent = Sequent(
             ant=p,
@@ -201,7 +206,8 @@ class TestTwoParentInvertible(unittest.TestCase):
             con=None
         )
         tree = Tree(sequent)
-        tree.grow()
+        with patch('settings.__Settings.get_rule', return_value='add'):
+            tree.grow()
 
         left_parent = Sequent(
             ant=None,
@@ -511,3 +517,66 @@ class TestOneParentNonInvertible(unittest.TestCase):
         self.assertIsInstance(tree.branches[0][0], Tree)
         self.assertEqual(parent, tree.branches[0][0].root)
 
+    def test_left_add_and(self):
+        p = Atom('p')
+        q = Atom('q')
+
+        sequent = Sequent(
+            ant=Conjunction(p, q),
+            con=None
+        )
+        tree = Tree(sequent)
+        with patch('settings.__Settings.get_rule', return_value='add'):
+            tree.grow()
+
+        p1 = Sequent(
+            ant=p,
+            con=None
+        )
+        p2 = Sequent(
+            ant=q,
+            con=None,
+        )
+
+        self.assertIsInstance(tree.branches, tuple)
+        self.assertEqual(len(tree.branches), 2)
+        self.assertIsInstance(tree.branches[0], Branch)
+        self.assertIsInstance(tree.branches[1], Branch)
+        self.assertEqual(len(tree.branches[0]), 1)
+        self.assertEqual(len(tree.branches[1]), 1)
+        self.assertIsInstance(tree.branches[0][0], Tree)
+        self.assertIsInstance(tree.branches[1][0], Tree)
+        self.assertEqual(p1, tree.branches[0][0].root)
+        self.assertEqual(p2, tree.branches[1][0].root)
+
+    def test_right_add_or(self):
+        p = Atom('p')
+        q = Atom('q')
+
+        sequent = Sequent(
+            ant=None,
+            con=Disjunction(p, q),
+        )
+        tree = Tree(sequent)
+        with patch('settings.__Settings.get_rule', return_value='add'):
+            tree.grow()
+
+        p1 = Sequent(
+            ant=None,
+            con=p
+        )
+        p2 = Sequent(
+            ant=None,
+            con=q,
+        )
+
+        self.assertIsInstance(tree.branches, tuple)
+        self.assertEqual(len(tree.branches), 2)
+        self.assertIsInstance(tree.branches[0], Branch)
+        self.assertIsInstance(tree.branches[1], Branch)
+        self.assertEqual(len(tree.branches[0]), 1)
+        self.assertEqual(len(tree.branches[1]), 1)
+        self.assertIsInstance(tree.branches[0][0], Tree)
+        self.assertIsInstance(tree.branches[1][0], Tree)
+        self.assertEqual(p1, tree.branches[0][0].root)
+        self.assertEqual(p2, tree.branches[1][0].root)

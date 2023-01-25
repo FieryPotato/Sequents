@@ -38,6 +38,25 @@ class LeftMultAnd:
         return (self.sequent.mix(prop_sequent),),
 
 
+class LeftAddAnd:
+    invertible = False
+    parents = 1
+
+    def __init__(self, proposition: Conjunction, sequent: Sequent):
+        self.proposition = proposition
+        self.sequent = sequent
+
+    def apply(self) -> tuple[tuple[Sequent], ...]:
+        parents = (
+            Sequent(
+                ant=prop,
+                con=None
+            )
+            for prop in (self.proposition.left, self.proposition.right)
+        )
+        return tuple((self.sequent.mix(parent),) for parent in parents)
+
+
 class RightAddAnd:
     invertible = True
     parents = 2
@@ -72,6 +91,25 @@ class RightMultOr:
             con=(self.proposition.left, self.proposition.right)
         )
         return (self.sequent.mix(prop_sequent),),
+
+
+class RightAddOr:
+    invertible = True
+    parents = 1
+
+    def __init__(self, proposition: Disjunction, sequent: Sequent):
+        self.proposition = proposition
+        self.sequent = sequent
+
+    def apply(self) -> tuple[tuple[Sequent], ...]:
+        parents = (
+            Sequent(
+                ant=None,
+                con=prop
+            )
+            for prop in (self.proposition.left, self.proposition.right)
+        )
+        return tuple((self.sequent.mix(parent),) for parent in parents)
 
 
 class LeftAddOr:
@@ -257,7 +295,7 @@ RULE_DICT = {
     'ant': {
         '~': {'add': LeftNot,
               'mul': LeftNot},
-        '&': {'add': ...,
+        '&': {'add': LeftAddAnd,
               'mul': LeftMultAnd},
         'v': {'add': LeftAddOr,
               'mul': ...},
@@ -273,7 +311,7 @@ RULE_DICT = {
               'mul': RightNot},
         '&': {'add': RightAddAnd,
               'mul': ...},
-        'v': {'add': ...,
+        'v': {'add': RightAddOr,
               'mul': RightMultOr},
         '->': {'add': ...,
                'mul': RightMultIf},
