@@ -148,6 +148,26 @@ class RightMultIf:
         return (self.sequent.mix(prop_sequent),),
 
 
+class RightAddIf:
+    invertible = False
+    parents = 1
+
+    def __init__(self, proposition: Conditional, sequent: Sequent) -> None:
+        self.proposition = proposition
+        self.sequent = sequent
+
+    def apply(self) -> tuple[tuple[Sequent], ...]:
+        left_parent = Sequent(
+            ant=None,
+            con=self.proposition.left
+        )
+        right_parent = Sequent(
+            ant=self.proposition.right,
+            con=None
+        )
+        return tuple((self.sequent.mix(parent),) for parent in (left_parent, right_parent))
+
+
 class LeftAddIf:
     invertible = True
     parents = 2
@@ -313,7 +333,7 @@ RULE_DICT = {
               'mul': ...},
         'v': {'add': RightAddOr,
               'mul': RightMultOr},
-        '->': {'add': ...,
+        '->': {'add': RightAddIf,
                'mul': RightMultIf},
         '∀': {'add': RightForall,
               'mul': RightForall},

@@ -580,3 +580,35 @@ class TestOneParentNonInvertible(unittest.TestCase):
         self.assertIsInstance(tree.branches[1][0], Tree)
         self.assertEqual(p1, tree.branches[0][0].root)
         self.assertEqual(p2, tree.branches[1][0].root)
+
+    def test_right_add_if(self):
+        p = Atom('p')
+        q = Atom('q')
+
+        sequent = Sequent(
+            ant=None,
+            con=Conditional(p, q),
+        )
+        tree = Tree(sequent)
+        with patch('settings.__Settings.get_rule', return_value='add'):
+            tree.grow()
+
+        p1 = Sequent(
+            ant=None,
+            con=p
+        )
+        p2 = Sequent(
+            ant=q,
+            con=None,
+        )
+
+        self.assertIsInstance(tree.branches, tuple)
+        self.assertEqual(len(tree.branches), 2)
+        self.assertIsInstance(tree.branches[0], Branch)
+        self.assertIsInstance(tree.branches[1], Branch)
+        self.assertEqual(len(tree.branches[0]), 1)
+        self.assertEqual(len(tree.branches[1]), 1)
+        self.assertIsInstance(tree.branches[0][0], Tree)
+        self.assertIsInstance(tree.branches[1][0], Tree)
+        self.assertEqual(p1, tree.branches[0][0].root)
+        self.assertEqual(p2, tree.branches[1][0].root)
