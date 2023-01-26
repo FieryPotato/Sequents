@@ -40,7 +40,7 @@ __all__ = ['Sequent']
 
 import itertools
 from dataclasses import dataclass
-from typing import Self
+from typing import Self, Iterable
 
 import utils
 from proposition import Proposition
@@ -130,10 +130,15 @@ class Sequent:
             raise ValueError(f'Parameter side must be "ant" or "con", not {side}.')
         return Sequent(ant, con)
 
-    def mix(*sequents) -> Self:
+    def mix(*sequents: tuple[Self] | Self) -> Self:
         """
         Return a sequent whose antecedent is the combined antecedents
         of the input sequents, and likewise for consequents.
+
+        Can be called either as a static method or as an instance method.
+        Where s0, s1, and s2 are sequents:
+        >>> Sequent.mix(s0, s1, s2) == s0.mix(s1, s2)
+        True
         """
         return Sequent(
             ant=sum((sequent.ant for sequent in sequents), ()),

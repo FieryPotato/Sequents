@@ -141,7 +141,7 @@ class Tree:
             if rule.parents == 1:
                 self.branches = decompose_one_parent_non_invertible(rule)
             elif rule.parents == 2:
-                pass
+                self.branches = decompose_two_parent_non_invertible(rule)
 
 
 def decompose_one_parent_invertible(rule: rules.Rule) -> tuple[Branch]:
@@ -172,6 +172,19 @@ def decompose_two_parent_invertible(rule: rules.Rule) -> tuple[Branch]:
 
 def decompose_one_parent_non_invertible(rule: rules.Rule) -> tuple[Branch]:
     result_sequents: tuple[tuple[Sequent], ...] = rule.apply()
+    results: tuple = ()
+    for result in result_sequents:
+        branch = Branch()
+        for sequent in result:
+            sub_tree = Tree(sequent)
+            sub_tree.grow()
+            branch += (sub_tree,)
+        results += (branch,)
+    return results
+
+
+def decompose_two_parent_non_invertible(rule: rules.Rule) -> tuple[Branch]:
+    result_sequents: tuple[tuple[Sequent, Sequent], ...] = rule.apply()
     results: tuple = ()
     for result in result_sequents:
         branch = Branch()

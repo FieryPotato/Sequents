@@ -1,6 +1,7 @@
 from typing import Protocol, TypeVar
 
-from proposition import Proposition, Conjunction, Disjunction, Negation, Conditional, Quantifier, Universal, Existential
+from proposition import Proposition, Conjunction, Disjunction, Negation, \
+    Conditional, Quantifier, Universal, Existential
 from sequent import Sequent
 from settings import Settings
 
@@ -48,10 +49,7 @@ class LeftAddAnd:
 
     def apply(self) -> tuple[tuple[Sequent], ...]:
         parents = (
-            Sequent(
-                ant=prop,
-                con=None
-            )
+            Sequent(ant=prop, con=None)
             for prop in (self.proposition.left, self.proposition.right)
         )
         return tuple((self.sequent.mix(parent),) for parent in parents)
@@ -60,21 +58,35 @@ class LeftAddAnd:
 class RightAddAnd:
     invertible = True
     parents = 2
-    
+
     def __init__(self, proposition: Conjunction, sequent: Sequent):
         self.proposition = proposition
         self.sequent = sequent
-    
+
     def apply(self) -> tuple[tuple[Sequent, Sequent]]:
-        left = Sequent(
-            ant=None,
-            con=self.proposition.left
-        )
-        right = Sequent(
-            ant=None,
-            con=self.proposition.right
-        )
+        left = Sequent(ant=None, con=self.proposition.left)
+        right = Sequent(ant=None, con=self.proposition.right)
         return tuple(self.sequent.mix(parent) for parent in (left, right)),  # type: ignore
+
+
+class RightMultAnd:
+    invertible = False
+    parents = 2
+
+    def __init__(self, proposition: Conjunction, sequent: Sequent) -> None:
+        self.proposition = proposition
+        self.sequent = sequent
+
+    def apply(self) -> tuple[tuple[Sequent, Sequent], ...]:
+        left_parent = Sequent(ant=None, con=self.proposition.left)
+        right_parent = Sequent(ant=None, con=self.proposition.right)
+        results = (
+            (left_parent.mix(left), right_parent.mix(right))
+            for left, right in self.sequent.possible_mix_parents()
+        )
+        if not results:
+            return tuple((left_parent, right_parent)),
+        return tuple(results)
 
 
 class RightMultOr:
@@ -86,10 +98,7 @@ class RightMultOr:
         self.sequent = sequent
 
     def apply(self) -> tuple[tuple[Sequent]]:
-        prop_sequent = Sequent(
-            ant=None,
-            con=(self.proposition.left, self.proposition.right)
-        )
+        prop_sequent = Sequent(ant=None, con=(self.proposition.left, self.proposition.right))
         return (self.sequent.mix(prop_sequent),),
 
 
@@ -103,10 +112,7 @@ class RightAddOr:
 
     def apply(self) -> tuple[tuple[Sequent], ...]:
         parents = (
-            Sequent(
-                ant=None,
-                con=prop
-            )
+            Sequent(ant=None, con=prop)
             for prop in (self.proposition.left, self.proposition.right)
         )
         return tuple((self.sequent.mix(parent),) for parent in parents)
@@ -115,21 +121,35 @@ class RightAddOr:
 class LeftAddOr:
     invertible = True
     parents = 2
-    
+
     def __init__(self, proposition: Disjunction, sequent: Sequent):
         self.proposition = proposition
         self.sequent = sequent
-        
+
     def apply(self) -> tuple[tuple[Sequent, Sequent]]:
-        left = Sequent(
-            ant=self.proposition.left,
-            con=None
-        )
-        right = Sequent(
-            ant=self.proposition.right,
-            con=None
-        )
+        left = Sequent(ant=self.proposition.left, con=None)
+        right = Sequent(ant=self.proposition.right, con=None)
         return tuple(self.sequent.mix(parent) for parent in (left, right)),  # type: ignore
+
+
+class LeftMultOr:
+    invertible = False
+    parents = 2
+
+    def __init__(self, proposition: Disjunction, sequent: Sequent) -> None:
+        self.proposition = proposition
+        self.sequent = sequent
+
+    def apply(self) -> tuple[tuple[Sequent, Sequent], ...]:
+        left_parent = Sequent(ant=self.proposition.left, con=None)
+        right_parent = Sequent(ant=self.proposition.right, con=None)
+        results = (
+            (left_parent.mix(left), right_parent.mix(right))
+            for left, right in self.sequent.possible_mix_parents()
+        )
+        if not results:
+            return tuple((left_parent, right_parent)),
+        return tuple(results)
 
 
 class RightMultIf:
@@ -141,10 +161,7 @@ class RightMultIf:
         self.sequent = sequent
 
     def apply(self) -> tuple[tuple[Sequent]]:
-        prop_sequent = Sequent(
-            ant=self.proposition.left,
-            con=self.proposition.right
-        )
+        prop_sequent = Sequent(ant=self.proposition.left, con=self.proposition.right)
         return (self.sequent.mix(prop_sequent),),
 
 
@@ -157,35 +174,43 @@ class RightAddIf:
         self.sequent = sequent
 
     def apply(self) -> tuple[tuple[Sequent], ...]:
-        left_parent = Sequent(
-            ant=None,
-            con=self.proposition.left
-        )
-        right_parent = Sequent(
-            ant=self.proposition.right,
-            con=None
-        )
+        left_parent = Sequent(ant=None, con=self.proposition.left)
+        right_parent = Sequent(ant=self.proposition.right, con=None)
         return tuple((self.sequent.mix(parent),) for parent in (left_parent, right_parent))
 
 
 class LeftAddIf:
     invertible = True
     parents = 2
-    
+
     def __init__(self, proposition: Conditional, sequent: Sequent):
         self.proposition = proposition
         self.sequent = sequent
-        
+
     def apply(self) -> tuple[tuple[Sequent, Sequent]]:
-        left = Sequent(
-            ant=None,
-            con=self.proposition.left
-        )
-        right = Sequent(
-            ant=self.proposition.right,
-            con=None
-        )
+        left = Sequent(ant=None, con=self.proposition.left)
+        right = Sequent(ant=self.proposition.right, con=None)
         return tuple(self.sequent.mix(parent) for parent in (left, right)),  # type: ignore
+
+
+class LeftMultIf:
+    invertible = False
+    parents = 2
+
+    def __init__(self, proposition: Conditional, sequent: Sequent) -> None:
+        self.proposition = proposition
+        self.sequent = sequent
+
+    def apply(self) -> tuple[tuple[Sequent, Sequent], ...]:
+        left_parent = Sequent(ant=None, con=self.proposition.left)
+        right_parent = Sequent(ant=self.proposition.right, con=None)
+        results = (
+            (left_parent.mix(left), right_parent.mix(right))
+            for left, right in self.sequent.possible_mix_parents()
+        )
+        if not results:
+            return tuple((left_parent, right_parent)),
+        return tuple(results)
 
 
 class LeftNot:
@@ -197,10 +222,7 @@ class LeftNot:
         self.sequent = sequent
 
     def apply(self) -> tuple[tuple[Sequent]]:
-        prop_sequent = Sequent(
-            ant=None,
-            con=self.proposition.prop
-        )
+        prop_sequent = Sequent(ant=None, con=self.proposition.prop)
         return (self.sequent.mix(prop_sequent),),
 
 
@@ -213,10 +235,7 @@ class RightNot:
         self.sequent = sequent
 
     def apply(self) -> tuple[tuple[Sequent]]:
-        prop_sequent = Sequent(
-            ant=self.proposition.prop,
-            con=None
-        )
+        prop_sequent = Sequent(ant=self.proposition.prop, con=None)
         return (self.sequent.mix(prop_sequent),),
 
 
@@ -233,10 +252,7 @@ class LeftForall:
 
     def apply(self) -> tuple[tuple[Sequent], ...]:
         prop_sequents = (
-            Sequent(
-                ant=self.proposition.instantiate_with(name),
-                con=None
-            )
+            Sequent(ant=self.proposition.instantiate_with(name), con=None)
             for name in self.names
         )
         return tuple((self.sequent.mix(sequent),) for sequent in prop_sequents)  # type: ignore
@@ -258,10 +274,7 @@ class RightForall:
 
     def apply(self) -> tuple[tuple[Sequent], ...]:
         prop_sequents = (
-            Sequent(
-                ant=None,
-                con=self.proposition.instantiate_with(name),
-            )
+            Sequent(ant=None, con=self.proposition.instantiate_with(name))
             for name in self.names
         )
         return tuple((self.sequent.mix(sequent),) for sequent in prop_sequents)  # type: ignore
@@ -280,10 +293,7 @@ class LeftExists:
 
     def apply(self) -> tuple[tuple[Sequent], ...]:
         prop_sequents = (
-            Sequent(
-                ant=self.proposition.instantiate_with(name),
-                con=None,
-            )
+            Sequent(ant=self.proposition.instantiate_with(name), con=None)
             for name in self.names
         )
         return tuple((self.sequent.mix(sequent),) for sequent in prop_sequents)
@@ -302,10 +312,7 @@ class RightExists:
 
     def apply(self) -> tuple[tuple[Sequent], ...]:
         prop_sequents = (
-            Sequent(
-                ant=None,
-                con=self.proposition.instantiate_with(name)
-            )
+            Sequent(ant=None, con=self.proposition.instantiate_with(name))
             for name in self.names
         )
         return tuple((self.sequent.mix(sequent),) for sequent in prop_sequents)
@@ -318,9 +325,9 @@ RULE_DICT = {
         '&': {'add': LeftAddAnd,
               'mul': LeftMultAnd},
         'v': {'add': LeftAddOr,
-              'mul': ...},
+              'mul': LeftMultOr},
         '->': {'add': LeftAddIf,
-               'mul': ...},
+               'mul': LeftMultIf},
         '∀': {'add': LeftForall,
               'mul': LeftForall},
         '∃': {'add': LeftExists,
@@ -330,7 +337,7 @@ RULE_DICT = {
         '~': {'add': RightNot,
               'mul': RightNot},
         '&': {'add': RightAddAnd,
-              'mul': ...},
+              'mul': RightMultAnd},
         'v': {'add': RightAddOr,
               'mul': RightMultOr},
         '->': {'add': RightAddIf,
@@ -344,6 +351,22 @@ RULE_DICT = {
 
 
 def get_rule(sequent: Sequent, names: set[str] = None) -> Rule:
+    """
+    Return an object following the Rule protocol based on sequent. Rules
+    are either invertible or not and have either 1 or 2 parents.
+
+    Rule.proposition is the Proposition that will be decomposed.
+    Rule.sequent is the Sequent from which the proposition came, minus
+    that Proposition.
+
+    Rule.apply() returns a tuple of tuples of Sequents representing the
+    decomposition results as follows:
+        - One-parent invertible -> tuple[tuple[Sequent]]
+        - Two-parent invertible -> tuple[tuple[Sequent, Sequent]]
+        - One-parent non-invertible -> tuple[tuple[Sequent], ...]
+        - Two-parent non-invertible -> tuple[tuple[Sequent, Sequent], ...]
+
+    """
     prop, side, index = sequent.first_complex_prop()
     sequent_minus_prop = sequent.remove_proposition_at(side, index)
     rule_type = Settings().get_rule(connective=prop.symb, side=side)
