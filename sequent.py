@@ -127,7 +127,7 @@ class Sequent:
             ant = self.ant
             con = self.con[:index] + self.con[1 + index:]
         else:
-            raise ValueError(f'Parameter side must be "ant" or "con", not {side}.')
+            raise ValueError(f'Parameter "side" must be "ant" or "con", not {side}.')
         return Sequent(ant, con)
 
     def mix(*sequents: tuple[Self] | Self) -> Self:
@@ -139,6 +139,7 @@ class Sequent:
         Where s0, s1, and s2 are sequents:
         >>> Sequent.mix(s0, s1, s2) == s0.mix(s1, s2)
         True
+        Order matters
         """
         return Sequent(
             ant=sum((sequent.ant for sequent in sequents), ()),

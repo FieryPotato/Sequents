@@ -26,10 +26,9 @@ Tree(root: str, is_grown: bool = False, names: list[str] = [])
 __all__ = ['Tree']
 
 from dataclasses import dataclass, field
-from typing import Generator, Self, Tuple
+from typing import Generator, Self
 
 import rules
-import utils
 from sequent import Sequent
 
 
@@ -83,21 +82,29 @@ class Tree:
     @property
     def is_grown(self) -> bool:
         """Return whether this tree's .grow() method has been called."""
-        if not self.branches:
-            return False
-        if self.branches[0] is not None:
-            return False
-        return True
+        if self.branches:
+            return True
+        return False
+
+    @property
+    def parents(self) -> Generator[Self, None, None]:
+        """
+        Generates trees from among parents of this sequent.
+        """
+        for branch in self.branches:
+            for leaf in branch:
+                yield leaf
 
     def height(self) -> int:
         """
-        Return the proof height of this tree, which is just the
-        complexity of its root.
+        Return the proof height of this tree. In other words, the
+        greatest number of steps it takes to fully decompose a branch.
         """
-        # if not self.is_grown:
-        #     raise RuntimeError('Trees must be grown to measure their height.')
-        # return utils.nested_dict_depth(self.branches)
-        ...
+        if not self.is_grown:
+            self.grow()
+        if self.root.is_atomic:
+            return 1
+        return max(parent.height() for parent in self.parents) + 1
 
     def width(self) -> int:
         """
@@ -105,10 +112,15 @@ class Tree:
         any list branches (i.e. non-invertible rules) in it. Returns 0 
         if any value in any branch is a list.
         """
-        # if not self.is_grown:
-        #     raise RuntimeError('Trees must be grown to measure their width.')
-        # return utils.count_dict_branches(self.branches)
-        ...
+        if not self.is_grown:
+            self.grow()
+        if self.root.is_atomic:
+            return 1
+        width = len(next(iter(self.branches)))
+        for branch in self.branches:
+            for parent in branch:
+                width += max(parent.width() - 1)
+        return width
 
     def sequents(self) -> Generator[Sequent, None, None]:
         """ Yields from sequents in self. """
@@ -125,66 +137,18 @@ class Tree:
         if self.branches:
             return
 
-        # Atomic root means no branches, but this must be distinct from
-        # a tree that has not been grown. We use [None] to mark this.
+        # Atomic root means no branches, but this must be distinguished
+        # from a tree that has not been grown. We mark this with (None,)
         if self.root.is_atomic:
-            self.branches = None,
+            self.branches = (None,)
             return
 
         rule = rules.get_rule(self.root, names=self.names)
-        if rule.invertible:
-            if rule.parents == 1:
-                self.branches = decompose_one_parent_invertible(rule)
-            elif rule.parents == 2:
-                self.branches = decompose_two_parent_invertible(rule)
-        else:
-            if rule.parents == 1:
-                self.branches = decompose_one_parent_non_invertible(rule)
-            elif rule.parents == 2:
-                self.branches = decompose_two_parent_non_invertible(rule)
+        self.branches = apply_decomposition(rule)
 
 
-def decompose_one_parent_invertible(rule: rules.Rule) -> tuple[Branch]:
-    result_sequents: tuple[tuple[Sequent]] = rule.apply()
-    results: tuple = ()
-    for result in result_sequents:
-        branch = Branch()
-        for sequent in result:
-            sub_tree = Tree(sequent)
-            sub_tree.grow()
-            branch += (sub_tree,)
-        results += (branch,)
-    return results
-
-
-def decompose_two_parent_invertible(rule: rules.Rule) -> tuple[Branch]:
-    result_sequents: tuple[tuple[Sequent, Sequent]] = rule.apply()
-    results: tuple = ()
-    for result in result_sequents:
-        branch = Branch()
-        for sequent in result:
-            sub_tree = Tree(sequent)
-            sub_tree.grow()
-            branch += (sub_tree,)
-        results += (branch,)
-    return results
-
-
-def decompose_one_parent_non_invertible(rule: rules.Rule) -> tuple[Branch]:
-    result_sequents: tuple[tuple[Sequent], ...] = rule.apply()
-    results: tuple = ()
-    for result in result_sequents:
-        branch = Branch()
-        for sequent in result:
-            sub_tree = Tree(sequent)
-            sub_tree.grow()
-            branch += (sub_tree,)
-        results += (branch,)
-    return results
-
-
-def decompose_two_parent_non_invertible(rule: rules.Rule) -> tuple[Branch]:
-    result_sequents: tuple[tuple[Sequent, Sequent], ...] = rule.apply()
+def apply_decomposition(rule: rules.Rule) -> tuple[Branch]:
+    result_sequents: rules.decomp_result = rule.apply()
     results: tuple = ()
     for result in result_sequents:
         branch = Branch()
@@ -205,17 +169,18 @@ def split_tree(tree) -> list[Tree]:
     follow one of the possibilities in the list from
     sequent.possible_mix_parents.
     """
-    if (root_parent := tree.branches[tree.root]) is None:
-        return [tree]
-    result = []
-    for sub_tree in utils.split_branch(root_parent):
-        new_dict = {tree.root: sub_tree}
-        result.append(
-            Tree(
-                root=tree.root,
-                is_grown=True,
-                names=tree.names,
-                branches=new_dict
-            )
-        )
-    return result
+    # if (root_parent := tree.branches[tree.root]) is None:
+    #     return [tree]
+    # result = []
+    # for sub_tree in utils.split_branch(root_parent):
+    #     new_dict = {tree.root: sub_tree}
+    #     result.append(
+    #         Tree(
+    #             root=tree.root,
+    #             is_grown=True,
+    #             names=tree.names,
+    #             branches=new_dict
+    #         )
+    #     )
+    # return result
+    pass
