@@ -28,16 +28,25 @@ class TestTreeMethods(unittest.TestCase):
 
     def test_tree_width(self) -> None:
 
-        t_1 = string_to_tree('A; B')
-        self.assertEqual(1, t_1.width())
+        atom = string_to_tree('A; B')
+        self.assertEqual(1, atom.width())
 
         with patch('settings.__Settings.get_rule', return_value='add'):
-            t_2 = string_to_tree('A; B & C')
-            self.assertEqual(2, t_2.width())
+            two_parent = string_to_tree('A; B & C')
+            self.assertEqual(2, two_parent.width())
+
+            two_then_one = string_to_tree('A v B; ~ C')
+            self.assertEqual(2, two_then_one.width())
+
+            two_then_two = string_to_tree('A v B; C & D')
+            self.assertEqual(4, two_then_two.width())
+
+            two_then_left_is_two = string_to_tree('A v (B v C); ')
+            self.assertEqual(3, two_then_left_is_two.width())
 
         with patch('settings.__Settings.get_rule', return_value='mul'):
-            t_1_ = string_to_tree('A & B; C')
-            self.assertEqual(1, t_1_.width())
+            one_parent = string_to_tree('A & B; C')
+            self.assertEqual(1, one_parent.width())
 
 
 class TestTreeSplitting(unittest.TestCase):

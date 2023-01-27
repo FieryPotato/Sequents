@@ -108,26 +108,23 @@ class Tree:
 
     def width(self) -> int:
         """
-        Return the number of leaves (axioms) in self if there aren't 
-        any list branches (i.e. non-invertible rules) in it. Returns 0 
-        if any value in any branch is a list.
+        Returns the number of atoms this tree contains.
         """
         if not self.is_grown:
             self.grow()
         if self.root.is_atomic:
             return 1
-        width = len(next(iter(self.branches)))
-        for branch in self.branches:
-            for parent in branch:
-                width += max(parent.width() - 1)
-        return width
+
+        return max(sum(parent.width() for parent in branch) for branch in self.branches)
 
     def sequents(self) -> Generator[Sequent, None, None]:
         """ Yields from sequents in self. """
-        # if not self.is_grown:
-        #     raise RuntimeError('Trees must be grown to inspect their sequents.')
-        # yield from utils.nodes_in_dict(self.branches)
-        ...
+        if not self.is_grown:
+            self.grow()
+        if self.root.is_atomic:
+            yield self.root
+        else:
+            yield from (parent.sequents() for branch in self.branches for parent in branch)
 
     def grow(self):
         """
@@ -169,18 +166,4 @@ def split_tree(tree) -> list[Tree]:
     follow one of the possibilities in the list from
     sequent.possible_mix_parents.
     """
-    # if (root_parent := tree.branches[tree.root]) is None:
-    #     return [tree]
-    # result = []
-    # for sub_tree in utils.split_branch(root_parent):
-    #     new_dict = {tree.root: sub_tree}
-    #     result.append(
-    #         Tree(
-    #             root=tree.root,
-    #             is_grown=True,
-    #             names=tree.names,
-    #             branches=new_dict
-    #         )
-    #     )
-    # return result
     pass
