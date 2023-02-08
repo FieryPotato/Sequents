@@ -3,172 +3,153 @@ import unittest
 from unittest.mock import patch
 
 import convert
-from convert import dict_to_tree, string_to_tree, \
-    string_to_sequent, sequent_to_tree
-from proposition import Atom, Conjunction, Negation, Disjunction, Conditional
-from sequent import Sequent
-from tree import Tree, split_tree
+from tree import Tree
 
 
 class TestTreeMethods(unittest.TestCase):
 
     def test_tree_height(self) -> None:
-        self.assertEqual(1, string_to_tree('A; B').height())
-        self.assertEqual(2, string_to_tree('A & B; C').height())
-        self.assertEqual(2, string_to_tree('A; B & C').height())
-        self.assertEqual(3, string_to_tree('A & B; C & D').height())
-        self.assertEqual(3, string_to_tree('A & B; C v D').height())
-        self.assertEqual(3, string_to_tree('A v B; C & D').height())
-        self.assertEqual(3, string_to_tree('A; (A & B) & (C & D)').height())
-        self.assertEqual(4, string_to_tree('(A & B) & (C & D); A').height())
-        self.assertEqual(3, string_to_tree('(A v B) v (C v D); A').height())
-        self.assertEqual(4, string_to_tree('A; (A v B) v (C v D)').height())
-        self.assertEqual(3, string_to_tree('(A -> B) -> (C -> D); A').height())
-        self.assertEqual(4, string_to_tree('A; (A -> B) -> (C -> D)').height())
+        self.assertEqual(1, convert.string_to_tree('A; B').height())
+        self.assertEqual(2, convert.string_to_tree('A & B; C').height())
+        self.assertEqual(2, convert.string_to_tree('A; B & C').height())
+        self.assertEqual(3, convert.string_to_tree('A & B; C & D').height())
+        self.assertEqual(3, convert.string_to_tree('A & B; C v D').height())
+        self.assertEqual(3, convert.string_to_tree('A v B; C & D').height())
+        self.assertEqual(3, convert.string_to_tree('A; (A & B) & (C & D)').height())
+        self.assertEqual(4, convert.string_to_tree('(A & B) & (C & D); A').height())
+        self.assertEqual(3, convert.string_to_tree('(A v B) v (C v D); A').height())
+        self.assertEqual(4, convert.string_to_tree('A; (A v B) v (C v D)').height())
+        self.assertEqual(3, convert.string_to_tree('(A -> B) -> (C -> D); A').height())
+        self.assertEqual(4, convert.string_to_tree('A; (A -> B) -> (C -> D)').height())
 
     def test_tree_width(self) -> None:
 
-        atom = string_to_tree('A; B')
+        atom = convert.string_to_tree('A; B')
         self.assertEqual(1, atom.width())
 
         with patch('settings.__Settings.get_rule', return_value='add'):
-            two_parent = string_to_tree('A; B & C')
+            two_parent = convert.string_to_tree('A; B & C')
             self.assertEqual(2, two_parent.width())
 
-            two_then_one = string_to_tree('A v B; ~ C')
+            two_then_one = convert.string_to_tree('A v B; ~ C')
             self.assertEqual(2, two_then_one.width())
 
-            two_then_two = string_to_tree('A v B; C & D')
+            two_then_two = convert.string_to_tree('A v B; C & D')
             self.assertEqual(4, two_then_two.width())
 
-            two_then_left_is_two = string_to_tree('A v (B v C); ')
+            two_then_left_is_two = convert.string_to_tree('A v (B v C); ')
             self.assertEqual(3, two_then_left_is_two.width())
 
+            one_then_two = convert.string_to_tree('A & B; C & D')
+            self.assertEqual(2, one_then_two.width())
+
         with patch('settings.__Settings.get_rule', return_value='mul'):
-            one_parent = string_to_tree('A & B; C')
+            one_parent = convert.string_to_tree('A & B; C')
             self.assertEqual(1, one_parent.width())
 
 
 class TestTreeSplitting(unittest.TestCase):
-    def test_complexity_0_tree(self) -> None:
-        t = string_to_tree('A; A')
-        self.assertEqual([t], split_tree(t))
+    def test_atomic_tree_is_no_op(self) -> None:
+        atom = convert.string_to_tree('A; B')
+        result = atom.split()
 
-    def test_c1_1pi(self) -> None:
-        s = string_to_sequent('A & B; A, B')
-        expected = [dict_to_tree({
-            s: {string_to_sequent('A, B; A, B'): None}
-        })]
-        with patch('rules.get_rule_setting', return_value='mul'):
-            tree = sequent_to_tree(s)
-            actual = split_tree(tree)
-            self.assertEqual(expected, actual)
+        self.assertEqual(1, len(result))
+        self.assertIsInstance(result, list)
+        self.assertIsInstance(result[0], Tree)
 
-    def test_c1_2pi(self) -> None:
-        s = string_to_sequent('A, B; A & B')
-        expected = [dict_to_tree({
-            s: {string_to_sequent('A, B; A'): None,
-                string_to_sequent('A, B; B'): None
-                }
-        })]
-        with patch('rules.get_rule_setting', return_value='add'):
-            t = sequent_to_tree(s)
-            actual = split_tree(t)
-            self.assertEqual(expected, actual)
+    def test_invertible_one_parent_is_no_op(self) -> None:
+        invertible = convert.string_to_tree('~ A; B')
+        result = invertible.split()
 
-    def test_c1_1pni(self) -> None:
-        e_branch_a = {
-            Sequent((Conjunction(Atom('A'), Atom('B')),), (Atom('A'), Atom('B'))):
-                {Sequent((Atom('A'),), (Atom('A'), Atom('B'))): None}
-        }
-        e_branch_b = {
-            Sequent((Conjunction(Atom('A'), Atom('B')),), (Atom('A'), Atom('B'))):
-                {Sequent((Atom('B'),), (Atom('A'), Atom('B'))): None}
-        }
-        with patch('rules.get_rule_setting', return_value='add'):
-            tree = string_to_tree('A & B; A, B')
-            expected = [e_branch_a, e_branch_b]
-            split = split_tree(tree)
-            actual = [t.branches for t in split]
-            self.assertEqual(expected, actual)
+        self.assertEqual(1, len(result))
+        self.assertIsInstance(result, list)
+        self.assertIsInstance(result[0], Tree)
 
-    def test_c1_2pni(self) -> None:
-        root = string_to_sequent('A, B; C & D')
-        a = {
-            root: {
-                string_to_sequent('A, B; C'): None,
-                string_to_sequent('; D'): None
-            }
-        }
-        b = {
-            root: {
-                string_to_sequent('A; C'): None,
-                string_to_sequent('B; D'): None
-            }
-        }
-        c = {
-            root: {
-                string_to_sequent('B; C'): None,
-                string_to_sequent('A; D'): None
-            }
-        }
-        d = {
-            root: {
-                string_to_sequent('; C'): None,
-                string_to_sequent('A, B; D'): None
-            }
-        }
-        expected = [a, b, c, d]
-        with patch('rules.get_rule_setting', return_value='mul'):
-            tree = sequent_to_tree(root)
-            split = split_tree(tree)
-            actual = [t.branches for t in split]
-            self.assertEqual(expected, actual)
+        expected_parent = convert.string_to_sequent('; B, A')
+        actual_parent = result[0].branches[0][0]
+        self.assertEqual(expected_parent, actual_parent.root)
 
-    def test_1pni_then_2pi_split(self) -> None:
-        string = 'A & C, A -> B; B'
-        root = convert.string_to_sequent(string)
-        a = {
-            root: {
-                convert.string_to_sequent('A, A -> B; B'): {
-                    convert.string_to_sequent('A, A; A'): None,
-                    convert.string_to_sequent('A, B; B'): None
-                }
-            }
-        }
-        b = {
-            root: {
-                convert.string_to_sequent('C, A -> B; B'): {
-                    convert.string_to_sequent('C, A; A'): None,
-                    convert.string_to_sequent('C, B; B'): None
-                }
-            }
+    def test_invertible_two_parent_is_no_op(self) -> None:
+        with patch('settings.__Settings.get_rule', return_value='add'):
+            invertible = convert.string_to_tree('A v B; C')
+        result = invertible.split()
 
-        }
-        expected = [a, b]
-        with patch('rules.get_rule_setting', return_value='add'):
-            tree = convert.sequent_to_tree(root)
-            split = split_tree(tree)
-            actual = [t.branches for t in split]
-            self.assertEqual(expected, actual)
+        self.assertEqual(1, len(result))
+        self.assertIsInstance(result, list)
+        self.assertIsInstance(result[0], Tree)
 
-    def test_quantified_split(self) -> None:
-        string = 'Human<socrates>, forallx (Human<x> -> Mortal<x>); Mortal<socrates>'
-        root = string_to_sequent(string)
-        tree = string_to_tree(string)
-        split = split_tree(tree)
-        actual = [t.branches for t in split]
-        a = {
-            root: {
-                string_to_sequent('Human<socrates>, Human<socrates> -> Mortal<socrates>; Mortal<socrates>'): {
-                    string_to_sequent('Human<socrates>; Mortal<socrates>, Human<socrates>'): None,
-                    string_to_sequent('Human<socrates>, Mortal<socrates>; Human<socrates>'): None
-                }
-            }
+        left_parent = convert.string_to_sequent('A; C')
+        actual_left = result[0].branches[0][0]
+        self.assertEqual(left_parent, actual_left.root)
 
-        }
-        expected = [a]
-        self.assertEqual(expected, actual)
+        right_parent = convert.string_to_sequent('B; C')
+        actual_right = result[0].branches[0][1]
+        self.assertEqual(right_parent, actual_right.root)
+
+    def test_height_two_invertible_tree_split(self) -> None:
+        invertible = convert.string_to_tree('~ A; ~ B')
+        result = invertible.split()
+
+        self.assertEqual(1, len(result))
+        self.assertIsInstance(result, list)
+        self.assertIsInstance(result[0], Tree)
+
+        intermediate_parent = convert.string_to_sequent('; ~ B, A')
+        actual_intermediate = result[0].branches[0][0]
+        self.assertIsInstance(actual_intermediate, Tree)
+        self.assertEqual(intermediate_parent, actual_intermediate.root)
+        self.assertEqual(1, len(actual_intermediate.branches))
+
+        final_parent = convert.string_to_sequent('B; A')
+        actual_final = result[0].branches[0][0].branches[0][0]
+        self.assertIsInstance(actual_final, Tree)
+        self.assertEqual(final_parent, actual_final.root)
+        self.assertEqual(1, len(actual_final.branches))
+
+    # def test_non_invertible_one_parent(self) -> None:
+    #     tree = convert.string_to_tree(
+    #         'forallx (P<x>); ', names={'alice', 'bob'}
+    #     )
+    #     result = sorted(split_tree(tree))
+
+    #     self.assertEqual(2, len(result))
+    #     self.assertIsInstance(result, list)
+
+    #     parent_0 = convert.string_to_sequent('P<alice>; ')
+    #     self.assertIsInstance(result[0], Tree)
+    #     self.assertEqual(1, len(result[0].branches))
+    #     self.assertEqual(result[0].branches[0].root, parent_0)
+
+    #     parent_1 = convert.string_to_sequent('P<bob>; ')
+    #     self.assertIsInstance(result[1], Tree)
+    #     self.assertEqual(1, len(result[1].branches))
+    #     self.assertEqual(result[1].branches[0].root, parent_1)
+
+    # def test_non_invertible_then_invertible(self) -> None:
+    #     tree = convert.string_to_tree('A & B; A & B')
+    #     result = split_tree(tree)
+
+    #     self.assertEqual(2, len(result))
+
+
+    # def test_non_invertible_then_non_invertible(self) -> None:
+    #     tree = convert.string_to_tree('A & B; C v D')
+
+    #     with patch('settings.__Settings.get_rule', return_value='add'):
+    #         tree.grow()
+
+    #     result = split_tree(tree)
+
+    #     self.assertEqual(4, len(result))
+
+    #     ACD_parent = convert.string_to_sequent('A; C v D')
+    #     AC_parent = convert.string_to_sequent('A; C')
+    #     AD_parent = convert.string_to_sequent('A; D')
+
+    #     BCD_parent = convert.string_to_sequent('B; C v D')
+    #     BC_parent = convert.string_to_sequent('B; C')
+    #     BD_parent = convert.string_to_sequent('B; D')
+
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 import unittest
 
 import convert
+from tree import Tree, Branch
 
 from utils import deparenthesize, find_connective
 from proposition import Atom, Conditional, Conjunction, \
@@ -35,7 +36,6 @@ class TestConvertProposition(unittest.TestCase):
     comp_neg = Negation(negation)
     comp_uni = Universal('y', Universal('x', quan_atom_xy))
     comp_exi = Existential('y', Existential('x', quan_atom_xy))
-    
 
     def __complex(self, connective: str) -> str:
         """

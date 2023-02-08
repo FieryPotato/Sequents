@@ -32,7 +32,7 @@ import rules
 from sequent import Sequent
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, order=True)
 class Branch:
     """
     A fancy tuple, whose goal is to make reasoning about the
@@ -60,6 +60,9 @@ class Branch:
             added = other
         return Branch(self.leaves + added)
 
+    def __radd__(self, other) -> Self:
+        return self + other
+
     def __getitem__(self, item):
         return self.leaves[item]
 
@@ -77,7 +80,7 @@ class Tree:
     branches: tuple[Branch | None, ...] = ()
 
     def __post_init__(self) -> None:
-        self.names.update({name for name in self.root.names})
+        self.names.update(self.root.names)
 
     @property
     def is_grown(self) -> bool:
@@ -143,27 +146,69 @@ class Tree:
         rule = rules.get_rule(self.root, names=self.names)
         self.branches = apply_decomposition(rule)
 
+    def split(self) -> list[Self]:
+        if not self.is_grown:
+            self.grow()
+
+        # Atomic trees have no parents and therefore cannot be split.
+        if self.root.is_atomic:
+            return [self]
+
+        result = []
+        branch: Branch
+        for branch in self.branches:
+            parent_results = []
+            parent: Tree
+            for i, parent in enumerate(branch):
+                if (i + 1) > len(parent_results):
+                    parent_results.append([])
+                split_parent: list[Tree] = parent.split()
+                parent_results[i].extend(split_parent)
+
+            parent_result_length = len(parent_results[0])
+            parent_groups = []
+            if len(parent_results) == 2:
+                for i in range(parent_result_length):
+                    parent_groups.append(
+                        (parent_results[0][i], parent_results[1][i])
+                    )
+            elif len(parent_results) == 1:
+                for i in range(parent_result_length):
+                    parent_groups.append(
+                        (parent_results[0][i],)
+                    )
+
+            for group in parent_groups:
+                new_tree = Tree(
+                    root=self.root,
+                    names=self.names,
+                    branches=(Branch(group),)
+                )
+                result.append(new_tree)
+
+        return result
+
 
 def apply_decomposition(rule: rules.Rule) -> tuple[Branch]:
-    result_sequents: rules.decomp_result = rule.apply()
-    results: tuple = ()
-    for result in result_sequents:
-        branch = Branch()
-        for sequent in result:
-            sub_tree = Tree(sequent)
-            sub_tree.grow()
-            branch += (sub_tree,)
-        results += (branch,)
-    return results
+    decomposition_result: rules.decomp_result = rule.apply()
+    return branches_from_decomp_result(decomposition_result)
 
 
-def split_tree(tree) -> list[Tree]:
-    """
-    Return a list of all possible full trees in tree, where a full tree
-    consists only of dict[Sequent, dict | None] pairs. All non-
-    invertible rules are split into separate trees, which are identical
-    to each other up to the rule application, after which they each
-    follow one of the possibilities in the list from
-    sequent.possible_mix_parents.
-    """
-    pass
+def branches_from_decomp_result(decomposition_result: rules.decomp_result) -> tuple[Branch]:
+    branches: tuple = ()
+    for decomposition in decomposition_result:
+        branches += (branch_from_decomp_result(decomposition),)
+    return branches
+
+
+def branch_from_decomp_result(decomposition: tuple[Sequent, ...]) -> Branch:
+    branch = Branch()
+    for sequent in decomposition:
+        branch += (sub_tree_from_sequent(sequent),)
+    return branch
+
+
+def sub_tree_from_sequent(sequent: Sequent) -> Tree:
+    sub_tree = Tree(sequent)
+    sub_tree.grow()
+    return sub_tree

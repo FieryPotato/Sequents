@@ -55,7 +55,7 @@ def sequent_to_tree(sequent: Sequent, names: set = None, grow: bool = True) -> T
     """
     if names is None:
         names = set()
-    tree = Tree(sequent, names=names)
+    tree = Tree(root=sequent, names=names)
     if grow:
         tree.grow()
     return tree
