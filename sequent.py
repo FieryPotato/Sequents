@@ -39,7 +39,7 @@ other data types into sequents, I'll add one there.
 __all__ = ['Sequent']
 
 import itertools
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Self, Iterable
 
 import utils
@@ -50,6 +50,7 @@ from proposition import Proposition
 class Sequent:
     ant: tuple[Proposition, ...] | Proposition | None
     con: tuple[Proposition, ...] | Proposition | None
+    _first_complex_prop: tuple[Proposition, str, int] = field(default=None, init=False)
 
     def __post_init__(self):
         # Ensure self.ant and self.con contain tuples of propositions
@@ -159,17 +160,28 @@ class Sequent:
             side_map = {'ant': 'L', 'con': 'R'}
             return side_map[side] + symbol
 
-    def first_complex_prop(self) -> \
-            tuple[Proposition, str, int] | None:
+    def first_complex_prop(self) -> tuple[Proposition, str, int] | None:
         """
         Return the leftmost complex proposition in the sequent, the
         side of the sequent it's on, and its index on that side. If
         self.is_atomic, return None.
         """
+        # Check that we haven't already checked this.
+        if self._first_complex_prop is not None:
+            return self._first_complex_prop
+
+        # All these returns are to get around the fact that we want to
+        # have a nested for loop (because we both iterate and return side)
         for side in ('ant', 'con'):
             for i, prop in enumerate(getattr(self, side)):
                 if prop.complexity >= 1:
-                    return prop, side, i
+                    self._first_complex_prop = prop, side, i
+                    return self._first_complex_prop
+
+        # Explicit `return None` if self.is_atomic.
+        # I would call self.is_atomic to check, but actually the implementation
+        # here just does the same steps so if it's not atomic we would end up doing
+        # a whole loop through each proposition in each side twice.
         return None
 
     def possible_mix_parents(self) -> list[tuple[Self, Self]]:
