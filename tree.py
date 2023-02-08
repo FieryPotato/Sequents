@@ -70,22 +70,6 @@ class Branch:
         return len(self.leaves)
 
 
-def _organize_split_parents(split_parents):
-    parent_result_length = len(split_parents[0])
-    parent_groups = []
-    if len(split_parents) == 2:
-        for i in range(parent_result_length):
-            parent_groups.append(
-                (split_parents[0][i], split_parents[1][i])
-            )
-    elif len(split_parents) == 1:
-        for i in range(parent_result_length):
-            parent_groups.append(
-                (split_parents[0][i],)
-            )
-    return parent_groups
-
-
 @dataclass(slots=True, order=True)
 class Tree:
     """
@@ -172,29 +156,19 @@ class Tree:
 
         result = []
         for branch in self.branches:
-            split_parents = self._split_branch_parents(branch)
-
-            for group in split_parents:
-                new_tree = Tree(
-                    root=self.root,
-                    names=self.names,
-                    branches=(Branch(group),)
-                )
-                result.append(new_tree)
-
+            split_parents: list[tuple[Tree]] = _split_branch_parents(branch)
+            result.extend(self._new_trees_from_split_parents(split_parents))
         return result
 
-    def _split_branch_parents(self, branch) -> list[tuple[Self]]:
-        root_first_complex_proposition = self.root.first_complex_prop()
-        proposition = root_first_complex_proposition[0]
-        arity = proposition.arity
-
-        split_parents = [[] for _ in range(arity)]
-        for i, parent in enumerate(branch):
-            split_parent: list[Tree] = parent.split()
-            split_parents[i].extend(split_parent)
-
-        return _organize_split_parents(split_parents)
+    def _new_trees_from_split_parents(self, split_parents) -> list[Self]:
+        return [
+            Tree(
+                root=self.root,
+                names=self.names,
+                branches=(Branch(group),)
+            )
+            for group in split_parents
+        ]
 
 
 def apply_decomposition(rule: rules.Rule) -> tuple[Branch]:
@@ -216,7 +190,20 @@ def branch_from_decomp_result(decomposition: tuple[Sequent, ...]) -> Branch:
     return branch
 
 
+def _organize_split_parents(split_parents: list[list[Tree]]) -> list[tuple[Tree]]:
+    parent_result_length = len(split_parents[0])
+    return [
+        tuple(split_parent[i] for split_parent in split_parents)
+        for i in range(parent_result_length)
+    ]
+
+
 def sub_tree_from_sequent(sequent: Sequent) -> Tree:
     sub_tree = Tree(sequent)
     sub_tree.grow()
     return sub_tree
+
+
+def _split_branch_parents(branch) -> list[tuple[Self]]:
+    split_parents = [parent.split() for parent in branch]
+    return _organize_split_parents(split_parents)
