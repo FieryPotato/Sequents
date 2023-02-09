@@ -76,11 +76,14 @@ class Tree:
     Class representing proof-trees with a Sequent object as the root.
     """
     root: Sequent
+    grow_flag: bool = field(default=False, repr=False)
     names: set[str] = field(default_factory=set)
     branches: tuple[Branch | None, ...] = ()
 
     def __post_init__(self) -> None:
         self.names.update(self.root.names)
+        if self.grow_flag:
+            self.grow()
 
     @property
     def is_grown(self) -> bool:
@@ -144,7 +147,7 @@ class Tree:
             return
 
         rule = rules.get_rule(self.root, names=self.names)
-        self.branches = apply_decomposition(rule)
+        self.branches = _apply_decomposition(rule)
 
     def split(self) -> list[Self]:
         if not self.is_grown:
@@ -157,36 +160,36 @@ class Tree:
         result = []
         for branch in self.branches:
             split_parents: list[tuple[Tree]] = _split_branch_parents(branch)
-            result.extend(self._new_trees_from_split_parents(split_parents))
+            for tree in self._new_trees_from_split_parents(split_parents):
+                result.append(tree)
         return result
 
-    def _new_trees_from_split_parents(self, split_parents) -> list[Self]:
-        return [
-            Tree(
+    def _new_trees_from_split_parents(self, split_parents) -> Generator[Self, None, None]:
+        for group in split_parents:
+            yield Tree(
                 root=self.root,
                 names=self.names,
                 branches=(Branch(group),)
             )
-            for group in split_parents
-        ]
 
 
-def apply_decomposition(rule: rules.Rule) -> tuple[Branch]:
+
+def _apply_decomposition(rule: rules.Rule) -> tuple[Branch]:
     decomposition_result: rules.decomp_result = rule.apply()
-    return branches_from_decomp_result(decomposition_result)
+    return _branches_from_decomp_result(decomposition_result)
 
 
-def branches_from_decomp_result(decomposition_result: rules.decomp_result) -> tuple[Branch]:
+def _branches_from_decomp_result(decomposition_result: rules.decomp_result) -> tuple[Branch]:
     branches: tuple = ()
     for decomposition in decomposition_result:
-        branches += (branch_from_decomp_result(decomposition),)
+        branches += (_branch_from_decomp_result(decomposition),)
     return branches
 
 
-def branch_from_decomp_result(decomposition: tuple[Sequent, ...]) -> Branch:
+def _branch_from_decomp_result(decomposition: tuple[Sequent, ...]) -> Branch:
     branch = Branch()
     for sequent in decomposition:
-        branch += (sub_tree_from_sequent(sequent),)
+        branch += (Tree(sequent,),)
     return branch
 
 
@@ -196,12 +199,6 @@ def _organize_split_parents(split_parents: list[list[Tree]]) -> list[tuple[Tree]
         tuple(split_parent[i] for split_parent in split_parents)
         for i in range(parent_result_length)
     ]
-
-
-def sub_tree_from_sequent(sequent: Sequent) -> Tree:
-    sub_tree = Tree(sequent)
-    sub_tree.grow()
-    return sub_tree
 
 
 def _split_branch_parents(branch) -> list[tuple[Self]]:
