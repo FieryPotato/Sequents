@@ -173,7 +173,6 @@ class Tree:
             )
 
 
-
 def _apply_decomposition(rule: rules.Rule) -> tuple[Branch]:
     decomposition_result: rules.decomp_result = rule.apply()
     return _branches_from_decomp_result(decomposition_result)

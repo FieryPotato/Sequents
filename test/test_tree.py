@@ -72,7 +72,7 @@ class TestTreeSplitting(unittest.TestCase):
     def test_invertible_two_parent_is_no_op(self) -> None:
         with patch('settings.__Settings.get_rule', return_value='add'):
             invertible = convert.string_to_tree('A v B; C')
-        result = invertible.split()
+            result = invertible.split()
 
         self.assertEqual(1, len(result))
         self.assertIsInstance(result, list)
@@ -109,8 +109,7 @@ class TestTreeSplitting(unittest.TestCase):
     def test_height_two_two_parent_invertible_split(self) -> None:
         with patch('settings.__Settings.get_rule', return_value='add'):
             invertible = convert.string_to_tree('A v B; C & D')
-
-        result = invertible.split()
+            result = invertible.split()
 
         self.assertEqual(1, len(result))
         self.assertIsInstance(result, list)
@@ -165,30 +164,46 @@ class TestTreeSplitting(unittest.TestCase):
         self.assertEqual(1, len(result[1].branches))
         self.assertEqual(result[1].branches[0][0].root, parent_1)
 
-    # def test_non_invertible_then_invertible(self) -> None:
-    #     tree = convert.string_to_tree('A & B; A & B')
-    #     result = split_tree(tree)
+    def test_non_invertible_then_non_invertible_one_parent(self) -> None:
+        with patch('settings.__Settings.get_rule', return_value='add'):
+            tree = convert.string_to_tree('A & B; C v D')
+            result = tree.split()
 
-    #     self.assertEqual(2, len(result))
+        self.assertEqual(4, len(result))
 
+        expected_acd = convert.string_to_sequent('A; C v D')
+        actual_acd = result[0].branches[0][0]
+        self.assertIsInstance(actual_acd, Tree)
+        self.assertEqual(expected_acd, actual_acd.root)
+        expected_acd_ac = convert.string_to_sequent('A; C')
+        actual_acd_ac = result[0].branches[0][0].branches[0][0]
+        self.assertIsInstance(actual_acd_ac, Tree)
+        self.assertEqual(expected_acd_ac, actual_acd_ac.root)
 
-    # def test_non_invertible_then_non_invertible(self) -> None:
-    #     tree = convert.string_to_tree('A & B; C v D')
+        actual_acd_ = result[1].branches[0][0]
+        self.assertIsInstance(actual_acd_, Tree)
+        self.assertEqual(expected_acd, actual_acd_.root)
+        expected_acd_ad = convert.string_to_sequent('A; D')
+        actual_acd_ad = result[1].branches[0][0].branches[0][0]
+        self.assertIsInstance(actual_acd_ad, Tree)
+        self.assertEqual(expected_acd_ad, actual_acd_ad.root)
 
-    #     with patch('settings.__Settings.get_rule', return_value='add'):
-    #         tree.grow()
+        expected_bcd = convert.string_to_sequent('B; C v D')
+        actual_bcd = result[2].branches[0][0]
+        self.assertIsInstance(actual_bcd, Tree)
+        self.assertEqual(expected_bcd, actual_bcd.root)
+        expected_bcd_bc = convert.string_to_sequent('B; C')
+        actual_bcd_bc = result[2].branches[0][0].branches[0][0]
+        self.assertIsInstance(actual_bcd_bc, Tree)
+        self.assertEqual(expected_bcd_bc, actual_bcd_bc.root)
 
-    #     result = split_tree(tree)
-
-    #     self.assertEqual(4, len(result))
-
-    #     ACD_parent = convert.string_to_sequent('A; C v D')
-    #     AC_parent = convert.string_to_sequent('A; C')
-    #     AD_parent = convert.string_to_sequent('A; D')
-
-    #     BCD_parent = convert.string_to_sequent('B; C v D')
-    #     BC_parent = convert.string_to_sequent('B; C')
-    #     BD_parent = convert.string_to_sequent('B; D')
+        actual_bcd_ = result[3].branches[0][0]
+        self.assertIsInstance(actual_bcd_, Tree)
+        self.assertEqual(expected_bcd, actual_bcd_.root)
+        expected_bcd_bd = convert.string_to_sequent('B; D')
+        actual_bcd_bd = result[3].branches[0][0].branches[0][0]
+        self.assertIsInstance(actual_bcd_bd, Tree)
+        self.assertEqual(expected_bcd_bd, actual_bcd_bd.root)
 
 
 
