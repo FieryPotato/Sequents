@@ -25,6 +25,7 @@ Tree(root: str, is_grown: bool = False, names: list[str] = [])
 
 __all__ = ['Tree']
 
+import itertools
 from dataclasses import dataclass, field
 from typing import Generator, Self
 
@@ -192,14 +193,26 @@ def _branch_from_decomp_result(decomposition: tuple[Sequent, ...]) -> Branch:
     return branch
 
 
-def _organize_split_parents(split_parents: list[list[Tree]]) -> list[tuple[Tree]]:
-    parent_result_length = len(split_parents[0])
+def _split_branch_parents(branch: Branch) -> list[tuple[Tree] | tuple[Tree, Tree]]:
+    if len(branch) == 1:
+        return _split_one_parent_branch(branch)
+    elif len(branch) == 2:
+        return _split_two_parent_branch(branch)
+    else:
+        raise NotImplementedError('Branches with length > 2 are not currently supported.')
+
+
+def _split_one_parent_branch(branch: Branch) -> list[tuple[Tree]]:
+    return [(tree,) for tree in branch[0].split()]
+
+
+def _split_two_parent_branch(branch: Branch) -> list[tuple[Tree, Tree]]:
     return [
-        tuple(split_parent[i] for split_parent in split_parents)
-        for i in range(parent_result_length)
+        (left, right)
+        for left, right in itertools.product(
+            branch[0].split(),  # split left parent
+            branch[1].split()  # split right parent
+        )
     ]
 
 
-def _split_branch_parents(branch) -> list[tuple[Self]]:
-    split_parents = [parent.split() for parent in branch]
-    return _organize_split_parents(split_parents)

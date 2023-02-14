@@ -205,6 +205,65 @@ class TestTreeSplitting(unittest.TestCase):
         self.assertIsInstance(actual_bcd_bd, Tree)
         self.assertEqual(expected_bcd_bd, actual_bcd_bd.root)
 
+    def test_non_invertible_then_non_invertible_two_parent(self) -> None:
+        with patch('settings.__Settings.get_rule', return_value='mul'):
+            tree = convert.string_to_tree('A v B; C & D')
+            result = tree.split()
+
+        self.assertEqual(4, len(result))
+
+        _0_expected_l = convert.string_to_sequent('A; C & D')
+        _0_actual_l = result[0].branches[0][0]
+        self.assertEqual(_0_expected_l, _0_actual_l.root)
+        _0_expected_ll = convert.string_to_sequent('A; C')
+        _0_actual_ll = result[0].branches[0][0].branches[0][0]
+        self.assertEqual(_0_expected_ll, _0_actual_ll.root)
+        _0_expected_lr = convert.string_to_sequent('; D')
+        _0_actual_lr = result[0].branches[0][0].branches[0][1]
+        self.assertEqual(_0_expected_lr, _0_actual_lr.root)
+        _0_expected_r = convert.string_to_sequent('B; ')
+        _0_actual_r = result[0].branches[0][1]
+        self.assertEqual(_0_expected_r, _0_actual_r.root)
+
+        _1_expected_l = convert.string_to_sequent('A; C & D')
+        _1_actual_l = result[1].branches[0][0]
+        self.assertEqual(_1_expected_l, _1_actual_l.root)
+        _1_expected_ll = convert.string_to_sequent('; C')
+        _1_actual_ll = result[1].branches[0][0].branches[0][0]
+        self.assertEqual(_1_expected_ll, _1_actual_ll.root)
+        _1_expected_lr = convert.string_to_sequent('A; D')
+        _1_actual_lr = result[1].branches[0][0].branches[0][1]
+        self.assertEqual(_1_expected_lr, _1_actual_lr.root)
+        _1_expected_r = convert.string_to_sequent('B; ')
+        _1_actual_r = result[1].branches[0][1]
+        self.assertEqual(_1_expected_r, _1_actual_r.root)
+
+        _2_expected_l = convert.string_to_sequent('A; ')
+        _2_actual_l = result[2].branches[0][0]
+        self.assertEqual(_2_expected_l, _2_actual_l.root)
+        _2_expected_r = convert.string_to_sequent('B; C & D')
+        _2_actual_r = result[2].branches[0][1]
+        self.assertEqual(_2_expected_r, _2_actual_r.root)
+        _2_expected_rl = convert.string_to_sequent('B; C')
+        _2_actual_rl = result[2].branches[0][1].branches[0][0]
+        self.assertEqual(_2_expected_rl, _2_actual_rl.root)
+        _2_expected_rr = convert.string_to_sequent('; D')
+        _2_actual_rr = result[2].branches[0][1].branches[0][1]
+        self.assertEqual(_2_expected_rr, _2_actual_rr.root)
+
+        _3_expected_l = convert.string_to_sequent('A; ')
+        _3_actual_l = result[3].branches[0][0]
+        self.assertEqual(_3_expected_l, _3_actual_l.root)
+        _3_expected_r = convert.string_to_sequent('B; C & D')
+        _3_actual_r = result[3].branches[0][1]
+        self.assertEqual(_3_expected_r, _3_actual_r.root)
+        _3_expected_rl = convert.string_to_sequent('; C')
+        _3_actual_rl = result[3].branches[0][1].branches[0][0]
+        self.assertEqual(_3_expected_rl, _3_actual_rl.root)
+        _3_expected_rr = convert.string_to_sequent('B; D')
+        _3_actual_rr = result[3].branches[0][1].branches[0][1]
+        self.assertEqual(_3_expected_rr, _3_actual_rr.root)
+
 
 
 if __name__ == '__main__':
