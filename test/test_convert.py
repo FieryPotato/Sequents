@@ -3,7 +3,7 @@ import unittest
 import convert
 from tree import Tree, Branch
 
-from utils import deparenthesize, find_connective
+from convert import find_connective, deparenthesize
 from proposition import Atom, Conditional, Conjunction, \
     Disjunction, Negation, Universal, Existential
 from sequent import Sequent

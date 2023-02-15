@@ -1,19 +1,9 @@
 import itertools
 import re
 
-from typing import Protocol, Any, Generator
+from typing import Any, Generator
 
-from utils import count_dict_branches
-
-
-class Tree(Protocol):
-    branches: dict
-
-    def height(self) -> int:
-        ...
-
-    def width(self) -> int:
-        ...
+from tree import Tree, Branch
 
 
 ARRAY_VALS = {

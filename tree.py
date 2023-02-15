@@ -77,13 +77,13 @@ class Tree:
     Class representing proof-trees with a Sequent object as the root.
     """
     root: Sequent
-    grow_flag: bool = field(default=False, repr=False)
+    grow_on_creation: bool = field(default=False, repr=False)
     names: set[str] = field(default_factory=set)
     branches: tuple[Branch | None, ...] = ()
 
     def __post_init__(self) -> None:
         self.names.update(self.root.names)
-        if self.grow_flag:
+        if self.grow_on_creation:
             self.grow()
 
     @property

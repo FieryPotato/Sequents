@@ -5,7 +5,6 @@ from pathlib import Path
 import convert
 
 from HTML.document import Builder
-from tree import split_tree
 
 
 class TestBuilderMethods(unittest.TestCase):
@@ -148,7 +147,7 @@ class TestCreate(unittest.TestCase):
     def test_create_trees_with_names(self) -> None:
         tree = convert.string_to_tree('forallx (human<x> -> mortal<x>), human<Socrates>; mortal<Socrates>')
         document = Builder()
-        document.build(split_tree(tree))
+        document.build(tree.split())
         document.save(self.outfile)
 
         with open(self.outfile, 'r') as f:

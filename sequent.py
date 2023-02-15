@@ -40,9 +40,8 @@ __all__ = ['Sequent']
 
 import itertools
 from dataclasses import dataclass, field
-from typing import Self, Iterable
+from typing import Self, Iterable, Generator
 
-import utils
 from proposition import Proposition
 
 
@@ -190,8 +189,8 @@ class Sequent:
         from an application of mix or another non-invertible rule.
         """
         combinations = itertools.product(
-            utils.binary_combinations(self.ant),
-            utils.binary_combinations(self.con)
+            binary_combinations(self.ant),
+            binary_combinations(self.con)
         )
         return [
             (
@@ -200,3 +199,16 @@ class Sequent:
             )
             for antecedents, consequents in combinations
         ]
+
+
+def binary_combinations(data: tuple) -> Generator[tuple[tuple, tuple], None, None]:
+    """
+    Yields all possible ways to split input data into two groups.
+    """
+    # Represent which parent had the proposition by allocating True
+    # to one and false to the other (in all combinations).
+    combinations = itertools.product([True, False], repeat=len(data))
+    for combination in combinations:
+        x = [data[i] for i, v in enumerate(combination) if v]
+        y = [data[i] for i, v in enumerate(combination) if not v]
+        yield tuple(x), tuple(y)
