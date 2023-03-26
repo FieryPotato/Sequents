@@ -14,9 +14,10 @@ The Sequents API is vastly improved from the MaterialInference one,
 with main classes and functions easily accessible via sane import paths
 from the Sequents package. 
 
-As of this writing (2022-09-13) the program applies invertible rules by
-default to sequents in the input file and saves them as byte strings. 
-These can be loaded back up using pickle as follows.
+As of this writing (2022-12-05) the program applies invertible rules by
+default to sequents in the input file and saves them as byte strings,
+as a json dictionary, or as an HTML document. These can be loaded back 
+up using pickle as follows.
 ```
 >>> import pickle
 >>> path = 'path\to\bytes\file'
@@ -27,8 +28,6 @@ The pickle package allows for a more streamlined way to share these objects
 between people, uses, and projects, as it allows users to move objects 
 directly without the need to translate them to json first, although the 
 relevant packages still need to be imported.
-
-Saving to and loading from json is also supported. 
 
 First-order propositions are now supported. When loading a text file, names
 discovered in the sequents and used by the prover. Loading a .json file 
@@ -62,6 +61,12 @@ To save the output as a .json file, use the --json option as below:
 $ python3 Sequents solve --json (infile) [outfile]
 ```
 
+To save the output as an .html file (viewable in a web browser, but 
+not later loadable), use the --html option as below:
+```
+$ python3 Sequents solve --html (infile) [outfile]
+```
+
 When loading from a .txt file, the prover expects sequents as a pair
 of comma-separated lists of proposions, separated from each other
 by a semicolon.
@@ -86,14 +91,14 @@ the import of classes using a commonsense syntax.
 >>> from Sequents.sequent import Sequent
 ...
 ```
-See the documentation in each package for more detailed information.
+See the docstring in each file for more detailed information.
 
 Note that the convert module is much better suited to the creation of
-sequent and proposition objects if you're starting with strings, as it
-takes all the pain out of creating more and more deeply nested objects
-and the mess of open and closing parentheses you need to write (not to
-mention the commas to force tuples for single-proposition antecedents 
-and consequents).
+sequent and proposition objects than direct creation if you're starting
+with strings, as it takes all the pain out of creating more and more 
+deeply nested objects and the mess of open and closing parentheses you 
+need to write (not to mention the commas to force tuples for single-
+proposition antecedents and consequents).
 
 For example:
 ```
