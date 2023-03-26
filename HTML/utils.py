@@ -3,8 +3,7 @@ import re
 
 from typing import Any, Generator
 
-from tree import Tree, Branch
-
+from tree import Tree
 
 ARRAY_VALS = {
     str: '',
@@ -12,7 +11,6 @@ ARRAY_VALS = {
     int: 0,
     'css': '.'
 }
-
 
 CSS_KEY_MAP = {
     ' ': '_',
@@ -24,24 +22,23 @@ CSS_KEY_MAP = {
     ';': '6'
 }
 
-
 ENTITY_MAP = {
     r';': 'semicolon',
     r'\s&\s': 'ampersand',
     r'&': '&and;',
     r'\sand\s': ' &and; ',
     r'-\>': '&rarr;',
-    r'\<': ' &lt; ',
-    r'\>': ' &gt; ',
+    r'\<': '&lt;',
+    r'\>': '&gt;',
     r'\simplies\s': ' &rarr; ',
     r'v': '&or;',
     r'\sor\s': ' &or; ',
     r'~\s': '&not; ',
     r'not\s': '&not; ',
-    r'∀': '&forall;',
     r'forall': '&forall;',
-    r'∃': '&exists;',
     r'exists': '&exists;',
+    r'∀': '&forall;',
+    r'∃': '&exists;',
     'ampersand': '&and;',
     'semicolon': ' &vdash;',
 }
@@ -59,6 +56,7 @@ def get_array(tree: Tree, dtype=None) -> list[list[Any]]:
     is either a builtin type (str, None, or int) or 'css', which fills
     the cell with "'.'".
     """
+    # Root is 1, then each height is 2 cells tall (axioms count as one)
     rows = 1 + (2 * tree.height())
     columns = 2 * tree.width()
     val = ARRAY_VALS[dtype]
@@ -74,7 +72,7 @@ def gridify(tree: Tree) -> tuple[list, list]:
     """
     css: list[list[str]] = get_array(tree, dtype='css')
     objects: list[list[None]] = get_array(tree, dtype=None)
-    root, branches = next(iter(tree.branches.items()))
+    root, leaves = tree.root, tree.branches[0]
 
     css[1][-1] = 'ft'
     css[2][-1] = 'ft'
@@ -88,9 +86,9 @@ def gridify(tree: Tree) -> tuple[list, list]:
         objects[0][i] = root.long_string
         objects[1][i] = root.long_string
 
-    if branches is not None:
+    if leaves is not None:
         gridify_branch(
-            branches, css, objects, tag='f', x_start=0, x_end=len(css[0]), y=2
+            leaves, css, objects, tag='f', x_start=0, x_end=len(css[0]), y=2
         )
 
     # Because of our order of iteration in subroutines, css and
@@ -100,40 +98,52 @@ def gridify(tree: Tree) -> tuple[list, list]:
     return css, objects
 
 
-def gridify_branch(branch: dict, css: list, objects: list, tag: str = 'f',
-                   x_start=0, x_end=-1, y=2) -> tuple[list, list]:
-    """Returned tuple contains css and objects in that order."""
-    match len(branch.values()):
+def gridify_branch(leaves: tuple[Tree],
+                   css: list[list[str]],
+                   objects: list[list[Any]],
+                   tag: str = 'f',
+                   x_start=0,
+                   x_end=-1,
+                   y=2
+                   ) -> None:
+    """Mutates css and objects to fill them with the contents of the branch."""
+    match len(leaves):
         case 1:
             gridify_one_parent_branch(
-                branch, css, objects, tag, x_start, x_end, y
+                leaves, css, objects, tag, x_start, x_end, y
             )
         case 2:
             gridify_two_parent_branch(
-                branch, css, objects, tag, x_start, x_end, y
+                leaves, css, objects, tag, x_start, x_end, y
             )
         case _:
-            raise ValueError(f'Malformed branch: {branch}')
+            raise ValueError(f'Malformed branch: {leaves}')
 
 
-def gridify_two_parent_branch(branch, css, objects, tag, x_start, x_end, y):
+def gridify_two_parent_branch(leaves: tuple[Tree, Tree],
+                              css: list[list[str]],
+                              objects: list[list[Any]],
+                              tag: str,
+                              x_start: int,
+                              x_end: int,
+                              y: int) -> None:
     """
-    Returns css and objects (in that order) for two-parent branches
-    with the objects in branch added to each.
+    Mutates css and objects to fill them with a two-parent branch.
     """
     # The width of each parent tree, ordered left to right.
     parent_lengths = [
-        count_dict_branches(parent)    # Count only returns integers for
-        if parent is not None else 1   # non-None parents, so for None
-        for parent in branch.values()  # parents we substitute 1.
+        parent.width()
+        if parent is not None else 1
+        for parent in leaves
     ]
 
     # Prevent index errors trying to access the nth index of a length n list.
     grid_width = len(css[0])
     x_end = x_end if x_end != grid_width else grid_width - 1
 
-    for i, items in enumerate(branch.items()):
-        sequent, parents = items
+    for i, leaf in enumerate(leaves):
+        sequent = leaf.root
+        parents = leaf.branches[0]
         new_tag = f'{tag}l' if not i else f'{tag}r'
 
         # Left branches use x_start.
@@ -149,28 +159,32 @@ def gridify_two_parent_branch(branch, css, objects, tag, x_start, x_end, y):
 
         if parents is not None:
             gridify_branch(
-                branch=parents, css=css, objects=objects, tag=new_tag,
-                x_start=new_x_start, x_end=new_x_end, y=y+2
+                leaves=parents, css=css, objects=objects, tag=new_tag,
+                x_start=new_x_start, x_end=new_x_end, y=y + 2
             )
 
-    return css, objects
 
-
-def gridify_one_parent_branch(branch, css, objects, tag, x_start, x_end, y):
+def gridify_one_parent_branch(leaves,
+                              css,
+                              objects,
+                              tag,
+                              x_start,
+                              x_end,
+                              y):
     """
-    Returns css and objects (in that order) for one-parent branches
-    with the objects in branch added to each.
+    Mutates css and objects to add the contents of Branch
     """
-    sequent = next(iter(branch.keys()))
+    sequent = leaves[0].root
+    branch = leaves[0].branches[0]
     new_tag = tag + 'm'
     array_end = x_end if x_end != len(css[0]) else x_end - 1
 
     fill_grids(sequent, css, objects, new_tag, x_start, array_end, y)
 
-    if (parent := branch[sequent]) is not None:
+    if branch is not None:
         gridify_branch(
-            branch=parent, css=css, objects=objects, tag=new_tag,
-            x_start=x_start, x_end=x_end, y=y+2
+            leaves=branch, css=css, objects=objects, tag=new_tag,
+            x_start=x_start, x_end=x_end, y=y + 2
         )
 
 
@@ -186,7 +200,7 @@ def fill_grids(sequent, css, objects, tag, x_start, x_end, y):
         objects[y + 1][j] = sequent.long_string
     css[y + 1][x_end] = tag + 't'
     css[y + 2][x_end] = tag + 't'
-    
+
     rule = sequent.tag()
     objects[y + 1][x_end] = rule
     objects[y + 2][x_end] = rule
@@ -235,4 +249,3 @@ def unnest(iterable, iterable_type=str) -> Generator[str, None, None]:
             yield from unnest(sub_iterable)
     else:
         yield iterable
-

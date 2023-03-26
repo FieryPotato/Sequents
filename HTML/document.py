@@ -1,5 +1,3 @@
-from typing import Generator
-
 import dominate
 
 from dominate import tags
@@ -7,7 +5,6 @@ from dominate.tags import h3
 from dominate.util import raw
 
 from HTML import utils
-from tree import Tree
 
 
 class Builder:
@@ -74,7 +71,7 @@ class Builder:
             ._<root's long string> { grid-template-areas:\n
                 <lines from template_areas>\n
                 <...>\n
-                <last line>;\n
+                <last line>\n
             }\n
         Where angle brackets format like pseudo-code f-strings
         and escaped curly braces are literal.
@@ -85,7 +82,7 @@ class Builder:
             formatted_line = f'{" " * 8}"{bare_line}"\n'
             result.append(formatted_line)
         result[-1] = result[-1][:-1]
-        result[-1] += ';\n'
+        result[-1] += '\n'
         result.append(" " * 6 + '}\n')
         return [raw(line) for line in result]
 

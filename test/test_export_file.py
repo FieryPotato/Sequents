@@ -63,6 +63,7 @@ class TestExportBytes(unittest.TestCase):
 
         self.assertEqual(TREES, actual)
 
+
 if __name__ == '__main__':
     unittest.main()
 

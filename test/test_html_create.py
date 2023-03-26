@@ -26,7 +26,7 @@ class TestBuilderMethods(unittest.TestCase):
             '        "fl flt fr frt"\n',
             '        "fl . fr ft"\n',
             '        "f f f ft"\n',
-            '        "f f f .";\n',
+            '        "f f f ."\n',
             '      }\n'
         ]
 

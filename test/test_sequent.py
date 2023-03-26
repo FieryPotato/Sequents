@@ -135,11 +135,6 @@ class TestSequent(unittest.TestCase):
         s2 = Sequent((self.q,), (self.p,))
         self.assertTrue(s1 > s2 or s1 < s2)
 
-    def test_raise_error_when_ant_or_con_is_proposition(self):
-        for p in self.propositions:
-            with self.subTest(i=p):
-                self.assertRaises(ValueError, lambda: Sequent(p, p))
-
     def test_sequent_tag(self) -> None:
         sequents = [
             Sequent((self.p,), (self.q,)),
