@@ -9,16 +9,16 @@ __all__ = [
 
 from typing import Protocol, Type
 
-import utils
 
-from proposition import Atom, Negation, Universal, Existential, Conjunction, Disjunction, Conditional
+from proposition import Atom, Negation, Universal, Existential, Conjunction, Disjunction, Conditional, Proposition
 from sequent import Sequent
 from tree import Tree
-from utils import serialize
 
 
-class Proposition(Protocol):
-    ...
+NEST_MAP = {
+    '(': 1,
+    ')': -1
+}
 
 
 def string_to_proposition(string) -> Proposition:
@@ -29,8 +29,8 @@ def string_to_proposition(string) -> Proposition:
     Empty strings raise a value error. If a connective word or symbol
     cannot be matched, an atom with the full string is returned.
     """
-    string = utils.deparenthesize(string)
-    split_string: list[str] = utils.find_connective(string)
+    string = deparenthesize(string)
+    split_string: list[str] = find_connective(string)
 
     fac: Type[PropositionFactory]
     match split_string:
@@ -59,7 +59,7 @@ def sequent_to_tree(sequent: Sequent, names: set = None, grow: bool = True) -> T
     """
     if names is None:
         names = set()
-    tree = Tree(sequent, names=names)
+    tree = Tree(root=sequent, names=names)
     if grow:
         tree.grow()
     return tree
@@ -95,7 +95,7 @@ def tree_to_dict(tree) -> dict:
     """
     Create a dictionary from a tree.
     """
-    return serialize(tree.branches)
+    ...
 
 
 def string_to_sequent(string: str) -> Sequent:
@@ -213,3 +213,102 @@ class ConditionalFactory:
             string_to_proposition(ant),
             string_to_proposition(con)
         )
+
+
+def find_connective(string: str) -> list[str]:
+    """
+    Return a list of strings separating the main connective from
+    surrounding propositional material. Deparenthesizes sub-
+    propositions.
+
+    >>> find_connective('A & B')
+    ['A', '&', 'B']
+    >>> find_connective('(A -> B) v (B -> A)')
+    ['A -> B', 'v', 'B -> A']
+    >>> find_connective('not C')
+    ['not', 'C']
+    >>> find_connective('anything')
+    ['anything']
+    """
+    string = deparenthesize(string)
+    # Return early if the string is empty.
+    if not string:
+        return ['']
+
+    # connective keywords
+    negations = {'~', 'not'}
+    binaries = {'&', 'v', 'and', 'or', '->', 'implies'}
+    quantifiers = {'∃', '∀', 'exists', 'forall'}
+
+    word_list = string.split(' ')
+
+    # Check for negation as main connective.
+    if (connective := word_list[0]) in negations:
+        negatum = ' '.join(word_list[1:])
+        return [connective, deparenthesize(negatum)]
+
+    # Check for quantifiers as main connective.
+    # The first slice into word_list finds a word, the second, a letter
+    if (connective := word_list[0][:-1]) in quantifiers:
+        variable = word_list[0][-1]
+        prop = ' '.join(word_list[1:])
+        return [connective, variable, deparenthesize(prop)]
+
+    # Check for binary connectives as main connective.
+    nestedness = 0
+    for i, word in enumerate(word_list):
+
+        for char in word:
+            # Increase nestedness with each '('
+            # Decrease nestedness with each ')'
+            # No change for other characters.
+            nestedness += NEST_MAP[char] if char in NEST_MAP else 0
+
+        if (connective := word) in binaries and nestedness == 0:
+            left = deparenthesize(' '.join(word_list[:i]))
+            right = deparenthesize(' '.join(word_list[i + 1:]))
+            return [left, connective, right]
+
+    return [string]
+
+
+def deparenthesize(string: str) -> str:
+    """
+    Remove all linked outer parentheses from input string.
+
+    >>> deparenthesize('(one set)')
+    'one set'
+    >>> deparenthesize('((two sets))')
+    'two sets'
+    >>> deparenthesize('(nested (sets))')
+    'nested (sets)'
+    >>> deparenthesize('(unconnected) (sets)')
+    '(unconnected) (sets)'
+    """
+    # Return early if the string is empty.
+    if not string:
+        return ''
+
+    # While string is bookended by parentheses.
+    while string.startswith('(') and string.endswith(')'):
+
+        # Ensure outer parentheses are connected
+        nestedness = 0
+        for index, char in enumerate(string):
+
+            # Increase nestedness with each '('
+            # Decrease nestedness with each ')'
+            # No change otherwise.
+            nestedness += NEST_MAP[char] if char in NEST_MAP else 0
+
+            # If the first and last parentheses are not connected
+            # eg. (A v B) -> (C & D)
+            if nestedness <= 0 and ((index + 1) < len(string)):
+                return string
+
+        # If they are connected, remove them and check again.
+        string = string[1:-1]
+
+    return string
+
+

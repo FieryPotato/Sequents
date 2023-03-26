@@ -48,7 +48,12 @@ class __Settings(MutableMapping):
         self.save()
 
     def get_rule(self, connective: str, side: str) -> str:
-        """Returns rule type from config.json."""
+        """
+        Returns rule type from config.json ('add' or 'mul').
+        @param connective: the symbol of the desired connective ('&', 'v', etc.).
+        @param side: 'ant' or 'con'
+
+        """
         return self['connective_type'][connective][side]
 
     def set_rule(self, connective: str, side: str, value) -> None:

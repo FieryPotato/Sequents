@@ -39,39 +39,50 @@ other data types into sequents, I'll add one there.
 __all__ = ['Sequent']
 
 import itertools
-from dataclasses import dataclass
-from typing import Protocol, TypeVar# , Self
+from dataclasses import dataclass, field
+from typing import Self, Iterable, Generator
 
-import utils
-
-
-Self = TypeVar('Self')
+from proposition import Proposition
 
 
-class Proposition(Protocol):
-    complexity: int
-
-
-@dataclass(frozen=True, slots=True, order=True)
+@dataclass(slots=True, order=True)
 class Sequent:
-    ant: tuple
-    con: tuple
-    
+    ant: tuple[Proposition, ...] | Proposition | None
+    con: tuple[Proposition, ...] | Proposition | None
+    _first_complex_prop: tuple[Proposition, str, int] = field(default=None, init=False)
+
     def __post_init__(self):
-        for side in self:
-            if not isinstance(side, tuple):
-                # I'd like to be able to convert on the fly for people
-                # not using the convert module, but I can't make sequents
-                # frozen if I do.
-                raise ValueError(f'Sequent sides must be of type tuple, not {type(side)}.')
+        # Ensure self.ant and self.con contain tuples of propositions
+        for attr in 'ant', 'con':
+            if getattr(self, attr) is None:
+                setattr(self, attr, ())
+                continue
+            if not isinstance(getattr(self, attr), tuple):
+                # Create a list to avoid tuple() using the proposition's
+                # .__iter__() for tuple construction.
+                side = [getattr(self, attr)]
+                setattr(self, attr, tuple(side))
 
     def __iter__(self):
-        yield from (self.ant, self.con)
+        yield self.ant
+        yield self.con
 
     def __str__(self) -> str:
         ant_str = ', '.join(map(str, self.ant))
         con_str = ', '.join(map(str, self.con))
         return f'{ant_str}; {con_str}'
+
+    def __hash__(self):
+        """
+        What makes a sequent unique is the contents of its antecedent
+        and consequent as well as where the divider is between the two.
+        """
+        return hash(self.ant + ('|-',) + self.con)
+
+    def __eq__(self, other):
+        if not isinstance(other, Sequent):
+            return False
+        return self.ant == other.ant and self.con == other.con
 
     @property
     def is_atomic(self) -> bool:
@@ -116,21 +127,24 @@ class Sequent:
             ant = self.ant
             con = self.con[:index] + self.con[1 + index:]
         else:
-            raise ValueError(f'Parameter side must be "ant" or "con", not {side}.')
+            raise ValueError(f'Parameter "side" must be "ant" or "con", not {side}.')
         return Sequent(ant, con)
 
-    @staticmethod
-    def mix(*args) -> Self:
+    def mix(*sequents: tuple[Self] | Self) -> Self:
         """
         Return a sequent whose antecedent is the combined antecedents
-        of all sequents in args, and likewise for consequents.
+        of the input sequents, and likewise for consequents.
+
+        Can be called either as a static method or as an instance method.
+        Where s0, s1, and s2 are sequents:
+        >>> Sequent.mix(s0, s1, s2) == s0.mix(s1, s2)
+        True
+        Order matters
         """
-        new_ant = ()
-        new_con = ()
-        for arg in args:
-            new_ant = new_ant + arg.ant
-            new_con = new_con + arg.con
-        return Sequent(new_ant, new_con)
+        return Sequent(
+            ant=sum((sequent.ant for sequent in sequents), ()),
+            con=sum((sequent.con for sequent in sequents), ())
+        )
 
     def tag(self) -> str:
         """
@@ -145,17 +159,28 @@ class Sequent:
             side_map = {'ant': 'L', 'con': 'R'}
             return side_map[side] + symbol
 
-    def first_complex_prop(self) ->\
-            tuple[Proposition, str, int] | None:
+    def first_complex_prop(self) -> tuple[Proposition, str, int] | None:
         """
         Return the leftmost complex proposition in the sequent, the
         side of the sequent it's on, and its index on that side. If
         self.is_atomic, return None.
         """
+        # Check that we haven't already checked this.
+        if self._first_complex_prop is not None:
+            return self._first_complex_prop
+
+        # All these returns are to get around the fact that we want to
+        # have a nested for loop (because we both iterate and return side)
         for side in ('ant', 'con'):
             for i, prop in enumerate(getattr(self, side)):
                 if prop.complexity >= 1:
-                    return prop, side, i
+                    self._first_complex_prop = prop, side, i
+                    return self._first_complex_prop
+
+        # Explicit `return None` if self.is_atomic.
+        # I would call self.is_atomic to check, but actually the implementation
+        # here just does the same steps so if it's not atomic we would end up doing
+        # a whole loop through each proposition in each side twice.
         return None
 
     def possible_mix_parents(self) -> list[tuple[Self, Self]]:
@@ -164,8 +189,8 @@ class Sequent:
         from an application of mix or another non-invertible rule.
         """
         combinations = itertools.product(
-            utils.binary_combinations(self.ant),
-            utils.binary_combinations(self.con)
+            binary_combinations(self.ant),
+            binary_combinations(self.con)
         )
         return [
             (
@@ -175,3 +200,15 @@ class Sequent:
             for antecedents, consequents in combinations
         ]
 
+
+def binary_combinations(data: tuple) -> Generator[tuple[tuple, tuple], None, None]:
+    """
+    Yields all possible ways to split input data into two groups.
+    """
+    # Represent which parent had the proposition by allocating True
+    # to one and false to the other (in all combinations).
+    combinations = itertools.product([True, False], repeat=len(data))
+    for combination in combinations:
+        x = [data[i] for i, v in enumerate(combination) if v]
+        y = [data[i] for i, v in enumerate(combination) if not v]
+        yield tuple(x), tuple(y)

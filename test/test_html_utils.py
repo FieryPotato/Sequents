@@ -171,7 +171,11 @@ class TestHTMLification(unittest.TestCase):
     def test_atom(self) -> None:
         seq = string_to_sequent(STR_ATOM)  # A; B
         tree = sequent_to_tree(seq)
-        expected_grid_template_areas = CSS_ATOM
+        expected_grid_template_areas = [
+            ['.', 'ft'],
+            ['f', 'ft'],
+            ['f', '.'],
+        ]
         expected_objects = [
             [None, seq.tag()],
             [seq.long_string, seq.tag()],
